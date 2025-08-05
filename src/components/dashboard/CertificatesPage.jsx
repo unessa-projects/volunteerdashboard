@@ -1,6 +1,6 @@
 // src/pages/CertificatesPage.jsx
 import React, { useState, useEffect } from "react";
-import QuizOverlay from "../dashboard/QuizOverlay";
+import QuizOverlay from "./QuizOverlay";
 import axios from "axios";
 
 const CertificatesPage = () => {

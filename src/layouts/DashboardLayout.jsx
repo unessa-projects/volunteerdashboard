@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import {  AnimatePresence } from "framer-motion";
-import QuizOverlay from "../components/dashboard/QuizOverlay";
+import QuizOverlay from "../components/Dashboard/QuizOverlay";
 import Joyride, {STATUS}  from 'react-joyride';
 
 const DashboardLayout = () => {

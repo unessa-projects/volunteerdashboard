@@ -38,7 +38,7 @@ import Insights from "./components/Dashboard/Insights";
 import Donations from "./components/Dashboard/Donation";
 import Explore from "./components/Dashboard/Explore";
 import Community from "./components/Dashboard/Community";
-import CertificatesPage from "./components/dashboard/CertificatesPage";
+import CertificatesPage from "./components/Dashboard/CertificatesPage";
 
 const App = () => {
   return (
