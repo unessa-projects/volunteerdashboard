@@ -32,7 +32,7 @@ import G80Certificate from "./components/dashboard/G80Certificate";
 import TrustCertificate from "./components/dashboard/TrustCertificate";
 import ProjectKeytaab from "./components/dashboard/Projectkeytaab";
 import Learning from "./components/dashboard/Learning";
-import Emotional from "./components/dashboard/emotional";
+import Emotional from "./components/dashboard/Emotional";
 import Mental from "./components/dashboard/Mental";
 import Insights from "./components/dashboard/Insights";
 import Donations from "./components/dashboard/Donation";
