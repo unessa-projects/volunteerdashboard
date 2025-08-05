@@ -1,0 +1,6 @@
+{
+  "build": {
+    "install": "npm install --legacy-peer-deps",
+    "builder": "NIXPACKS"
+  }
+}
