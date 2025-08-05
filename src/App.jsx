@@ -19,26 +19,26 @@ import Form from "./components/Form";
 
 // Dashboard Pages
 // import Dashboard from "./components/Dashboard/Dashboard";
-import AuditReport from "./components/Dashboard/AuditReport";
-import RaiseFunds from "./components/Dashboard/RaiseFunds";
+import AuditReport from "./components/dashboard/AuditReport";
+import RaiseFunds from "./components/dashboard/RaiseFunds";
 // import ImpactCalculator from "./components/Dashboard/ImpactCalculator";
-import WhyInternship from "./components/Dashboard/WhyInternship";
-import UnderstandRole from "./components/Dashboard/UnderstandRole";
-import StartOrientation from "./components/Dashboard/StartOrientation";
-import Rewards from "./components/Dashboard/Rewards";
-import BuildConnection from "./components/Dashboard/BuildConnection";
-import CaptureAttention from "./components/Dashboard/CaptureAttention";
-import G80Certificate from "./components/Dashboard/G80Certificate";
-import TrustCertificate from "./components/Dashboard/TrustCertificate";
-import ProjectKeytaab from "./components/Dashboard/Projectkeytaab";
-import Learning from "./components/Dashboard/Learning";
-import Emotional from "./components/Dashboard/emotional";
-import Mental from "./components/Dashboard/Mental";
-import Insights from "./components/Dashboard/Insights";
-import Donations from "./components/Dashboard/Donation";
-import Explore from "./components/Dashboard/Explore";
-import Community from "./components/Dashboard/Community";
-import CertificatesPage from "./components/Dashboard/CertificatesPage";
+import WhyInternship from "./components/dashboard/WhyInternship";
+import UnderstandRole from "./components/dashboard/UnderstandRole";
+import StartOrientation from "./components/dashboard/StartOrientation";
+import Rewards from "./components/dashboard/Rewards";
+import BuildConnection from "./components/dashboard/BuildConnection";
+import CaptureAttention from "./components/dashboard/CaptureAttention";
+import G80Certificate from "./components/dashboard/G80Certificate";
+import TrustCertificate from "./components/dashboard/TrustCertificate";
+import ProjectKeytaab from "./components/dashboard/Projectkeytaab";
+import Learning from "./components/dashboard/Learning";
+import Emotional from "./components/dashboard/emotional";
+import Mental from "./components/dashboard/Mental";
+import Insights from "./components/dashboard/Insights";
+import Donations from "./components/dashboard/Donation";
+import Explore from "./components/dashboard/Explore";
+import Community from "./components/dashboard/Community";
+import CertificatesPage from "./components/dashboard/CertificatesPage";
 
 const App = () => {
   return (
