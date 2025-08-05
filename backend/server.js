@@ -5,8 +5,6 @@ import cors from 'cors';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
 
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 
 import userRoutes from './routes/userRoutes.js';

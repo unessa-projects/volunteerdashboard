@@ -18,10 +18,10 @@ import Page5 from "./components/Login/Page5";
 import Form from "./components/Form";
 
 // Dashboard Pages
-import Dashboard from "./components/Dashboard/Dashboard";
+// import Dashboard from "./components/Dashboard/Dashboard";
 import AuditReport from "./components/Dashboard/AuditReport";
 import RaiseFunds from "./components/Dashboard/RaiseFunds";
-import ImpactCalculator from "./components/Dashboard/ImpactCalculator";
+// import ImpactCalculator from "./components/Dashboard/ImpactCalculator";
 import WhyInternship from "./components/Dashboard/WhyInternship";
 import UnderstandRole from "./components/Dashboard/UnderstandRole";
 import StartOrientation from "./components/Dashboard/StartOrientation";

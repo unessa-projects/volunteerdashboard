@@ -5,7 +5,7 @@ import ImpactCalculator from "./ImpactCalculator";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [daysLeft, setDaysLeft] = useState(30);
+  const [, setDaysLeft] = useState(30);
 
   useEffect(() => {
     const savedStartDate = localStorage.getItem("startDate");

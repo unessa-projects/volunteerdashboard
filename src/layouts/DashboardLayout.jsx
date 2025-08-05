@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {  AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import Joyride, {STATUS}  from 'react-joyride';
 
@@ -69,7 +69,7 @@ const DashboardLayout = () => {
 
 
 
-  const storedUser = JSON.parse(localStorage.getItem("googleUser"));
+  // const storedUser = JSON.parse(localStorage.getItem("googleUser"));
 const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
 const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => {
@@ -77,7 +77,7 @@ const [showQuiz, setShowQuiz] = useState(false);
     return saved || "notAttempted"; // 'passed' | 'failed' | 'notAttempted'
   });
   
-  const [showStartButton, setShowStartButton] = useState(true);
+  const [, setShowStartButton] = useState(true);
   
   useEffect(() => {
     if (quizStatus === "failed") {
