@@ -115,7 +115,7 @@ const [showQuiz, setShowQuiz] = useState(false);
       setTimeout(() => setShowTour(true), 500);
   
       // Mark tour as seen in backend
-      fetch("http://localhost:5000/api/users/mark-tour-seen", {
+      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email })

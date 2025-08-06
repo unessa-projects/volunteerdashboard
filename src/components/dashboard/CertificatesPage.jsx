@@ -15,7 +15,7 @@ const CertificatesPage = () => {
 
   useEffect(() => {
     if (user?.email) {
-      axios.get(`http://localhost:5000/api/users/quiz-status/${user.email}`)
+      axios.get(`https://unessa-backend.onrender.com/api/users/quiz-status/${user.email}`)
         .then(res => setQuizStatus(res.data.quizStatus))
         .catch(() => setQuizStatus("notAttempted"));
     }
@@ -42,7 +42,7 @@ const CertificatesPage = () => {
         {hasPassed ? (
           // Show Download Button if Passed
           <a
-            href={`http://localhost:5000/offer-${user._id}.pdf`}
+            href={`https://unessa-backend.onrender.com/offer-${user._id}.pdf`}
             target="_blank"
             rel="noopener noreferrer"
             download

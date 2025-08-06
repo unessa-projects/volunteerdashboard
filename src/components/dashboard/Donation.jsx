@@ -18,7 +18,7 @@ function Donation() {
         return;
       }
 
-      const res = await axios.get(`http://localhost:5000/api/donations`, {
+      const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
         params: { username }
       });
 

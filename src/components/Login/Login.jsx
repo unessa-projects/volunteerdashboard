@@ -15,7 +15,7 @@ const Login = () => {
     localStorage.setItem("name", name);
 
     // Step 1: Check if user exists
-    const res = await fetch("http://localhost:5000/api/users/check", {
+    const res = await fetch("https://unessa-backend.onrender.com/api/users/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -25,11 +25,11 @@ const Login = () => {
 
     if (data.exists) {
       // Step 2: Fetch full user details
-      const userRes = await fetch(`http://localhost:5000/api/users/getUser/${email}`);
+      const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/getUser/${email}`);
       const userData = await userRes.json();
     
       // ✅ Fetch quiz status from backend
-      const quizRes = await fetch(`http://localhost:5000/api/users/quiz-status/${email}`);
+      const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
       const quizData = await quizRes.json();
       localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
     

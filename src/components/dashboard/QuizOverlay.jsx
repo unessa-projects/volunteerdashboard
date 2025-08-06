@@ -46,14 +46,14 @@ const QuizOverlay = ({ user, onComplete }) => {
         setQuizResult("⏳ Please wait, your offer letter is being generated...");
       
         // Generate offer letter
-        await axios.post("http://localhost:5000/offer/generate-offer", {
+        await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
           userId: user._id,
           email: user.email,
           name: user.name,
         });
       
         // ✅ Save quiz status to backend
-        await axios.post("http://localhost:5000/api/users/quiz-status", {
+        await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
           email: user.email,
           status: "passed",
         });
@@ -67,7 +67,7 @@ const QuizOverlay = ({ user, onComplete }) => {
         setTimeout(() => onComplete("passed"), 5000);
       } else {
         // Save failed status
-        await axios.post("http://localhost:5000/api/users/update-quiz-status", {
+        await axios.post("https://unessa-backend.onrender.com/api/users/update-quiz-status", {
           email: user.email,
           quizStatus: "failed",
         });
