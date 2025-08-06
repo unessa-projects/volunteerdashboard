@@ -17,11 +17,11 @@ import Page4 from "./components/Login/Page4";
 import Page5 from "./components/Login/Page5";
 import Form from "./components/Form";
 
-// Dashboard Pages
-// import Dashboard from "./components/Dashboard/Dashboard";
+
+import Dashboard from "./components/dashboard/Dashboard";
 import AuditReport from "./components/dashboard/AuditReport";
 import RaiseFunds from "./components/dashboard/RaiseFunds";
-// import ImpactCalculator from "./components/Dashboard/ImpactCalculator";
+import ImpactCalculator from "./components/dashboard/ImpactCalculator";
 import WhyInternship from "./components/dashboard/WhyInternship";
 import UnderstandRole from "./components/dashboard/UnderstandRole";
 import StartOrientation from "./components/dashboard/StartOrientation";
