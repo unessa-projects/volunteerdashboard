@@ -19,7 +19,7 @@ const Page4 = () => {
   {/* Logo */}
   <div className="absolute top-6 sm:top-8 md:top-10 left-1/2 transform -translate-x-1/2">
     <img
-      src="/logo.png"
+      src="/llogo.png"
       alt="Unessa Foundation Logo"
       className="object-contain w-24 sm:w-28 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
     />

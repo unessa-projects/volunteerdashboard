@@ -74,7 +74,7 @@ const Avatar = () => {
     <div className="min-h-screen bg-[#F4F9F8] bg-cover bg-center flex justify-center items-center px-4">
       <div className="absolute top-4 sm:top-6 md:top-8 left-1/2 transform -translate-x-1/2">
         <img
-          src="/logo.png"
+          src="/llogo.png"
           alt="Unessa Foundation Logo"
           className="w-20 sm:w-24 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
         />

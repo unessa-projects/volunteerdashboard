@@ -25,7 +25,7 @@ const Name = () => {
   {/* Logo */}
   <div className="absolute top-8 sm:top-10 md:top-12 left-1/2 transform -translate-x-1/2">
     <img
-      src="/logo.png"
+      src="/llogo.png"
       alt="Unessa Foundation Logo"
       className="object-contain w-24 sm:w-28 md:w-32 lg:w-36 xl:w-40 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
     />

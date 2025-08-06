@@ -87,7 +87,7 @@ const Login = () => {
     <div className="h-screen bg-[#F4F9F8] flex justify-center items-center relative">
       {/* Logo */}
       <img
-        src="/logo.png"
+        src="/llogo.png"
         alt="Unessa Foundation Logo"
         className="w-32 h-auto absolute top-6 left-1/2 transform -translate-x-1/2 opacity-95"
       />
