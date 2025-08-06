@@ -5,7 +5,7 @@ const Page1 = () => {
   const navigate = useNavigate();
 
   const handleNext = () => {
-    navigate("/page2");
+    navigate("/page3");
   };
 
   return (
@@ -23,14 +23,19 @@ const Page1 = () => {
     {/* Text and Button */}
     <div className="relative text-center max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl w-full flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12 mt-28 sm:mt-32 md:mt-36">
       <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-[#333333] leading-relaxed px-2">
-        This is an opportunity to support{" "}
-        <span className="font-bold">quality education</span>,{" "}
-        <span className="font-bold">social emotional learning</span> &{" "}
-        <span className="font-bold">mental well-being</span> of over{" "}
-        <span className="font-bold">1500 underprivileged children</span> plus master the{" "}
-        <span className="font-bold">art of expression</span> to learn a{" "}
-        <span className="font-bold">21st century must-have skill</span> & become the{" "}
-        <span className="font-bold">voice of our cause</span>.
+      
+        <span className="font-bold">Step Into Purpose. Speak for Change.</span>,{" "}
+        <span>Join a powerful movement to uplift</span> {" "}
+        <span className="font-bold">1500+ underprivileged children</span> &{" "}
+        <span>through</span>{" "}
+        <span className="font-bold">quality education, emotional wellness,</span> and {" "}
+        <span className="font-bold">self-expression.
+        </span> plus master the{" "} <br />
+        <span>This isn’t just an internship—it’s your chance to</span>{" "}
+        <span className="font-bold">build real-world impact,</span> grow the {" "}
+        <span className="font-bold">skill of storytelling,</span>  and become the {" "}
+        <span className="font-bold">voice that drives transformation in the 21st century.</span>.<br />
+        <span className="font-bold">💙 Let your journey of impact begin now.</span>
       </p>
   
       <button

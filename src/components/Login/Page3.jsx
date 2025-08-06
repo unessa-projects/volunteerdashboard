@@ -28,17 +28,23 @@ const Page3 = () => {
 
     {/* Heading */}
     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] leading-snug">
-      Be the face of <span className="italic">Unessa</span>
+    Be the Voice of <span className="italic">Unessa</span>
     </h1>
 
     {/* Subheading */}
     <p className="text-base sm:text-lg md:text-xl text-[#333333] font-medium">
-      Represent our cause with enthusiasm, sincerity, and professionalism.
+    This is more than a role — it’s a <span className="font-bold">responsibility </span>to champion hope, education, and emotional well-being for those who need it most.
+
     </p>
 
     {/* Disclaimer */}
     <p className="text-sm sm:text-base md:text-lg text-[#333333]">
-      If you are not ready to give it your best shot, no hard feelings — but this might not be for you.
+    If you're ready to lead with <span className="font-bold">passion, empathy, and purpose,</span> let’s create change together.
+    </p>
+
+
+    <p className="text-sm sm:text-base md:text-lg text-[#333333]">
+    But if you're unsure, no worries — our cause needs commitment, not half-measures.
     </p>
 
     {/* Button */}
@@ -49,7 +55,7 @@ const Page3 = () => {
                  rounded-xl text-base sm:text-lg md:text-xl font-semibold
                  hover:bg-[#1ca496] hover:scale-105 transition duration-300"
     >
-      I am ready
+      Yes, I’m All In
     </button>
 
   </div>

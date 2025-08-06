@@ -30,10 +30,15 @@ const Page4 = () => {
 
     {/* Heading */}
     <h4 className="text-[#333333] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
-      During this internship, you will be required to reach out to your personal network,
-      <br className="hidden sm:block" />
-      tell them about the cause and raise funds.
+    As part of this internship, you’ll help us spread the word and raise funds.
+
     </h4>
+
+    <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-[#333333] leading-relaxed px-2">
+      <span>This means reaching out to your personal network, sharing our mission, and supporting the cause.</span>
+      <span>If you're ready to make a difference—we're excited to have you!</span>
+
+    </p>
 
     {/* Buttons */}
     <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
