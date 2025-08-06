@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const rewards = [
   {
-    title: "VIBE",
+    title: "VIBE - Setting the tone for change",
     amount: "₹1,000 - ₹5,000",
     perks: [
       "20% Stipend",
@@ -14,7 +14,7 @@ const rewards = [
     textColor: "text-white"
   },
   {
-    title: "MOMENTUM",
+    title: "MOMENTUM - Building serious impact",
     amount: "₹5,000 - ₹15,000",
     perks: [
       "20% Stipend",
@@ -27,7 +27,7 @@ const rewards = [
     textColor: "text-white"
   },
   {
-    title: "CATALYST",
+    title: "CATALYST - You're the game-changer",
     amount: "₹15,000 - ₹30,000",
     perks: [
       "20% Stipend",
@@ -42,16 +42,17 @@ const rewards = [
     textColor: "text-white"
   },
   {
-    title: "ICON",
+    title: "ICON - A true legend, inspiring ultimate change",
     amount: "₹30,000+",
     perks: [
+      
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
       "Internship Opportunity (As per intern's qualifications and vacancy)",
-      "Letter of Recommendation from President of Muskurahat"
+      "Letter of Recommendation from Founder of Unessa"
     ],
     bgColor: "bg-[#eca90e]/85",
     borderColor: "border-teal-300",
