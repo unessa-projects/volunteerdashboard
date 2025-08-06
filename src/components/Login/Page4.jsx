@@ -14,34 +14,40 @@ const Page4 = () => {
   };
 
   return (
-    <div className="min-h-screen  bg-[#F4F9F8] bg-cover bg-center flex justify-center items-center relative px-4 sm:px-6">
+    <div className="relative min-h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6">
+
   {/* Logo */}
-  <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
+  <div className="absolute top-6 sm:top-8 md:top-10 left-1/2 transform -translate-x-1/2">
     <img
       src="/logo.png"
       alt="Unessa Foundation Logo"
-      className="w-24 sm:w-28 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
+      className="object-contain w-24 sm:w-28 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
     />
   </div>
 
   {/* Content Box */}
-  <div className="text-center w-full max-w-4xl space-y-6 sm:space-y-8 mt-32 sm:mt-40">
+  <div className="relative text-center w-full max-w-4xl flex flex-col gap-6 sm:gap-8 mt-28 sm:mt-36 md:mt-40">
+
+    {/* Heading */}
     <h4 className="text-[#333333] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
-      During this internship, you will be required to reach out to your personal network,<br className="hidden sm:block" />
+      During this internship, you will be required to reach out to your personal network,
+      <br className="hidden sm:block" />
       tell them about the cause and raise funds.
     </h4>
 
     {/* Buttons */}
     <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
       <button
-        className="bg-[#21B6A8] text-[#333333] px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-lg sm:text-xl font-semibold hover:bg-[#85e1d7] transition duration-300"
         onClick={handleAccept}
+        className="bg-[#21B6A8] text-[#333333] px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-lg sm:text-xl font-semibold
+                   hover:bg-[#1ca496] hover:scale-105 transition duration-300"
       >
         I Accept
       </button>
       <button
-        className="bg-gray-400 text-[#333333] px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-lg sm:text-xl font-semibold hover:bg-gray-500 transition duration-300"
         onClick={handleReject}
+        className="bg-gray-400 text-[#333333] px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-lg sm:text-xl font-semibold
+                   hover:bg-gray-500 hover:scale-105 transition duration-300"
       >
         I Don’t Accept
       </button>
@@ -55,6 +61,7 @@ const Page4 = () => {
     )}
   </div>
 </div>
+
 
   );
 };

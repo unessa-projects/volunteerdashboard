@@ -71,51 +71,56 @@ const Avatar = () => {
 };
 
   return (
-    <div className="min-h-screen bg-[#F4F9F8] bg-cover bg-center flex justify-center items-center px-4">
-      <div className="absolute top-4 sm:top-6 md:top-8 left-1/2 transform -translate-x-1/2">
+    <div className="relative min-h-screen bg-[#F4F9F8] bg-cover bg-center flex justify-center items-center px-4">
+  {/* Logo */}
+  <div className="absolute top-4 sm:top-6 md:top-8 left-1/2 transform -translate-x-1/2">
+    <img
+      src="/logo.png"
+      alt="Unessa Foundation Logo"
+      className="w-20 sm:w-24 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
+    />
+  </div>
+
+  {/* Avatar Container */}
+  <div className="relative bg-transparent border-none shadow-none w-full max-w-[90%] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl space-y-6 sm:space-y-8">
+    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#333333]">
+      Choose Your Avatar
+    </h1>
+
+    {/* Avatar Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
+      {avatarList.map((avatar, index) => (
         <img
-          src="/logo.png"
-          alt="Unessa Foundation Logo"
-          className="w-20 sm:w-24 md:w-32 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
+          key={index}
+          src={avatar}
+          alt={`Avatar ${index + 1}`}
+          onClick={() => debounceSelect(avatar)}
+          className={`object-cover w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28 rounded-full border-4 cursor-pointer transition duration-300 ${
+            selected === avatar
+              ? "border-[#333333] scale-110"
+              : "border-transparent hover:scale-105"
+          }`}
         />
-      </div>
-
-      <div className="bg-transparent border-none shadow-none w-full max-w-[90%] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl space-y-6 sm:space-y-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-[#333333]">
-          Choose Your Avatar
-        </h1>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
-          {avatarList.map((avatar, index) => (
-            <img
-              key={index}
-              src={avatar}
-              alt={`Avatar ${index + 1}`}
-              onClick={() => handleSelect(avatar)}
-              className={`w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28 rounded-full border-4 cursor-pointer transition duration-300 ${
-                selected === avatar
-                  ? "border-[#333333] scale-110"
-                  : "border-transparent hover:scale-105"
-              }`}
-            />
-          ))}
-        </div>
-
-        <div className="text-center">
-          <button
-            className={`px-6 sm:px-8 md:px-10 py-3 sm:py-4 text-lg sm:text-xl md:text-2xl font-bold rounded-xl md:rounded-2xl transition duration-300 ${
-              selected
-                ? "bg-[#21B6A8] text-[#333333] hover:bg-[#21B6A8]"
-                : "bg-[#21B6A8] text-[#333333] cursor-not-allowed"
-            }`}
-            disabled={!selected}
-            onClick={handleContinue}
-          >
-            Finish
-          </button>
-        </div>
-      </div>
+      ))}
     </div>
+
+    {/* Finish Button */}
+    <div className="text-center">
+      <button
+        className={`px-6 sm:px-8 md:px-10 py-3 sm:py-4 text-lg sm:text-xl md:text-2xl font-bold rounded-xl md:rounded-2xl transition duration-300 ${
+          selected
+            ? "bg-[#21B6A8] text-[#333333] hover:bg-[#21B6A8]"
+            : "bg-[#21B6A8] text-[#333333] cursor-not-allowed"
+        }`}
+        disabled={!selected}
+        onClick={handleContinue}
+      >
+        Finish
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 };
 
