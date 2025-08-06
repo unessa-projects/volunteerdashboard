@@ -23,7 +23,11 @@ export const generateAndSendOffer = async (req, res) => {
     let html = fs.readFileSync(templatePath, "utf8");
     html = html.replace(/{{name}}/g, name).replace(/{{date}}/g, date);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      executablePath: puppeteer.executablePath(), // Ensure Puppeteer uses the downloaded Chrome
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: true,
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 

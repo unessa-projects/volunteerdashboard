@@ -28,7 +28,12 @@ const razorpay = new Razorpay({
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://volunteerdashboard-production.up.railway.app", // No trailing slash
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
 app.use((req, res, next) => {
   if (req.originalUrl === "/api/webhook") {
     next(); // Skip body parser for webhook
