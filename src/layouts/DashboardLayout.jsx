@@ -314,7 +314,8 @@ const [showQuiz, setShowQuiz] = useState(false);
                     <Users size={18} /> Learning
                   </Link>
 
-                  <Link to="/certificates" className={linkClass("/certificates")}>
+                  <Link to="/certificates" className={linkClass("/certificates")}
+                    onClick={() => setIsMobileMenuOpen(false)}>
   <Download size={20} /> Download Certificates
 </Link>
                 </nav>
