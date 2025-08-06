@@ -72,7 +72,7 @@ const ImpactCalculator = () => {
   }, []);
 
   const handleCopyLink = () => {
-    const baseURL = "http://localhost:5173/form";
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username");
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     navigator.clipboard.writeText(finalURL);
@@ -81,7 +81,7 @@ const ImpactCalculator = () => {
   };
 
   const handleShare = () => {
-    const baseURL = "http://localhost:5173/form";
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username");
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
 
