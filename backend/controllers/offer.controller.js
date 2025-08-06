@@ -3,7 +3,8 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 import User from "../models/User.js";
-import puppeteer from "puppeteer";
+// import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,11 +24,11 @@ export const generateAndSendOffer = async (req, res) => {
     let html = fs.readFileSync(templatePath, "utf8");
     html = html.replace(/{{name}}/g, name).replace(/{{date}}/g, date);
 
-    const browser = await puppeteer.launch({
-      executablePath: puppeteer.executablePath(), // Ensure Puppeteer uses the downloaded Chrome
+    const browser = await chromium.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: true,
     });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
