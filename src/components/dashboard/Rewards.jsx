@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 
 const rewards = [
   {
-    title: "VIBE - Setting the tone for change",
+    title: "VIBE",
     amount: "₹1,000 - ₹5,000",
     perks: [
+      "- Setting the tone for change",
       "20% Stipend",
       "Certificate of completion"
     ],
@@ -14,9 +15,10 @@ const rewards = [
     textColor: "text-white"
   },
   {
-    title: "MOMENTUM - Building serious impact",
+    title: "MOMENTUM",
     amount: "₹5,000 - ₹15,000",
     perks: [
+      "- Building serious impact",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
@@ -30,6 +32,7 @@ const rewards = [
     title: "CATALYST - You're the game-changer",
     amount: "₹15,000 - ₹30,000",
     perks: [
+      "- You're the game-changer",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
@@ -45,7 +48,7 @@ const rewards = [
     title: "ICON - A true legend, inspiring ultimate change",
     amount: "₹30,000+",
     perks: [
-      
+      "- A true legend, inspiring ultimate change",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
