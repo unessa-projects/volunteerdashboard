@@ -8,11 +8,11 @@ const rewards = [
     perks: [
       "- Setting the tone for change",
       "20% Stipend",
-      "Certificate of completion"
+      "Certificate of completion",
     ],
-    bgColor: "bg-[#eca90e]/85 ",
-    borderColor: "border-indigo-300",
-    textColor: "text-white"
+    bgColor: "bg-gradient-to-br from-yellow-400 to-orange-400",
+    borderColor: "border-yellow-300",
+    textColor: "text-gray-900",
   },
   {
     title: "MOMENTUM",
@@ -22,14 +22,14 @@ const rewards = [
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
-      "Certificate for Crowdfunding course"
+      "Certificate for Crowdfunding course",
     ],
-    bgColor: "bg-[#eca90e]/85",
+    bgColor: "bg-gradient-to-br from-indigo-500 to-purple-500",
     borderColor: "border-purple-300",
-    textColor: "text-white"
+    textColor: "text-white",
   },
   {
-    title: "CATALYST - You're the game-changer",
+    title: "CATALYST",
     amount: "₹15,000 - ₹30,000",
     perks: [
       "- You're the game-changer",
@@ -38,14 +38,14 @@ const rewards = [
       "LinkedIn recommendation from our President",
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
-      "Internship Opportunity (As per intern's qualifications and vacancy)"
+      "Internship Opportunity (As per intern's qualifications and vacancy)",
     ],
-    bgColor: "bg-[#eca90e]/85",
+    bgColor: "bg-gradient-to-br from-blue-500 to-cyan-400",
     borderColor: "border-blue-300",
-    textColor: "text-white"
+    textColor: "text-white",
   },
   {
-    title: "ICON - A true legend, inspiring ultimate change",
+    title: "ICON",
     amount: "₹30,000+",
     perks: [
       "- A true legend, inspiring ultimate change",
@@ -55,13 +55,14 @@ const rewards = [
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
       "Internship Opportunity (As per intern's qualifications and vacancy)",
-      "Letter of Recommendation from Founder of Unessa"
+      "Letter of Recommendation from Founder of Unessa",
     ],
-    bgColor: "bg-[#eca90e]/85",
-    borderColor: "border-teal-300",
-    textColor: "text-white"
+    bgColor: "bg-gradient-to-br from-pink-500 to-red-400",
+    borderColor: "border-pink-300",
+    textColor: "text-white",
   },
 ];
+
 
 const Rewards = () => {
   const containerVariants = {
