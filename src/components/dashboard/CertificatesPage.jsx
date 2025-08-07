@@ -42,7 +42,7 @@ const CertificatesPage = () => {
         {hasPassed ? (
           // Show Download Button if Passed
           <a
-            href={`https://unessa-backend.onrender.com/offer-${user._id}.pdf`}
+            href={`https://unessa-backend.onrender.com/offer/offer-letter/${user._id}`}
             target="_blank"
             rel="noopener noreferrer"
             download

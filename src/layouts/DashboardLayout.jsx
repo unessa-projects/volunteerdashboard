@@ -18,6 +18,8 @@ const DashboardLayout = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("googleUser"));
     if (user?.avatar) setAvatar(user.avatar);
@@ -112,7 +114,7 @@ const [showQuiz, setShowQuiz] = useState(false);
     const isNewUser = localStorage.getItem("isNewUser");
   
     if (isNewUser === "true") {
-      setTimeout(() => setShowTour(true), 500);
+      const tourTimer= setTimeout(() => setShowTour(true), 500);
   
       // Mark tour as seen in backend
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
@@ -123,6 +125,7 @@ const [showQuiz, setShowQuiz] = useState(false);
   
       // Prevent tour from showing again
       localStorage.setItem("isNewUser", "false");
+      return ( )=> clearTimeout(tourTimer);
     }
   }, []);
   
