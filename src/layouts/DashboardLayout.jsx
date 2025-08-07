@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
-import Joyride, {STATUS}  from 'react-joyride';
+import Joyride, { CallBackProps, STATUS, Step}  from 'react-joyride';
 
 
 
@@ -77,7 +77,7 @@ const DashboardLayout = () => {
 
 
   // const storedUser = JSON.parse(localStorage.getItem("googleUser"));
-const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
+// const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
 const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => {
     const saved = localStorage.getItem("quizStatus");
@@ -106,88 +106,107 @@ const [showQuiz, setShowQuiz] = useState(false);
     }
     setShowQuiz(false);
   };
-  
-  const [showTour, setShowTour] = useState(false);
-  
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("googleUser") || "{}");
-    const isNewUser = localStorage.getItem("isNewUser");
-  
-    if (isNewUser === "true") {
-      const tourTimer= setTimeout(() =>{
-        setShowTour(true);
-      }, 1000);
-  
-      // Mark tour as seen in backend
-      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email })
-      });
-  
-      // Prevent tour from showing again
-      localStorage.setItem("isNewUser", "false");
-      return ()=> clearTimeout(tourTimer);
-    }
-  }, []);
-  
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setUser(JSON.parse(localStorage.getItem("googleUser") || "{}"));
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-  
-  // const [runTour, setRunTour] = useState(false);
 
   const isMobile = window.innerWidth < 1024;
-  const commonSteps = [
-    { target: '[data-tour-id="tour-internship-journey"]', content: "Explore your internship journey and steps to success." },
-    { target: '[data-tour-id="tour-our-credentials"]', content: "View our credentials to learn more about our authenticity." },
-    { target: '[data-tour-id="tour-learn-uneesa"]', content: "Discover Uneesa's key initiatives and projects." },
-  ];
-  const steps = isMobile
-    ? [
-        { target: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-        { target: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
-        { target: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
-        { target: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-        ...commonSteps,
-      ]
-    : [
-        { target: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-        { target: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
-        { target: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
-        { target: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-        ...commonSteps,
-      ];
+
+const steps = (isMobile
+  ? [
+      {
+        target: '[data-tour-id="tour-avatar-mobile"]',
+        content: "This is your profile avatar. Click here to manage your account and logout.",
+      },
+      {
+        target: '[data-tour-id="tour-home-mobile"]',
+        content: "Go back to your dashboard anytime by clicking Home.",
+      },
+      {
+        target: '[data-tour-id="tour-insights-mobile"]',
+        content: "Check analytics and insights about your impact here.",
+      },
+      {
+        target: '[data-tour-id="tour-donations-mobile"]',
+        content: "Track and manage donations here.",
+      },
+    ]
+  : [
+      {
+        target: '[data-tour-id="tour-avatar-desktop"]',
+        content: "This is your profile avatar. Click here to manage your account and logout.",
+      },
+      {
+        target: '[data-tour-id="tour-home-desktop"]',
+        content: "Go back to your dashboard anytime by clicking Home.",
+      },
+      {
+        target: '[data-tour-id="tour-insights-desktop"]',
+        content: "Check analytics and insights about your impact here.",
+      },
+      {
+        target: '[data-tour-id="tour-donations-desktop"]',
+        content: "Track and manage donations here.",
+      },
+    ]
+).map((step) => ({
+  ...step,
+  disableBeacon: true, // ✅ disables the "trigger" dot
+}));
+
+const [showTour, setShowTour] = useState(false);
+const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("googleUser") || "{}"));
+
+// ✅ Tour logic
+useEffect(() => {
+  const isNewUser = localStorage.getItem("isNewUser");
+
+  if (isNewUser === "true") {
+    const tourTimer = setTimeout(() => {
+      setShowTour(true);
+    }, 1000); // ✅ Delay to allow UI to render
+
+    // ✅ Mark tour as seen in backend
+    fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email }),
+    });
+
+    localStorage.setItem("isNewUser", "false");
+
+    return () => clearTimeout(tourTimer);
+  }
+}, [user.email]); // ✅ make sure user is available
+
+// ✅ Optional: Keep user state in sync with localStorage
+useEffect(() => {
+  const handleStorageChange = () => {
+    setUser(JSON.parse(localStorage.getItem("googleUser") || "{}"));
+  };
+  window.addEventListener("storage", handleStorageChange);
+  return () => window.removeEventListener("storage", handleStorageChange);
+}, []);
+  // const [runTour, setRunTour] = useState(false);
+
+ 
+  // const commonSteps = [
+  //   { target: '[data-tour-id="tour-internship-journey"]', content: "Explore your internship journey and steps to success." },
+  //   { target: '[data-tour-id="tour-our-credentials"]', content: "View our credentials to learn more about our authenticity." },
+  //   { target: '[data-tour-id="tour-learn-uneesa"]', content: "Discover Uneesa's key initiatives and projects." },
+  // ];
+
   
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
 
-<Joyride
-  // text="Welcome to uneessa Foundation."
-    steps={steps}
-    run={true}
-    continuous
-    scrollToFirstStep
-    showProgress
-    showSkipButton  callback={(data) => {
-      const { status } = data;
-      const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-  
-      if (finishedStatuses.includes(status)) {
-        setShowQuiz(true);  // 🎯 Show quiz after tour
-      }
-    }}
-    styles={{
-      options: {
-        zIndex: 10000,
-      },
-    }}
-  />
+<Tour
+  steps={steps}
+  isOpen={showTour} // This is `true` when `isNewUser === "true"`
+  onRequestClose={() => setShowTour(false)}
+  showNavigation={true}
+  showCloseButton={true}
+  showButtons={true}
+  disableInteraction={false}
+/>
 
       {/* Mobile Header */}
       <motion.header 
