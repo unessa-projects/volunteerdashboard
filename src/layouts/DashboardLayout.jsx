@@ -4,7 +4,7 @@ import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Down
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import Joyride, { CallBackProps, STATUS, Step}  from 'react-joyride';
-import Tour from 'reactour';
+import { Tour } from '@reactour/tour';
 
 
 
