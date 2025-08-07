@@ -14,10 +14,10 @@ const Page4 = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-12">
   
-      {/* Logo */}
-      <div className="absolute top-4 sm:top-6 md:top-8 left-1/2 transform -translate-x-1/2">
+      {/* Logo - relative and responsive */}
+      <div className="mb-10 sm:mb-12 md:mb-16">
         <img
           src="/llogo.png"
           alt="Unessa Foundation Logo"
@@ -26,17 +26,21 @@ const Page4 = () => {
       </div>
   
       {/* Content Box */}
-      <div className="relative text-center w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl flex flex-col gap-6 sm:gap-8 mt-32 sm:mt-40">
+      <div className="text-center w-full max-w-[95%] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl flex flex-col gap-6 sm:gap-8 px-2 sm:px-4">
   
         {/* Heading */}
-        <h4 className="text-[#333333] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-snug px-2 sm:px-4">
+        <h4 className="text-[#333333] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
           As part of this internship, you’ll help us spread the word and raise funds.
         </h4>
   
         {/* Paragraph */}
-        <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#333333] leading-relaxed px-2 sm:px-4">
-          <span className="block mb-2">This means reaching out to your personal network, sharing our mission, and supporting the cause.</span>
-          <span className="block">If you're ready to make a difference — we're excited to have you!</span>
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#333333] leading-relaxed">
+          <span className="block mb-2">
+            This means reaching out to your personal network, sharing our mission, and supporting the cause.
+          </span>
+          <span className="block">
+            If you're ready to make a difference — we're excited to have you!
+          </span>
         </p>
   
         {/* Buttons */}
@@ -67,6 +71,7 @@ const Page4 = () => {
       </div>
     </div>
   );
+  
   
 };
 

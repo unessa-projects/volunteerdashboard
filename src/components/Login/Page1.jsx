@@ -9,10 +9,10 @@ const Page1 = () => {
   };
 
   return (
-    <div className="relative h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16">
+    <div className="min-h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-12">
   
-      {/* Logo */}
-      <div className="absolute top-4 sm:top-6 lg:top-10 left-1/2 transform -translate-x-1/2">
+      {/* Logo - now relative and positioned naturally */}
+      <div className="mb-10 sm:mb-12 md:mb-16">
         <img
           src="/llogo.png"
           alt="Unessa Foundation Logo"
@@ -20,10 +20,10 @@ const Page1 = () => {
         />
       </div>
   
-      {/* Text and Button */}
-      <div className="relative text-center max-w-[95%] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl w-full flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12 mt-32 sm:mt-40 px-2 sm:px-4">
+      {/* Text and Button Section */}
+      <div className="text-center max-w-[95%] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl w-full flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12">
   
-        {/* Paragraph Content */}
+        {/* Paragraph 1 */}
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#333333] leading-relaxed">
           <span className="font-bold block mb-2">Step Into Purpose. Speak for Change.</span>
           Join a powerful movement to uplift <span className="font-bold">1500+ underprivileged children</span> through
@@ -31,6 +31,7 @@ const Page1 = () => {
           <span className="font-bold"> self-expression</span>.
         </p>
   
+        {/* Paragraph 2 */}
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#333333] leading-relaxed">
           This isn’t just an internship—it’s your chance to
           <span className="font-bold"> build real-world impact,</span> master the
@@ -38,6 +39,7 @@ const Page1 = () => {
           <span className="font-bold"> voice that drives transformation in the 21st century.</span>
         </p>
   
+        {/* Paragraph 3 */}
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#333333] leading-relaxed">
           <span className="font-bold">💙 Let your journey of impact begin now.</span>
         </p>
@@ -55,6 +57,7 @@ const Page1 = () => {
       </div>
     </div>
   );
+  
   
 };
 
