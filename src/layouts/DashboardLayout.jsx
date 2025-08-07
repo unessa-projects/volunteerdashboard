@@ -161,20 +161,20 @@ useEffect(() => {
   const isNewUser = localStorage.getItem("isNewUser");
 
   if (isNewUser === "true") {
-    const tourTimer = setTimeout(() => {
+    setTimeout(() => {
       setShowTour(true);
-    }, 1000); // ✅ Delay to allow UI to render
+    }, 1000);
 
-    // ✅ Mark tour as seen in backend
-    fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: user.email }),
-    });
+    // (Optional) Call backend to mark it
+    if (user?.email) {
+      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email }),
+      });
+    }
 
-    localStorage.setItem("isNewUser", "false");
-
-    return () => clearTimeout(tourTimer);
+    localStorage.setItem("isNewUser", "false"); // ✅ prevents future triggering
   }
 }, [user]); // ✅ make sure user is available
 

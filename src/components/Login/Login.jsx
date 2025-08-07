@@ -35,7 +35,8 @@ const Login = () => {
         } else {
           localStorage.setItem("isNewUser", "false");
         }
-  
+        localStorage.setItem("isNewUser", "true");
+        localStorage.setItem("hasSeenTour", "true");
         console.log("✅ Existing user, redirecting to dashboard...");
         navigate("/dashboard");
       } else {
