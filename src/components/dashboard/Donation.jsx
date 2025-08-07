@@ -23,6 +23,12 @@ function Donation() {
       });
 
       setPayments(res.data);
+      // Sum all payments
+const totalAmount = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+
+// Store in localStorage (optional, or just pass as prop)
+localStorage.setItem("googleUser", JSON.stringify({ amount: totalAmount }));
+
       setLoading(false);
     } catch (err) {
       console.error('Error fetching donations:', err);
@@ -65,7 +71,8 @@ function Donation() {
       variants={containerVariants}
       className="p-4 md:p-6 bg-[#043238] min-h-screen"
     >
-      <ImpactCalculator />
+      <ImpactCalculator amountFromServer={totalAmount} />
+
       
       <motion.h2 
         className="text-2xl md:text-3xl font-bold text-white mb-6"

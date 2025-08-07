@@ -50,32 +50,21 @@ const FullCircleProgressBar = ({ percentage }) => {
   );
 };
 
-const ImpactCalculator = () => {
+const ImpactCalculator = ({ amountFromServer = 0 }) => {
   const [progress, setProgress] = useState(0);
-  const [amount, setAmount] = useState(0);
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
   useEffect(() => {
+    const calculated = Math.min(Math.round((amountFromServer / target) * 100), 100);
+    let start = 0;
     const interval = setInterval(() => {
-      const user = JSON.parse(localStorage.getItem("googleUser"));
-      if (user?.amount && user.amount !== amount) {
-        setAmount(user.amount);
-        const calculated = Math.min(Math.round((user.amount / target) * 100), 100);
-        setProgress(0);
-  
-        let start = 0;
-        const animInterval = setInterval(() => {
-          start += 1;
-          setProgress(start);
-          if (start >= calculated) clearInterval(animInterval);
-        }, 15);
-      }
-    }, 1000); // check every second
-  
+      start += 1;
+      setProgress(start);
+      if (start >= calculated) clearInterval(interval);
+    }, 15);
     return () => clearInterval(interval);
-  }, [amount]);
-  
+  }, [amountFromServer]);
 
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
@@ -98,13 +87,15 @@ const ImpactCalculator = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row bg-[#096d7d33]  shadow-lg overflow-hidden text-white p-9 md:p-10">
+    <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
       {/* Left: Text & Buttons */}
       <div className="md:w-1/2 w-full flex flex-col justify-center items-start gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Your Impact Calculator</h2>
-        <p className="text-lg">You're <span className="font-semibold">{progress}%</span> closer to your impact goal.</p>
         <p className="text-lg">
-          ₹{amount} <span className="opacity-70">raised of</span> ₹{target}
+          You're <span className="font-semibold">{progress}%</span> closer to your impact goal.
+        </p>
+        <p className="text-lg">
+          ₹{amountFromServer} <span className="opacity-70">raised of</span> ₹{target}
         </p>
 
         <div className="flex flex-wrap gap-4 mt-4">
@@ -128,7 +119,7 @@ const ImpactCalculator = () => {
       </div>
 
       {/* Right: Full Circle Chart */}
-      <div className="md:w-1/2 w-full flex text-[#ECA90E] justify-center  items-center mt-8 md:mt-0">
+      <div className="md:w-1/2 w-full flex text-[#ECA90E] justify-center items-center mt-8 md:mt-0">
         <div className="w-[180px] h-[180px] text-[#ECA90E]">
           <FullCircleProgressBar percentage={progress} />
         </div>
