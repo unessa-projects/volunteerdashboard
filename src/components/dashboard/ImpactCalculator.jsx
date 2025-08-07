@@ -1,101 +1,61 @@
 import React, { useEffect, useState } from "react";
+import FullCircleProgressBar from "./FullCircleProgressBar"; // Make sure this component exists
 
-const FullCircleProgressBar = ({ percentage }) => {
-  const radius = 80;
-  const stroke = 10;
-  const normalizedRadius = radius - stroke / 2;
-  const circumference = 2 * Math.PI * normalizedRadius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <svg height={radius * 2} width={radius * 2}>
-      <circle
-        stroke="#334155"
-        fill="transparent"
-        strokeWidth={stroke}
-        r={normalizedRadius}
-        cx={radius}
-        cy={radius}
-      />
-      <circle
-        stroke="url(#glowGradient)"
-        fill="transparent"
-        strokeWidth={stroke}
-        strokeDasharray={circumference}
-        strokeDashoffset={strokeDashoffset}
-        strokeLinecap="round"
-        r={normalizedRadius}
-        cx={radius}
-        cy={radius}
-        style={{ transition: "stroke-dashoffset 1s ease-out" }}
-      />
-      <defs>
-        <linearGradient id="glowGradient" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#22d3ee" />
-          <stop offset="100%" stopColor="#eca90e" />
-        </linearGradient>
-      </defs>
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fill="#ECA90E"
-        fontSize="40"
-        fontWeight="bold"
-      >
-        {percentage}%
-      </text>
-    </svg>
-  );
-};
-
-const ImpactCalculator = ({ amountFromServer = 0 }) => {
+const ImpactCalculator = () => {
   const [progress, setProgress] = useState(0);
+  const [amount, setAmount] = useState(0);
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
-  useEffect(() => {
-    const calculated = Math.min(Math.round((amountFromServer / target) * 100), 100);
-    let start = 0;
-    const interval = setInterval(() => {
-      start += 1;
-      setProgress(start);
-      if (start >= calculated) clearInterval(interval);
-    }, 15);
-    return () => clearInterval(interval);
-  }, [amountFromServer]);
-
   const handleCopyLink = () => {
-    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
-    const refName = localStorage.getItem("username");
-    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-    navigator.clipboard.writeText(finalURL);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const link = window.location.href;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    });
   };
 
   const handleShare = () => {
-    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
-    const refName = localStorage.getItem("username");
-    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-
-    const message = `Hello!\nI’m volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖`;
-
-    const whatsappURL = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    const message = `Support my cause and help me reach my donation goal! 💛\n${window.location.href}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
     window.open(whatsappURL, "_blank");
   };
 
+  useEffect(() => {
+    const updateProgress = (newAmount: number) => {
+      const calculated = Math.min(Math.round((newAmount / target) * 100), 100);
+      let start = 0;
+      const interval = setInterval(() => {
+        start += 1;
+        setProgress(start);
+        if (start >= calculated) clearInterval(interval);
+      }, 15);
+    };
+
+    const syncAmount = () => {
+      const user = JSON.parse(localStorage.getItem("googleUser") || "{}");
+      if (user?.amount && user.amount !== amount) {
+        setAmount(user.amount);
+        updateProgress(user.amount);
+      }
+    };
+
+    syncAmount(); // initial run on mount
+    const interval = setInterval(syncAmount, 3000); // check every 3 seconds for updates
+    return () => clearInterval(interval);
+  }, [amount]);
+
   return (
     <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
-      {/* Left: Text & Buttons */}
+      {/* Left Side - Text and Buttons */}
       <div className="md:w-1/2 w-full flex flex-col justify-center items-start gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Your Impact Calculator</h2>
         <p className="text-lg">
           You're <span className="font-semibold">{progress}%</span> closer to your impact goal.
         </p>
         <p className="text-lg">
-          ₹{amountFromServer} <span className="opacity-70">raised of</span> ₹{target}
+          ₹{amount} <span className="opacity-70">raised of</span> ₹{target}
         </p>
 
         <div className="flex flex-wrap gap-4 mt-4">
@@ -118,7 +78,7 @@ const ImpactCalculator = ({ amountFromServer = 0 }) => {
         )}
       </div>
 
-      {/* Right: Full Circle Chart */}
+      {/* Right Side - Progress Chart */}
       <div className="md:w-1/2 w-full flex text-[#ECA90E] justify-center items-center mt-8 md:mt-0">
         <div className="w-[180px] h-[180px] text-[#ECA90E]">
           <FullCircleProgressBar percentage={progress} />
