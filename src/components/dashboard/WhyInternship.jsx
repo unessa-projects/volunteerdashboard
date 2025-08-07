@@ -39,8 +39,10 @@ const WhyInternship = () => {
       <motion.div
         className="mb-8 sm:mb-10 md:mb-12 p-6 sm:p-8 md:p-10 rounded-3xl bg-white/90 backdrop-blur-md border-l-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
-        whileHover={{ y: -5 }}
-      >
+  initial="hidden"
+  animate="show"
+  whileHover={{ y: -5 }}
+>
         <motion.div
           className="flex items-center mb-4"
           variants={spinVariants}

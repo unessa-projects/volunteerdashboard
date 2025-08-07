@@ -39,12 +39,16 @@ const UnderstandRole = () => {
       <motion.div
         className="mb-8 sm:mb-10 md:mb-12 lg:mb-14 xl:mb-16 p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 rounded-3xl bg-white/90 backdrop-blur-md border-l-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
+        initial="hidden"
+        animate="show"
         whileHover={{ y: -5 }}
       >
         <motion.div
           className="flex items-center mb-4"
           variants={spinVariants}
-        >
+  initial="hidden"
+  animate="show"
+>
           <svg className="w-8 h-8 text-[#ECA90E]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
           </svg>
@@ -60,6 +64,8 @@ const UnderstandRole = () => {
       <motion.div
         className="mb-8 sm:mb-10 md:mb-12 lg:mb-14 xl:mb-16 p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 rounded-3xl bg-white/90 backdrop-blur-md border-r-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
+        initial="hidden"
+        animate="show"
         whileHover={{ y: -5 }}
       >
         <h2 className="text-[#ECA90E] text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6">
@@ -133,8 +139,10 @@ const UnderstandRole = () => {
       <motion.div
         className="p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14 rounded-3xl bg-white/90 backdrop-blur-md border-l-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
-        whileHover={{ y: -5 }}
-      >
+  initial="hidden"
+  animate="show"
+  whileHover={{ y: -5 }}
+>
         <div className="flex items-start">
           <motion.div
             className="mr-4"
