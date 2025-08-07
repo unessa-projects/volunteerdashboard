@@ -478,7 +478,7 @@ const [showQuiz, setShowQuiz] = useState(false);
           { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-mobile" },
           { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-mobile"  },
           { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-mobile" },
-          
+          { path: "/explore", icon: <Search size={20} />, label: "Explore" },
           { path: "/community", icon: <Users size={20} />, label: "Learning" },
           // { path: "/certificates", icon: <Download size={20} />, label: "Certificates"}
         ].map((item, index) => (
