@@ -171,40 +171,6 @@ const Dashboard = () => {
       <span className="font-semibold text-base">Project Sneh</span>
     </Link>
 
-    {/* Academic Learning */}
-    <Link data-tour-id="tour-learn-uneesa"
-      to="/learning"
-      className="cursor-pointer min-h-[200px] p-3 m-3  text-white bg-[#096d7d33]  rounded-2xl shadow-md flex items-center transition-transform duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg hover:z-10 hover:border-[#ECA90E] hover:border-2">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="#EF6C00" viewBox="0 0 24 24" className="w-12 h-12 mb-3">
-        <path d="M12 2L1 7l11 5 9-4.1v9.2c0 1.1-.9 2-2 2h-2v-3H8v3H6c-1.1 0-2-.9-2-2v-4l8 3.6 11-5L12 2z"/>
-      </svg>
-      <span className="font-semibold text-base">Academic Learning</span>
-    </Link>
-
-    {/* Social Emotional Learning */}
-    <Link
-      to="/emotional"
-      className="cursor-pointer min-h-[200px] p-3 m-3  text-white bg-[#096d7d33]  rounded-2xl shadow-md flex items-center transition-transform duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg hover:z-10 hover:border-[#ECA90E] hover:border-2">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="#EF6C00" viewBox="0 0 24 24" className="w-12 h-12 mb-3">
-        <path d="M12 12c2.7 0 5.4 1.3 6 4H6c.6-2.7 3.3-4 6-4zm0-2c-1.1 0-2-.9-2-2s.9-2 2-2 
-          2 .9 2 2-.9 2-2 2zm-6 2c0-3.3 2.7-6 6-6s6 2.7 6 6v6H6v-6z"/>
-      </svg>
-      <span className="font-semibold text-base">Social Emotional Learning</span>
-    </Link>
-
-    {/* Mental Well Being */}
-    <Link
-      to="/mental"
-      className="cursor-pointer min-h-[200px] p-3 m-3  text-white bg-[#096d7d33]  rounded-2xl shadow-md flex items-center transition-transform duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg hover:z-10 hover:border-[#ECA90E] hover:border-2">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="#EF6C00" viewBox="0 0 24 24" className="w-12 h-12 mb-3">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-          2 6.5 3.5 5 5.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 
-          5.99 14.96 5 16.5 5 18.5 5 20 6.5 20 
-          8.5c0 3.78-3.4 6.86-8.55 
-          11.54L12 21.35z"/>
-      </svg>
-      <span className="font-semibold text-base">Mental Well Being</span>
-    </Link>
   </div>
 </div>
       </section>

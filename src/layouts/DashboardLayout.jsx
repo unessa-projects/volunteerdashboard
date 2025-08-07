@@ -299,13 +299,7 @@ const [showQuiz, setShowQuiz] = useState(false);
                   >
                     <DollarSign size={18} /> Donations
                   </Link>
-                  <Link 
-                    to="/explore" 
-                    className={linkClass("/explore")}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Search size={18} /> Explore
-                  </Link>
+                  
                   <Link 
                     to="/community" 
                     className={linkClass("/community")}
