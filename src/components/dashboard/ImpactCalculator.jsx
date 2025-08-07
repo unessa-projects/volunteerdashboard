@@ -57,19 +57,25 @@ const ImpactCalculator = () => {
   const target = 36000;
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("googleUser"));
-    if (user?.amount) {
-      setAmount(user.amount);
-      const calculated = Math.min(Math.round((user.amount / target) * 100), 100);
-
-      let start = 0;
-      const interval = setInterval(() => {
-        start += 1;
-        setProgress(start);
-        if (start >= calculated) clearInterval(interval);
-      }, 15);
-    }
-  }, []);
+    const interval = setInterval(() => {
+      const user = JSON.parse(localStorage.getItem("googleUser"));
+      if (user?.amount && user.amount !== amount) {
+        setAmount(user.amount);
+        const calculated = Math.min(Math.round((user.amount / target) * 100), 100);
+        setProgress(0);
+  
+        let start = 0;
+        const animInterval = setInterval(() => {
+          start += 1;
+          setProgress(start);
+          if (start >= calculated) clearInterval(animInterval);
+        }, 15);
+      }
+    }, 1000); // check every second
+  
+    return () => clearInterval(interval);
+  }, [amount]);
+  
 
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
