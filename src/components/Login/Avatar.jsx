@@ -45,7 +45,9 @@ const Avatar = () => {
       console.log(":white_check_mark: User saved:", result);
       // Store the username in localStorage
       localStorage.setItem("username", username);
-      const userRes = await fetch(`https://unessa-backend.onrender.com/getUser/${email}`);
+      const encodedEmail = encodeURIComponent(email);
+const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/getUser/${encodedEmail}`);
+
       const fullUser = await userRes.json();
       localStorage.setItem("googleUser", JSON.stringify(fullUser));
       navigate("/page1");
