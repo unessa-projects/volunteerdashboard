@@ -8,7 +8,7 @@ const rewards = [
       "20% Stipend",
       "Certificate of completion"
     ],
-    icon: ":star2:",
+    
     borderColor: "border-[#ECA90E]"
   },
   {
@@ -20,7 +20,7 @@ const rewards = [
       "LinkedIn recommendation from our President",
       "Certificate for Crowdfunding course"
     ],
-    icon: ":zap:",
+    
     borderColor: "border-[#ECA90E]"
   },
   {
@@ -34,7 +34,7 @@ const rewards = [
       "Social Media Shoutout",
       "Internship Opportunity (As per intern's qualifications and vacancy)"
     ],
-    icon: ":fire:",
+    
     borderColor: "border-[#ECA90E]"
   },
   {
@@ -49,7 +49,6 @@ const rewards = [
       "Internship Opportunity (As per intern's qualifications and vacancy)",
       "Letter of Recommendation from President of Muskurahat"
     ],
-    icon: ":trophy:",
     borderColor: "border-[#ECA90E]"
   },
 ];

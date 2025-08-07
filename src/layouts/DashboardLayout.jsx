@@ -195,7 +195,22 @@ useEffect(() => {
   //   { target: '[data-tour-id="tour-learn-uneesa"]', content: "Discover Uneesa's key initiatives and projects." },
   // ];
 
+  const [tourSeen, setTourSeen] = useState(false);
+
+useEffect(() => {
+  const isNewUser = localStorage.getItem("isNewUser");
   
+  if (isNewUser === "true" && !tourSeen) {
+    setShowTour(true);
+  }
+}, [user, tourSeen]);
+// Add this useEffect
+useEffect(() => {
+  const isNewUserFlag = localStorage.getItem("isNewUser");
+  if (isNewUserFlag === 'true') {
+      setShowTour(true);
+  }
+}, []);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
