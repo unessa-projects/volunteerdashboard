@@ -23,7 +23,7 @@ const ImpactCalculator = () => {
   };
 
   useEffect(() => {
-    const updateProgress = (newAmount: number) => {
+    const updateProgress = (newAmount) => {
       const calculated = Math.min(Math.round((newAmount / target) * 100), 100);
       let start = 0;
       const interval = setInterval(() => {
