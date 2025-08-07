@@ -20,7 +20,8 @@ const DashboardLayout = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("googleUser") || "{}"));
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("googleUser"));
@@ -153,39 +154,40 @@ const steps = (isMobile
   disableBeacon: true, // ✅ disables the "trigger" dot
 }));
 
-const [showTour, setShowTour] = useState(false);
-const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("googleUser") || "{}"));
 
-// ✅ Tour logic
 useEffect(() => {
   const isNewUser = localStorage.getItem("isNewUser");
-
   if (isNewUser === "true") {
-    setTimeout(() => {
-      setShowTour(true);
-    }, 1000);
-
-    // (Optional) Call backend to mark it
-    if (user?.email) {
-      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email }),
-      });
-    }
-
-    localStorage.setItem("isNewUser", "false"); // ✅ prevents future triggering
+      // Delay the tour start slightly to ensure the UI has rendered
+      const timer = setTimeout(() => {
+          setShowTour(true);
+          // The tour should run only once. The `onRequestClose` will clear this flag.
+      }, 1000); 
+      return () => clearTimeout(timer);
   }
-}, [user]); // ✅ make sure user is available
+}, [user]); 
 
-// ✅ Optional: Keep user state in sync with localStorage
 useEffect(() => {
   const handleStorageChange = () => {
-    setUser(JSON.parse(localStorage.getItem("googleUser") || "{}"));
+      setUser(JSON.parse(localStorage.getItem("googleUser") || "{}"));
   };
   window.addEventListener("storage", handleStorageChange);
   return () => window.removeEventListener("storage", handleStorageChange);
 }, []);
+
+    // (Optional) Call backend to mark it
+  //   if (user?.email) {
+  //     fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ email: user.email }),
+  //     });
+  //   }
+
+  //   localStorage.setItem("isNewUser", "false"); // ✅ prevents future triggering
+  // };
+
+
   // const [runTour, setRunTour] = useState(false);
 
  
@@ -195,35 +197,31 @@ useEffect(() => {
   //   { target: '[data-tour-id="tour-learn-uneesa"]', content: "Discover Uneesa's key initiatives and projects." },
   // ];
 
-  const [tourSeen, setTourSeen] = useState(false);
 
-useEffect(() => {
-  const isNewUser = localStorage.getItem("isNewUser");
-  
-  if (isNewUser === "true" && !tourSeen) {
-    setShowTour(true);
-  }
-}, [user, tourSeen]);
-// Add this useEffect
-useEffect(() => {
-  const isNewUserFlag = localStorage.getItem("isNewUser");
-  if (isNewUserFlag === 'true') {
-      setShowTour(true);
-  }
-}, []);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
-
-<Tour
-  steps={steps}
-  isOpen={showTour} // This is `true` when `isNewUser === "true"`
-  onRequestClose={() => setShowTour(false)}
-  showNavigation={true}
-  showCloseButton={true}
-  showButtons={true}
-  disableInteraction={false}
-/>
+ <Tour
+                steps={steps}
+                isOpen={showTour}
+                onRequestClose={() => {
+                    setShowTour(false);
+                    localStorage.setItem("isNewUser", "false"); // Crucial line to prevent re-triggering
+                    
+                    // Call backend to mark tour as seen
+                    if (user?.email) {
+                        fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: user.email }),
+                        });
+                    }
+                }}
+                showNavigation={true}
+                showCloseButton={true}
+                showButtons={true}
+                disableInteraction={false}
+            />
 
       {/* Mobile Header */}
       <motion.header 
