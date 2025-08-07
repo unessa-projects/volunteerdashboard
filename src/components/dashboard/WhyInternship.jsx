@@ -44,7 +44,9 @@ const WhyInternship = () => {
         <motion.div
           className="flex items-center mb-4"
           variants={spinVariants}
-        >
+  initial="hidden"
+  animate="show"
+>
           <svg className="w-6 h-6 text-[#ECA90E]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
           </svg>
@@ -60,6 +62,8 @@ const WhyInternship = () => {
       <motion.div
         className="mb-8 sm:mb-10 md:mb-12 p-6 sm:p-8 md:p-10 rounded-3xl bg-white/90 backdrop-blur-md border-r-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
+        initial="hidden"
+        animate="show"
         whileHover={{ y: -5 }}
       >
         <h2 className="text-[#ECA90E] text-xl sm:text-2xl md:text-3xl font-bold mb-4">
@@ -122,6 +126,8 @@ const WhyInternship = () => {
       <motion.div
         className="p-6 sm:p-8 md:p-10 rounded-3xl bg-white/90 backdrop-blur-md border-l-4 border-[#ECA90E] shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
         variants={itemVariants}
+        initial="hidden"
+        animate="show"
         whileHover={{ y: -5 }}
       >
         <div className="flex items-start">
