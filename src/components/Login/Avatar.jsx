@@ -33,7 +33,7 @@ const Avatar = () => {
     username,
   };
   try {
-    const response = await fetch("http://localhost:5000/api/users/register", {
+    const response = await fetch("https://unessa-backend.onrender.com/api/users/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Avatar = () => {
       console.log(":white_check_mark: User saved:", result);
       // Store the username in localStorage
       localStorage.setItem("username", username);
-      const userRes = await fetch(`http://localhost:5000/api/users/getUser/${email}`);
+      const userRes = await fetch(`https://unessa-backend.onrender.com/getUser/${email}`);
       const fullUser = await userRes.json();
       localStorage.setItem("googleUser", JSON.stringify(fullUser));
       navigate("/page1");
