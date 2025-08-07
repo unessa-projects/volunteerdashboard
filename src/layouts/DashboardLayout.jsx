@@ -114,7 +114,9 @@ const [showQuiz, setShowQuiz] = useState(false);
     const isNewUser = localStorage.getItem("isNewUser");
   
     if (isNewUser === "true") {
-      const tourTimer= setTimeout(() => setShowTour(true), 500);
+      const tourTimer= setTimeout(() =>{
+        setShowTour(true);
+      }, 1000);
   
       // Mark tour as seen in backend
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
@@ -125,7 +127,7 @@ const [showQuiz, setShowQuiz] = useState(false);
   
       // Prevent tour from showing again
       localStorage.setItem("isNewUser", "false");
-      return ( )=> clearTimeout(tourTimer);
+      return ()=> clearTimeout(tourTimer);
     }
   }, []);
   
@@ -168,7 +170,7 @@ const [showQuiz, setShowQuiz] = useState(false);
 <Joyride
   // text="Welcome to uneessa Foundation."
     steps={steps}
-    run={showTour}
+    run={true}
     continuous
     scrollToFirstStep
     showProgress
