@@ -1,69 +1,58 @@
 import React from "react";
 import { motion } from "framer-motion";
-
 const rewards = [
   {
     title: "VIBE",
     amount: "₹1,000 - ₹5,000",
     perks: [
-      "- Setting the tone for change",
       "20% Stipend",
-      "Certificate of completion",
+      "Certificate of completion"
     ],
-    bgColor: "bg-gradient-to-br from-yellow-400 to-orange-400",
-    borderColor: "border-yellow-300",
-    textColor: "text-gray-900",
+    icon: ":star2:",
+    borderColor: "border-[#ECA90E]"
   },
   {
     title: "MOMENTUM",
     amount: "₹5,000 - ₹15,000",
     perks: [
-      "- Building serious impact",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
-      "Certificate for Crowdfunding course",
+      "Certificate for Crowdfunding course"
     ],
-    bgColor: "bg-gradient-to-br from-indigo-500 to-purple-500",
-    borderColor: "border-purple-300",
-    textColor: "text-white",
+    icon: ":zap:",
+    borderColor: "border-[#ECA90E]"
   },
   {
     title: "CATALYST",
     amount: "₹15,000 - ₹30,000",
     perks: [
-      "- You're the game-changer",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
-      "Internship Opportunity (As per intern's qualifications and vacancy)",
+      "Internship Opportunity (As per intern's qualifications and vacancy)"
     ],
-    bgColor: "bg-gradient-to-br from-blue-500 to-cyan-400",
-    borderColor: "border-blue-300",
-    textColor: "text-white",
+    icon: ":fire:",
+    borderColor: "border-[#ECA90E]"
   },
   {
     title: "ICON",
     amount: "₹30,000+",
     perks: [
-      "- A true legend, inspiring ultimate change",
       "20% Stipend",
       "Certificate of completion",
       "LinkedIn recommendation from our President",
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
       "Internship Opportunity (As per intern's qualifications and vacancy)",
-      "Letter of Recommendation from Founder of Unessa",
+      "Letter of Recommendation from President of Muskurahat"
     ],
-    bgColor: "bg-gradient-to-br from-pink-500 to-red-400",
-    borderColor: "border-pink-300",
-    textColor: "text-white",
+    icon: ":trophy:",
+    borderColor: "border-[#ECA90E]"
   },
 ];
-
-
 const Rewards = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -75,65 +64,86 @@ const Rewards = () => {
       }
     }
   };
-
   const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 40, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         type: "spring",
         stiffness: 100,
-        damping: 10
+        damping: 15
+      }
+    },
+    hover: {
+      y: -10,
+      scale: 1.03,
+      boxShadow: "0 20px 25px -5px rgba(236, 169, 14, 0.2)"
+    }
+  };
+  const iconVariants = {
+    hover: {
+      rotate: [0, 10, -10, 0],
+      transition: {
+        duration: 0.5
       }
     }
   };
-
   return (
-    <div className="px-4 py-10 bg-[#06444f]">
+    <div className="px-4 py-12 sm:py-16 bg-gradient-to-b from-blue-50 to-cyan-50">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-10"
+        transition={{ duration: 0.5, type: "spring" }}
+        className="text-center mb-12 sm:mb-16"
       >
-        <h1 className="text-4xl md:text-4xl font-bold text-[#eca90e] mb-2">
+        <h1 className="text-4xl md:text-5xl font-bold text-[#ECA90E] mb-3">
           REWARDS
         </h1>
-        <p className="text-white max-w-2xl  text-2xl mx-auto">
+        <p className="text-gray-800 max-w-2xl text-xl sm:text-2xl mx-auto">
           Earn exciting rewards based on your fundraising achievements
         </p>
       </motion.div>
-
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-4 sm:px-6"
       >
         {rewards.map((reward, index) => (
           <motion.div
             key={index}
             variants={cardVariants}
-            whileHover={{ y: -5, scale: 1.02 }}
-            className={`rounded-xl p-6  rext-2xl shadow-lg border ${reward.borderColor} ${reward.bgColor} transition-all duration-300 hover:shadow-xl`}
+            whileHover="hover"
+            className={`rounded-2xl p-6 sm:p-8 bg-white/90 backdrop-blur-md border-t-4 ${reward.borderColor} shadow-lg hover:shadow-xl transition-all duration-300`}
           >
             <div className="flex flex-col h-full">
-              <div className="mb-4">
-                <h2 className={`text-3xl font-medium ${reward.textColor}`}>
-                  {reward.title}
-                </h2>
-                <p className="text-black text-2xl font-medium mt-1">
-                  {reward.amount}
-                </p>
+              <div className="mb-6 flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[#ECA90E]">
+                    {reward.title}
+                  </h2>
+                  <p className="text-gray-800 text-xl sm:text-2xl font-medium mt-2">
+                    {reward.amount}
+                  </p>
+                </div>
+                <motion.span
+                  className="text-3xl sm:text-4xl"
+                  variants={iconVariants}
+                >
+                  {reward.icon}
+                </motion.span>
               </div>
-              
               <div className="flex-grow">
-                <ul className="space-y-2">
+                <ul className="space-y-3 sm:space-y-4">
                   {reward.perks.map((perk, i) => (
-                    <li key={i} className="flex items-start">
+                    <motion.li
+                      key={i}
+                      className="flex items-start"
+                      whileHover={{ x: 5 }}
+                    >
                       <svg
-                        className={`w-4 h-4 mt-1 mr-2 flex-shrink-0 ${reward.textColor}`}
+                        className="w-5 h-5 mt-0.5 mr-3 flex-shrink-0 text-[#ECA90E]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -146,13 +156,21 @@ const Rewards = () => {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      <span className="text-white">{perk}</span>
-                    </li>
+                      <span className="text-gray-700 text-sm sm:text-base">{perk}</span>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
-              
-              
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                  backgroundColor: "rgba(236, 169, 14, 0.9)"
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="mt-6 px-6 py-2 bg-[#ECA90E]/80 text-white rounded-full font-medium text-sm sm:text-base shadow-md hover:shadow-lg transition-all duration-300"
+              >
+                Learn More
+              </motion.button>
             </div>
           </motion.div>
         ))}
@@ -160,5 +178,4 @@ const Rewards = () => {
     </div>
   );
 };
-
 export default Rewards;

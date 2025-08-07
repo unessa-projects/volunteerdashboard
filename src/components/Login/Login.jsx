@@ -8,10 +8,12 @@ const Login = () => {
   const handleCredentialResponse = async (response) => {
     try {
       const decoded = jwtDecode(response.credential);
-      const { email } = decoded;
+      const { email, name, picture } = decoded;
+
+      // ✅ Store user info
+      localStorage.setItem("googleUser", JSON.stringify({ email, name, avatar: picture }));
   
-      // ✅ Store only email
-      localStorage.setItem("email", email);
+  
   
       // Step 1: Check if user exists
       const res = await fetch("https://unessa-backend.onrender.com/api/users/check", {
@@ -28,31 +30,30 @@ const Login = () => {
         const quizData = await quizRes.json();
         localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
   
-        // ✅ Set product tour flags (optional)
-        if (!localStorage.getItem("hasSeenTour")) {
-          localStorage.setItem("isNewUser", "true");
-          localStorage.setItem("hasSeenTour", "true");
-        } else {
-          localStorage.setItem("isNewUser", "false");
-        }
-        localStorage.setItem("isNewUser", "true");
-        localStorage.setItem("hasSeenTour", "true");
-        console.log("✅ Existing user, redirecting to dashboard...");
-        navigate("/dashboard");
+        // Check if tour has been seen before
+      if (data.user.hasSeenTour) { // Assuming your backend provides this flag
+        localStorage.setItem("isNewUser", "false");
       } else {
-        // ✅ First-time user (new)
-        localStorage.setItem("quizStatus", "notAttempted");
         localStorage.setItem("isNewUser", "true");
-        localStorage.setItem("hasSeenTour", "true");
-  
-        console.log("🆕 New user, redirecting to name setup...");
-        navigate("/name");
+        // Mark tour as seen on the client-side for immediate effect
+        // and ideally, update the backend here or in the Dashboard component.
       }
-  
-    } catch (err) {
-      console.error("Google login error:", err);
+      
+      console.log("✅ Existing user, redirecting to dashboard...");
+      navigate("/dashboard");
+    } else {
+      // ✅ First-time user (new)
+      localStorage.setItem("quizStatus", "notAttempted");
+      localStorage.setItem("isNewUser", "true");
+      
+      console.log("🆕 New user, redirecting to name setup...");
+      navigate("/name");
     }
-  };
+
+  } catch (err) {
+    console.error("Google login error:", err);
+  }
+};
   
 
 
