@@ -355,7 +355,7 @@ const [showQuiz, setShowQuiz] = useState(false);
               { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-desktop" },
               { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-desktop" },
               { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-desktop" },
-              { path: "/explore", icon: <Search size={20} />, label: "Explore",  },
+              
               { path: "/community", icon: <Users size={20} />, label: "Learning",  },
               { path: "/certificates", icon: <Download size={20} />, label: "Certificates",  }
             ].map((item, index) => (
@@ -417,14 +417,7 @@ const [showQuiz, setShowQuiz] = useState(false);
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <Link
-                to="/raise-funds"
-                className="flex items-center gap-2 bg-[#06444f] border-white border-2 text-white font-bold px-4 py-2 rounded-lg shadow hover:bg-[#f3b838] hover:scale-105 transition-transform"
-                whilehover={{ scale: 1.05 }}
-              >
-                <Plus className="w-5 h-5" />
-                <span>Raise Funds</span>
-              </Link>
+              
             </motion.div>
 
             <motion.div 
@@ -485,7 +478,7 @@ const [showQuiz, setShowQuiz] = useState(false);
           { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-mobile" },
           { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-mobile"  },
           { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-mobile" },
-          { path: "/explore", icon: <Search size={20} />, label: "Explore" },
+          
           { path: "/community", icon: <Users size={20} />, label: "Learning" },
           // { path: "/certificates", icon: <Download size={20} />, label: "Certificates"}
         ].map((item, index) => (
