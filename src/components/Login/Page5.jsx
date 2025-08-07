@@ -14,9 +14,9 @@ const Page5 = () => {
   };
 
   return (
-    <div className="relative h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen bg-[#F4F9F8] bg-cover bg-center flex flex-col items-center justify-center px-4 sm:px-6 py-6">
       {/* Logo */}
-      <div className="absolute top-4 sm:top-6 md:top-8 left-1/2 transform -translate-x-1/2">
+      <div className="mb-10 sm:mb-12 md:mb-14 flex justify-center">
         <img
           src="/llogo.png"
           alt="Unessa Foundation Logo"
@@ -25,7 +25,7 @@ const Page5 = () => {
       </div>
   
       {/* Main Content Box */}
-      <div className="relative text-center mt-32 sm:mt-36 md:mt-40 w-full max-w-[95%] sm:max-w-[90%] md:max-w-xl lg:max-w-2xl xl:max-w-3xl px-4 sm:px-6 md:px-10 flex flex-col gap-6 sm:gap-8">
+      <div className="text-center w-full max-w-[95%] sm:max-w-[90%] md:max-w-xl lg:max-w-2xl xl:max-w-3xl px-4 sm:px-6 md:px-10 flex flex-col gap-6 sm:gap-8">
         
         {/* Heading */}
         <h1 className="text-[#333333] text-2xl sm:text-3xl md:text-4xl font-bold leading-snug">

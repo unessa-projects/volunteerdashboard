@@ -63,7 +63,7 @@ return (
     {/* Logo Section */}
     <div className="w-full flex justify-center mb-8 sm:mb-10 md:mb-12">
       <img
-        src="/logo.png"
+        src="/llogo.png"
         alt="Unessa Foundation Logo"
         className="w-16 sm:w-20 md:w-24 h-auto opacity-95 drop-shadow-md hover:opacity-100 transition"
       />
