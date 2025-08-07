@@ -176,7 +176,7 @@ useEffect(() => {
 
     return () => clearTimeout(tourTimer);
   }
-}, [user.email]); // ✅ make sure user is available
+}, [user]); // ✅ make sure user is available
 
 // ✅ Optional: Keep user state in sync with localStorage
 useEffect(() => {
