@@ -6,39 +6,39 @@ import { motion } from 'framer-motion';
 function Donation() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
-  const fetchPayments = async () => {
-    try {
-      const username = localStorage.getItem("username"); // Get username directly from localStorage
-      
-      if (!username) {
-        console.log("No username found in localStorage");
+    const fetchPayments = async () => {
+      try {
+        const username = localStorage.getItem("username");
+  
+        if (!username) {
+          console.log("No username found in localStorage");
+          setLoading(false);
+          return;
+        }
+  
+        const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
+          params: { username }
+        });
+  
+        setPayments(res.data);
+  
+        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+        setTotalAmount(total); // ✅ Set state here
+        localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
+  
         setLoading(false);
-        return;
+      } catch (err) {
+        console.error('Error fetching donations:', err);
+        setLoading(false);
       }
-
-      const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
-        params: { username }
-      });
-
-      setPayments(res.data);
-      // Sum all payments
-const totalAmount = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-
-// Store in localStorage (optional, or just pass as prop)
-localStorage.setItem("googleUser", JSON.stringify({ amount: totalAmount }));
-
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching donations:', err);
-      setLoading(false);
-    }
-  };
-
-  fetchPayments();
-}, []);
-
+    };
+  
+    fetchPayments();
+  }, []);
+  
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
