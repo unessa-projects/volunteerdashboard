@@ -199,6 +199,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
+      <button onClick={() => setShowTour(true)}>Test Tour</button>
  <Tour
         steps={steps}
         isOpen={showTour}
