@@ -5,33 +5,125 @@ import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Tour } from '@reactour/tour';
 
-
-
-
-
-
-
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [avatar, setAvatar] = useState(null);
-  const [username, setUsername] = useState("User");
+
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("googleUser");
+    // Initialize with the user object or null if it doesn't exist
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const username = user?.name ? user.name.split(" ")[0] : "User";
+  const avatar = user?.avatar || null;
+
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("googleUser") || "{}"));
   const [showTour, setShowTour] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
+  const [, setShowStartButton] = useState(true);
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("googleUser"));
-    if (user?.avatar) setAvatar(user.avatar);
-    if (user?.name) setUsername(user.name.split(" ")[0]);
-  }, []);
+
+    // This effect is now cleaner as it doesn't need to update separate states
+    useEffect(() => {
+      if (quizStatus === "failed") {
+        setShowStartButton(false);
+        const timer = setTimeout(() => setShowStartButton(true), 60000);
+        return () => clearTimeout(timer);
+      } else if (quizStatus === "passed") {
+        setShowStartButton(false);
+      }
+    }, [quizStatus]);
+
+
+    useEffect(() => {
+      const handleStorageChange = () => {
+        const storedUser = localStorage.getItem("googleUser");
+        setUser(storedUser ? JSON.parse(storedUser) : null);
+      };
+      window.addEventListener("storage", handleStorageChange);
+      return () => window.removeEventListener("storage", handleStorageChange);
+    }, []);
+    
+ // --- ✅ Tour trigger now depends on the 'user' object ---
+ useEffect(() => {
+  const isNewUser = localStorage.getItem("isNewUser") === "true";
+  
+  // Check if it's a new user AND the user object with a name exists.
+  if (isNewUser && user?.name) {
+    const timer = setTimeout(() => {
+      setShowTour(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }
+}, [user]);
+  // useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem("googleUser"));
+  //   if (user?.avatar) setAvatar(user.avatar);
+  //   if (user?.name) setUsername(user.name.split(" ")[0]);
+  // }, []);
+
+  // const handleLogout = () => {
+  //   localStorage.removeItem("googleUser");
+  //   navigate("/login");
+  // };
+
+ 
+
+
+
+  // const storedUser = JSON.parse(localStorage.getItem("googleUser"));
+// const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
+  
+
+
+  const steps = useMemo(() => {
+    // Check window width here so it's fresh on each evaluation
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    
+    const tourSteps = (isMobile
+      ? [
+          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
+        ]
+      : [
+          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
+        ]
+    );
+
+    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
+    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
+  }, []); // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
+
 
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
+    localStorage.removeItem("quizStatus");
     navigate("/login");
   };
+  
+  
+  const handleQuizComplete = (result) => {
+    setQuizStatus(result);
+    localStorage.setItem("quizStatus", result);
+    if (result === "passed") {
+      // Just re-read from storage to update the single 'user' state
+      const storedUser = localStorage.getItem("googleUser");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    }
+    setShowQuiz(false);
+  };
+
+
+
+
 
   const isActive = (path) => location.pathname === path;
   const linkClass = (path) =>
@@ -75,87 +167,6 @@ const DashboardLayout = () => {
       }
     }
   };
-
-
-
-  // const storedUser = JSON.parse(localStorage.getItem("googleUser"));
-// const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
-const [showQuiz, setShowQuiz] = useState(false);
-  const [quizStatus, setQuizStatus] = useState(() => {
-    const saved = localStorage.getItem("quizStatus");
-    return saved || "notAttempted"; // 'passed' | 'failed' | 'notAttempted'
-  });
-  
-  const [, setShowStartButton] = useState(true);
-  
-  useEffect(() => {
-    if (quizStatus === "failed") {
-      setShowStartButton(false);
-      const timer = setTimeout(() => {
-        setShowStartButton(true);
-      }, 60000); // Show again after 1 minute
-      return () => clearTimeout(timer);
-    } else if (quizStatus === "passed") {
-      setShowStartButton(false);
-    }
-  }, [quizStatus]);
-  
-  const handleQuizComplete = (result) => {
-    setQuizStatus(result);
-    localStorage.setItem("quizStatus", result);
-    if (result === "passed") {
-      setUser(JSON.parse(localStorage.getItem("googleUser") || "{}")); // Refresh user state
-    }
-    setShowQuiz(false);
-  };
-
-  const steps = useMemo(() => {
-    // Check window width here so it's fresh on each evaluation
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    
-    const tourSteps = (isMobile
-      ? [
-          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-        ]
-      : [
-          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-        ]
-    );
-
-    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
-    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
-  }, []); // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
-
-
-
-  useEffect(() => {
-    const isNewUser = localStorage.getItem("isNewUser") === "true";
-    
-    // Only proceed if it's a new user AND we have successfully loaded the user's name.
-    // The `username !== "User"` check ensures the UI has likely rendered.
-    if (isNewUser && username !== "User") {
-      // The timeout now acts as a small buffer for animations to finish, not as the main delay.
-      const timer = setTimeout(() => {
-        setShowTour(true);
-      }, 500); // 500ms is usually enough.
-      
-      return () => clearTimeout(timer);
-    }
-  }, [username]); 
-
-useEffect(() => {
-  const handleStorageChange = () => {
-      setUser(JSON.parse(localStorage.getItem("googleUser") || "{}"));
-  };
-  window.addEventListener("storage", handleStorageChange);
-  return () => window.removeEventListener("storage", handleStorageChange);
-}, []);
 
     // (Optional) Call backend to mark it
   //   if (user?.email) {
