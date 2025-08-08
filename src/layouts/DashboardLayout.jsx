@@ -1,155 +1,125 @@
-import React, { useEffect, useState, useMemo,   } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
-import { Tour } from '@reactour/tour';
+import { Steps } from 'intro.js-react';
+import 'intro.js/introjs.css';
 
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   // Initialize user state from localStorage (parsed JSON or null)
- const [user, setUser] = useState(null);
-
-
-  // Loading is true if user data missing, false otherwise
- const [isLoading, setIsLoading] = useState(true);
-
-
- useEffect(() => {
-  const storedUserString = localStorage.getItem("googleUser");
-  let email = null;
-
-  if (storedUserString) {
-    try {
-      const parsedUser = JSON.parse(storedUserString);
-      email = parsedUser.email;
-    } catch {
-      localStorage.removeItem("googleUser");
-    }
-  }
-
-  if (!email) {
-    navigate("/login", { replace: true });
-    return;
-  }
-
-  // Fetch fresh user data from backend
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          // User not found — redirect to login
-          navigate("/login", { replace: true });
-          return;
-        }
-        throw new Error("Failed to fetch user data");
-      }
-
-      const userData = await response.json();
-      setUser(userData);
-      localStorage.setItem("googleUser", JSON.stringify(userData));
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      navigate("/login", { replace: true });
-    }
-  };
-
-  fetchUserData();
-}, [navigate]);
-
-  // Extract first name from full name safely, fallback "User"
-  const username = user?.name ? user.name.split(" ")[0] : "User";
-
-  // User avatar or null fallback
-  const avatar = user?.avatar || null;
-
-  // Other states
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [showTour, setShowTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
+  const [stepsEnabled, setStepsEnabled] = useState(false);
 
-  // Detect mobile screen
+  useEffect(() => {
+    const storedUserString = localStorage.getItem("googleUser");
+    let email = null;
+
+    if (storedUserString) {
+      try {
+        const parsedUser = JSON.parse(storedUserString);
+        email = parsedUser.email;
+      } catch {
+        localStorage.removeItem("googleUser");
+      }
+    }
+
+    if (!email) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            navigate("/login", { replace: true });
+            return;
+          }
+          throw new Error("Failed to fetch user data");
+        }
+
+        const userData = await response.json();
+        setUser(userData);
+        localStorage.setItem("googleUser", JSON.stringify(userData));
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        navigate("/login", { replace: true });
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const username = user?.name ? user.name.split(" ")[0] : "User";
+  const avatar = user?.avatar || null;
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    handleResize(); // initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Centralized navigation links
   const navLinks = [
-    { path: "/dashboard", icon: Home, label: "Home", tourId: { mobile: "tour-home-mobile", desktop: "tour-home-desktop" } },
-    { path: "/insights", icon: BarChart2, label: "Insights", tourId: { mobile: "tour-insights-mobile", desktop: "tour-insights-desktop" } },
-    { path: "/donations", icon: DollarSign, label: "Donations", tourId: { mobile: "tour-donations-mobile", desktop: "tour-donations-desktop" } },
+    { path: "/dashboard", icon: Home, label: "Home", introId: "home-step" },
+    { path: "/insights", icon: BarChart2, label: "Insights", introId: "insights-step" },
+    { path: "/donations", icon: DollarSign, label: "Donations", introId: "donations-step" },
     { path: "/community", icon: Users, label: "Learning" },
     { path: "/certificates", icon: Download, label: "Certificates" }
   ];
 
-  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
+  const steps = [
+    {
+      element: '[data-intro-id="avatar-step"]',
+      intro: "This is your profile avatar. Click here to manage your account and logout.",
+      position: 'bottom'
+    },
+    {
+      element: '[data-intro-id="home-step"]',
+      intro: "Go back to your dashboard anytime by clicking Home.",
+      position: isMobile ? 'bottom' : 'right'
+    },
+    {
+      element: '[data-intro-id="insights-step"]',
+      intro: "Check analytics and insights about your impact here.",
+      position: isMobile ? 'bottom' : 'right'
+    },
+    {
+      element: '[data-intro-id="donations-step"]',
+      intro: "Track and manage donations here.",
+      position: isMobile ? 'bottom' : 'right'
+    }
+  ];
 
-  // Define tour steps based on device
-  const steps = useMemo(() => {
-    const tourSteps = isMobile // Use the 'isMobile' state variable from the component's scope
-      ? [
-          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-        ]
-      : [
-          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-        ];
-
-    return tourSteps.map(step => ({
-      ...step,
-      disableBeacon: true,
-      styles: {
-        backgroundColor: "#043238",
-        color: "white"
-      }
-    }));
-  }, [isMobile]);
-
-  // Sync user state on localStorage change (e.g., from another tab)
   useEffect(() => {
-    const handleStorageChange = () => {
-      const storedUser = localStorage.getItem("googleUser");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  // Trigger tour for new user when user data and steps are ready
-  useEffect(() => {
-    // A new user is one who has not seen the tour yet.
     if (user && !user.hasSeenTour) {
       const timer = setTimeout(() => {
-        setShowTour(true);
-      }, 3000);
+        setStepsEnabled(true);
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [user, steps]);
+  }, [user]);
 
-  const handleTourClose = () => {
-    setShowTour(false);
+  const handleTourComplete = () => {
+    setStepsEnabled(false);
     if (user?.email) {
-      // Optimistically update the user state to prevent re-showing the tour on refresh
       const updatedUser = { ...user, hasSeenTour: true };
       setUser(updatedUser);
       localStorage.setItem('googleUser', JSON.stringify(updatedUser));
 
-      // Then, notify the backend that the tour has been seen
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,32 +128,25 @@ const DashboardLayout = () => {
     }
   };
 
-  // Example logout handler
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
     localStorage.removeItem("quizStatus");
     navigate("/login");
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  
-  
   const handleQuizComplete = (result) => {
     setQuizStatus(result);
     localStorage.setItem("quizStatus", result);
     if (result === "passed") {
-      // Just re-read from storage to update the single 'user' state
       const storedUser = localStorage.getItem("googleUser");
       setUser(storedUser ? JSON.parse(storedUser) : null);
     }
     setShowQuiz(false);
   };
 
-
-
-
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   const isActive = (path) => location.pathname === path;
   const linkClass = (path) =>
@@ -193,7 +156,6 @@ const DashboardLayout = () => {
         : "text-white hover:text-[#FFB823] hover:bg-[#043238]/40"
     }`;
 
-  // Animation variants
   const sidebarVariants = {
     hidden: { x: -300, opacity: 0 },
     visible: { 
@@ -228,41 +190,26 @@ const DashboardLayout = () => {
     }
   };
 
-
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
-     
- <Tour
+      <Steps
+        enabled={stepsEnabled}
         steps={steps}
-        isOpen={showTour}
-        onRequestClose={handleTourClose}
-        styles={{
-          popover: (base) => ({
-            ...base,
-            backgroundColor: '#043238',
-            color: 'white',
-            zIndex: 9999,
-          }),
-          mask: (base) => ({
-            ...base,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          }),
-          maskArea: (base) => ({
-            ...base,
-            rx: 10,
-          }),
-          badge: (base) => ({
-            ...base,
-            backgroundColor: '#FFB823',
-          }),
-          controls: (base) => ({
-            ...base,
-            marginTop: 20,
-          }),
-          close: (base) => ({
-            ...base,
-            color: '#FFB823',
-          }),
+        initialStep={0}
+        onExit={handleTourComplete}
+        options={{
+          nextLabel: 'Next →',
+          prevLabel: '← Back',
+          doneLabel: 'Got it!',
+          skipLabel: 'Skip',
+          hideNext: false,
+          tooltipClass: 'bg-[#043238] text-white',
+          highlightClass: 'tour-highlight',
+          showStepNumbers: false,
+          showBullets: true,
+          showProgress: true,
+          disableInteraction: false,
+          exitOnOverlayClick: false
         }}
       />
 
@@ -278,11 +225,7 @@ const DashboardLayout = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-[#06444f] transition-colors"
           >
-            {isMobileMenuOpen ? (
-              <X size={24} />
-            ) : (
-              <Menu size={24} />
-            )}
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
           <h1 className="text-xl font-bold">Welcome, {username} 👋</h1>
         </div>
@@ -299,9 +242,9 @@ const DashboardLayout = () => {
             <motion.div
               className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
               onClick={() => setShowLogout((prev) => !prev)}
-              whilehover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              data-tour-id="tour-avatar-mobile"
+              data-intro-id="avatar-step"
             >
               {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
             </motion.div>
@@ -324,11 +267,10 @@ const DashboardLayout = () => {
         </div>
       </motion.header>
 
-      {/* Mobile Menu (appears from left) */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
               initial={{ opacity: 0 }}
@@ -337,7 +279,6 @@ const DashboardLayout = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             />
             
-            {/* Sidebar */}
             <motion.aside 
               className="lg:hidden fixed top-0 left-0 h-full w-64 bg-[#06444f] border-r border-orange shadow-xl z-50 p-6 flex-col justify-between"
               initial="hidden"
@@ -365,7 +306,7 @@ const DashboardLayout = () => {
                     return (
                       <Link
                         key={link.path}
-                        data-tour-id={link.tourId?.mobile}
+                        data-intro-id={link.introId}
                         to={link.path}
                         className={linkClass(link.path)}
                         onClick={() => setIsMobileMenuOpen(false)}
@@ -381,7 +322,7 @@ const DashboardLayout = () => {
                 <motion.button
                   onClick={handleLogout}
                   className="w-full bg-[#ECA90E] shadow-[0_0_20px_4px_rgba(236,169,14,0.4)] text-white px-4 py-2 rounded-md text-sm hover:bg-[#d6990d] transition-all flex items-center justify-center gap-2"
-                  whilehover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <LogOut size={16} /> Logout
@@ -398,7 +339,6 @@ const DashboardLayout = () => {
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
-        data-tour-id="sidebar"
       >
         <div>
           <motion.div 
@@ -406,7 +346,6 @@ const DashboardLayout = () => {
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-             data-tour-id="logo"
           >
             <img src="/logo.png" alt="Unessa Logo" className="w-16 h-16 object-contain" />
             <h2 className="text-white text-xl font-bold">Unessa Foundation</h2>
@@ -420,9 +359,12 @@ const DashboardLayout = () => {
                 animate="visible"
                 variants={fadeIn}
                 transition={{ delay: index * 0.1 }}
-                data-tour-id={item.tourId?.desktop}
               >
-                <Link to={item.path} className={linkClass(item.path)}>
+                <Link 
+                  to={item.path} 
+                  className={linkClass(item.path)}
+                  data-intro-id={item.introId}
+                >
                   <item.icon size={20} />
                   {' '}
                   {item.label}
@@ -442,7 +384,7 @@ const DashboardLayout = () => {
           <motion.button
             onClick={handleLogout}
             className="w-full bg-[#ECA90E] shadow-[0_0_20px_4px_rgba(236,169,14,0.4)] text-white px-4 py-2 rounded-md text-sm hover:bg-[#d6990d] transition-all flex items-center justify-center gap-2"
-            whilehover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <LogOut size={18} /> Logout
@@ -474,24 +416,14 @@ const DashboardLayout = () => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              
-            </motion.div>
-
-            <motion.div 
-              className="group relative"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
               <motion.div 
-                
                 className="w-10 h-10 lg:w-14 lg:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
                 onClick={() => setShowLogout((prev) => !prev)}
-                whilehover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                data-tour-id="tour-avatar-desktop"
+                data-intro-id="avatar-step"
               >
-                {avatar && <img  src={avatar} alt="avatar" className="w-full h-full object-cover" />}
+                {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
               </motion.div>
 
               <AnimatePresence>
@@ -539,7 +471,7 @@ const DashboardLayout = () => {
             variants={popIn}
             transition={{ delay: index * 0.1 }}
             className="flex-1"
-            data-tour-id={item.tourId?.mobile}
+            data-intro-id={item.introId}
           >
             <Link to={item.path} className={linkClass(item.path)}>
               <item.icon size={20} />
