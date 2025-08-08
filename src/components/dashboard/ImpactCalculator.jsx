@@ -76,49 +76,39 @@ const ImpactCalculator = () => {
       }
     }, 15);
   };
+const fetchAndAnimate = async () => {
+  try {
+    const storedUser = localStorage.getItem("googleUser");
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    
+    // Use username here, NOT name!
+    const username = parsedUser?.username || localStorage.getItem("username");
 
-  const fetchAndAnimate = async () => {
-    try {
-      const storedUser = localStorage.getItem("googleUser");
-      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-      const username = parsedUser?.name || localStorage.getItem("username");
-
-      if (!username) {
-        console.warn("No username found in localStorage");
-        setTotalAmount(0);
-        setProgress(0);
-        return;
-      }
-
-      const res = await axios.get(
-        "https://unessa-backend.onrender.com/api/donations",
-        { params: { username } }
-      );
-
-      console.log("API response data:", res.data); // Debug fetched data
-
-      if (!Array.isArray(res.data) || res.data.length === 0) {
-        console.warn("No donations found for user:", username);
-        setTotalAmount(0);
-        setProgress(0);
-        return;
-      }
-
-      const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-      setTotalAmount(total);
-
-      localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
-
-      if (!target) return;
-
-      const calculated = Math.min(Math.round((total / target) * 100), 100);
-      animateProgress(calculated);
-    } catch (err) {
-      console.error("Error fetching donations:", err);
+    if (!username) {
+      console.log("No username found in localStorage");
       setTotalAmount(0);
       setProgress(0);
+      return;
     }
-  };
+
+    const res = await axios.get(
+      "https://unessa-backend.onrender.com/api/donations",
+      { params: { username } }
+    );
+
+    const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+    setTotalAmount(total);
+
+    localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
+
+    if (!target) return;
+
+    const calculated = Math.min(Math.round((total / target) * 100), 100);
+    animateProgress(calculated);
+  } catch (err) {
+    console.error("Error fetching donations:", err);
+  }
+};
 
   useEffect(() => {
     fetchAndAnimate();
