@@ -43,6 +43,9 @@ useEffect(() => {
   setShowTour(true);
 }, []);
 
+localStorage.setItem("isNewUser", "true");
+localStorage.removeItem("googleUser");
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -255,6 +258,12 @@ useEffect(() => {
             ...base,
             backgroundColor: '#043238',
             color: 'white',
+            zIndex: 9999,
+          }),
+          mask: (base) => ({ // Changed from maskWrapper to mask
+            ...base,
+            color: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 9998, // Add this line
           }),
           maskArea: (base) => ({
             ...base,
@@ -278,6 +287,12 @@ useEffect(() => {
           }),
         }}
       />
+      <button 
+  onClick={() => setShowTour(true)}
+  className="fixed top-20 right-4 bg-red-500 p-2 z-[10000]"
+>
+  Test Tour
+</button>
       {/* Mobile Header */}
       <motion.header 
         className="lg:hidden flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
