@@ -12,39 +12,37 @@ function Donation() {
     const fetchPayments = async () => {
       try {
         const username = localStorage.getItem("username");
-  
+
         if (!username) {
           console.log("No username found in localStorage");
           setLoading(false);
           return;
         }
-  
+
         const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
           params: { username }
         });
-  
-        setPayments(res.data);
-  
-        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-        setTotalAmount(total); // ✅ Set state here
 
-        // CORRECT: Update user object in localStorage without overwriting other properties
+        setPayments(res.data);
+
+        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+        setTotalAmount(total);
+
         const storedUser = localStorage.getItem("googleUser");
         const user = storedUser ? JSON.parse(storedUser) : {};
         user.amount = total;
         localStorage.setItem("googleUser", JSON.stringify(user));
-  
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching donations:', err);
         setLoading(false);
       }
     };
-  
+
     fetchPayments();
   }, []);
-  
-  // Animation variants
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -70,7 +68,7 @@ function Donation() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -78,8 +76,7 @@ function Donation() {
     >
       <ImpactCalculator amountFromServer={totalAmount} />
 
-      
-      <motion.h2 
+      <motion.h2
         className="text-2xl md:text-3xl font-bold text-white mb-6"
         variants={itemVariants}
       >
@@ -87,14 +84,14 @@ function Donation() {
       </motion.h2>
 
       {loading ? (
-        <motion.div 
+        <motion.div
           className="flex justify-center items-center h-40"
           variants={itemVariants}
         >
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#ECA90E]"></div>
         </motion.div>
       ) : payments.length === 0 ? (
-        <motion.p 
+        <motion.p
           className="text-white text-center py-10"
           variants={itemVariants}
         >
@@ -103,7 +100,7 @@ function Donation() {
       ) : (
         <>
           {/* Desktop Table */}
-          <motion.div 
+          <motion.div
             className="hidden md:block overflow-x-auto"
             variants={itemVariants}
           >
@@ -119,13 +116,15 @@ function Donation() {
               </thead>
               <tbody className="bg-[#06444f] divide-y divide-[#043238]">
                 {payments.map((payment) => (
-                  <motion.tr 
+                  <motion.tr
                     key={payment._id}
                     className="hover:bg-[#043238]/50 transition-colors"
                     variants={itemVariants}
                     whileHover={{ scale: 1.01 }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-white">{payment.formattedDate}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-white">
+                      {payment.formattedDate || new Date(payment.createdAt).toLocaleDateString()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-white font-medium">₹{payment.amount}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-white">{payment.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-white">{payment.email}</td>
@@ -137,37 +136,37 @@ function Donation() {
           </motion.div>
 
           {/* Mobile Cards */}
-          <motion.div 
+          <motion.div
             className="md:hidden space-y-4"
             variants={containerVariants}
           >
             {payments.map((payment) => (
               <motion.div
                 key={payment._id}
-                className="bg-[#06444f] rounded-lg p-4 shadow-md border border-[#ECA90E]/20"
+                className="bg-[#06444f] rounded-lg p-4 shadow-md border border-[#ECA90E]/20 text-white"
                 variants={itemVariants}
                 whileHover={{ y: -2 }}
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-[#ECA90E]">Date</p>
-                    <p className="text-white">{payment.formattedDate}</p>
+                    <p>{payment.formattedDate || new Date(payment.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#ECA90E]">Amount</p>
-                    <p className="text-white font-medium">₹{payment.amount}</p>
+                    <p className="font-medium">₹{payment.amount}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#ECA90E]">Name</p>
-                    <p className="text-white">{payment.name}</p>
+                    <p>{payment.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#ECA90E]">Email</p>
-                    <p className="text-white truncate">{payment.email}</p>
+                    <p className="truncate">{payment.email}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-sm text-[#ECA90E]">Phone</p>
-                    <p className="text-white">{payment.phone}</p>
+                    <p>{payment.phone}</p>
                   </div>
                 </div>
               </motion.div>
