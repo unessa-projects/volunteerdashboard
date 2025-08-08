@@ -55,16 +55,26 @@ const ImpactCalculator = ({ amountFromServer = 0 }) => {
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
-  useEffect(() => {
-    const calculated = Math.min(Math.round((amountFromServer / target) * 100), 100);
-    let start = 0;
-    const interval = setInterval(() => {
-      start += 1;
-      setProgress(start);
-      if (start >= calculated) clearInterval(interval);
-    }, 15);
-    return () => clearInterval(interval);
-  }, [amountFromServer]);
+ useEffect(() => {
+  if (!amountFromServer || !target) return; // Skip if data not ready
+
+  const calculated = Math.min(
+    Math.round((amountFromServer / target) * 100),
+    100
+  );
+
+  let start = 0;
+  setProgress(0); // reset before starting animation
+
+  const interval = setInterval(() => {
+    start += 1;
+    setProgress(start);
+    if (start >= calculated) clearInterval(interval);
+  }, 15);
+
+  return () => clearInterval(interval);
+}, [amountFromServer, target]);
+
 
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
