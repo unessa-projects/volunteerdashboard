@@ -32,6 +32,8 @@ const Avatar = () => {
     avatar: selected,
     username,
   };
+  
+
   try {
     const response = await fetch("https://unessa-backend.onrender.com/api/users/register", {
       method: "POST",

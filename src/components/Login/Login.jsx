@@ -8,10 +8,10 @@ const Login = () => {
   const handleCredentialResponse = async (response) => {
     try {
       const decoded = jwtDecode(response.credential);
-      const { email, name, picture } = decoded;
+      const { email, name, picture, username } = decoded;
 
       // ✅ Store user info
-      localStorage.setItem("googleUser", JSON.stringify({ email, name, avatar: picture }));
+      localStorage.setItem("googleUser", JSON.stringify({ email, name, avatar: picture, username }));
   
   
   
