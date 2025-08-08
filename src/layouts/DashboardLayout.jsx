@@ -32,12 +32,37 @@ const DashboardLayout = () => {
       navigate("/login");
     }
 
+
     // Set initial mobile state
     const checkIfMobile = () => setIsMobile(window.innerWidth < 1024);
     checkIfMobile();
     window.addEventListener('resize', checkIfMobile);
     return () => window.removeEventListener('resize', checkIfMobile);
   }, [navigate]);
+
+    const steps = useMemo(() => {
+    // Check window width here so it's fresh on each evaluation
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    console.log('Is mobile:', isMobile);
+
+    const tourSteps = (isMobile
+      ? [
+          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
+        ]
+      : [
+          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
+        ]
+    );
+
+    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
+    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
+  }, []);
 
   // Quiz status effect
   useEffect(() => {
@@ -63,65 +88,69 @@ const DashboardLayout = () => {
     }
   }, [user]);
 
-  // Tour steps configuration
-  const steps = useMemo(() => {
-    console.log('Generating steps for:', isMobile ? 'mobile' : 'desktop');
-    
-    const commonSteps = isMobile
-      ? [
-          {
-            selector: '[data-tour-id="tour-avatar-mobile"]',
-            content: "This is your profile. Click here to manage your account and logout.",
-            position: 'bottom'
-          },
-          {
-            selector: '[data-tour-id="tour-home-mobile"]',
-            content: "Go back to your dashboard anytime by clicking Home.",
-            position: 'right'
-          },
-          {
-            selector: '[data-tour-id="tour-insights-mobile"]',
-            content: "Check analytics and insights about your impact here.",
-            position: 'right'
-          },
-          {
-            selector: '[data-tour-id="tour-donations-mobile"]',
-            content: "Track and manage donations here.",
-            position: 'right'
-          }
-        ]
-      : [
-          {
-            selector: '[data-tour-id="tour-avatar-desktop"]',
-            content: "This is your profile. Click here to manage your account and logout.",
-            position: 'left'
-          },
-          {
-            selector: '[data-tour-id="tour-home-desktop"]',
-            content: "Go back to your dashboard anytime by clicking Home.",
-            position: 'right'
-          },
-          {
-            selector: '[data-tour-id="tour-insights-desktop"]',
-            content: "Check analytics and insights about your impact here.",
-            position: 'right'
-          },
-          {
-            selector: '[data-tour-id="tour-donations-desktop"]',
-            content: "Track and manage donations here.",
-            position: 'right'
-          }
-        ];
 
-    return commonSteps.map(step => ({
-      ...step,
-      disableBeacon: true,
-      styles: {
-        backgroundColor: '#043238',
-        color: 'white',
-      }
-    }));
-  }, [isMobile]);
+  // Tour steps configuration
+//   const steps = useMemo(() => {
+//     console.log('Generating steps for:', isMobile ? 'mobile' : 'desktop');
+    
+//     const commonSteps = isMobile
+//       ? [
+//           {
+//             selector: '[data-tour-id="tour-avatar-mobile"]',
+//             content: "This is your profile. Click here to manage your account and logout.",
+//             position: 'bottom'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-home-mobile"]',
+//             content: "Go back to your dashboard anytime by clicking Home.",
+//             position: 'right'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-insights-mobile"]',
+//             content: "Check analytics and insights about your impact here.",
+//             position: 'right'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-donations-mobile"]',
+//             content: "Track and manage donations here.",
+//             position: 'right'
+//           }
+//         ]
+//       : [
+//           {
+//             selector: '[data-tour-id="tour-avatar-desktop"]',
+//             content: "This is your profile. Click here to manage your account and logout.",
+//             position: 'left'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-home-desktop"]',
+//             content: "Go back to your dashboard anytime by clicking Home.",
+//             position: 'right'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-insights-desktop"]',
+//             content: "Check analytics and insights about your impact here.",
+//             position: 'right'
+//           },
+//           {
+//             selector: '[data-tour-id="tour-donations-desktop"]',
+//             content: "Track and manage donations here.",
+//             position: 'right'
+//           }
+//         ];
+// =======
+//  // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
+// >>>>>>> b14938b7881ea1010ccd396dbb958a233a348a25
+
+//     return commonSteps.map(step => ({
+//       ...step,
+//       disableBeacon: true,
+//       styles: {
+//         backgroundColor: '#043238',
+//         color: 'white',
+//       }
+//     }));
+//   }, [isMobile]);
 
   const handleLogout = () => {
     localStorage.removeItem("googleUser");

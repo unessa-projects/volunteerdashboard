@@ -60,47 +60,46 @@ const ImpactCalculator = () => {
   useEffect(() => {
     let intervalId;
 
-   const fetchAndAnimate = async () => {
-  try {
-    const storedUser = localStorage.getItem("googleUser");
-    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-    const username = parsedUser?.username || localStorage.getItem("username");
+    const fetchAndAnimate = async () => {
+      try {
+        const storedUser = localStorage.getItem("googleUser");
+        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        const username = parsedUser?.username || localStorage.getItem("username");
 
-    if (!username) {
-      console.log("No username found in localStorage");
-      return;
-    }
+        if (!username) {
+          console.log("No username found in localStorage");
+          return;
+        }
 
-    const res = await axios.get(
-      `https://unessa-backend.onrender.com/api/donations`,
-      { params: { username } }
-    );
+        const res = await axios.get(
+          "https://unessa-backend.onrender.com/api/donations",
+          { params: { username } }
+        );
 
-    const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-    setTotalAmount(total);
+        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+        setTotalAmount(total);
 
-    // ✅ Store donation amount separately, not overwriting googleUser
-    localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
+        // ✅ Store only donation amount, avoid overwriting googleUser
+        localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
 
-    const calculated = Math.min(Math.round((total / target) * 100), 100);
+        const calculated = Math.min(Math.round((total / target) * 100), 100);
 
-    let start = 0;
-    setProgress(0);
+        let start = 0;
+        setProgress(0);
 
-    const anim = setInterval(() => {
-      start += 1;
-      setProgress(start);
-      if (start >= calculated) clearInterval(anim);
-    }, 15);
+        const anim = setInterval(() => {
+          start += 1;
+          setProgress(start);
+          if (start >= calculated) clearInterval(anim);
+        }, 15);
 
-  } catch (err) {
-    console.error("Error fetching donations:", err);
-  }
-};
+      } catch (err) {
+        console.error("Error fetching donations:", err);
+      }
+    };
 
-
-    fetchAndAnimate(); // first run
-    intervalId = setInterval(fetchAndAnimate, 60000); // refresh every 5s
+    fetchAndAnimate();
+    intervalId = setInterval(fetchAndAnimate, 60000); // refresh every minute
 
     return () => clearInterval(intervalId);
   }, [target]);
