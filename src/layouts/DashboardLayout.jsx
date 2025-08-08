@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo  } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
-import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
+import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Tour } from '@reactour/tour';
@@ -13,21 +13,13 @@ const storedUser = localStorage.getItem("googleUser");
   const initialUser = storedUser ? JSON.parse(storedUser) : null;
 
   const [user, setUser] = useState(initialUser);
-  const [isLoading, setIsLoading] = useState(!initialUser); // loading only if no user found yet
+  const [isLoading, setIsLoading] = useState(!initialUser);
 
-  // If user not loaded, try to load it again (for example, in case user data is updated somewhere else)
   useEffect(() => {
     if (!user) {
-      const stored = localStorage.getItem("googleUser");
-      if (stored) {
-        setUser(JSON.parse(stored));
-        setIsLoading(false);
-      } else {
-        navigate("/login"); // redirect if no user data
-      }
-    } else {
-      setIsLoading(false);
+      navigate("/login"); // redirect if no user data found on initial load
     }
+    // No need for an else block, isLoading is already false if 'user' exists
   }, [user, navigate]);
 
   // Username and avatar safely accessed after user is loaded
@@ -40,8 +32,6 @@ const storedUser = localStorage.getItem("googleUser");
   const [isMobile, setIsMobile] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
-  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
-  const [, setShowStartButton] = useState(true);
 
   // Detect mobile screen
   useEffect(() => {
@@ -51,10 +41,20 @@ const storedUser = localStorage.getItem("googleUser");
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Centralized navigation links
+  const navLinks = [
+    { path: "/dashboard", icon: Home, label: "Home", tourId: { mobile: "tour-home-mobile", desktop: "tour-home-desktop" } },
+    { path: "/insights", icon: BarChart2, label: "Insights", tourId: { mobile: "tour-insights-mobile", desktop: "tour-insights-desktop" } },
+    { path: "/donations", icon: DollarSign, label: "Donations", tourId: { mobile: "tour-donations-mobile", desktop: "tour-donations-desktop" } },
+    { path: "/community", icon: Users, label: "Learning" },
+    { path: "/certificates", icon: Download, label: "Certificates" }
+  ];
+
+  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
+
   // Define tour steps based on device
   const steps = useMemo(() => {
-    const isMobile = window.innerWidth < 1024;
-    const tourSteps = isMobile
+    const tourSteps = isMobile // Use the 'isMobile' state variable from the component's scope
       ? [
           { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
           { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
@@ -81,17 +81,6 @@ const storedUser = localStorage.getItem("googleUser");
       }
     }));
   }, [isMobile]);
-
-  // Manage quiz start button visibility
-  useEffect(() => {
-    if (quizStatus === "failed") {
-      setShowStartButton(false);
-      const timer = setTimeout(() => setShowStartButton(true), 60000);
-      return () => clearTimeout(timer);
-    } else if (quizStatus === "passed") {
-      setShowStartButton(false);
-    }
-  }, [quizStatus]);
 
   // Sync user state on localStorage change (e.g., from another tab)
   useEffect(() => {
