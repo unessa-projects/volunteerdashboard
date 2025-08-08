@@ -179,8 +179,7 @@ const Dashboard = () => {
         </div>
       </section>
 
-      {/* Social Links Section */}
-      <section className="my-10">
+<section className="my-10">
   <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-6 md:mb-8">
     Connect With Us
   </h2>
@@ -252,7 +251,14 @@ const Dashboard = () => {
           fill="#0077B5"
           className="w-10 h-10 md:w-12 md:h-12"
         >
-          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11.002-4.125 2.062 2.062 0 01-.002 4.125zm1.779 13.019H3.559V9h3.557v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.726v20.549C0 23.227.792 24 1.771 24h20.451c.98 0 1.778-.773 1.778-1.725V1.726C24 .774 23.204 0 22.225 0z" />
+        </svg>
+      </div>
+      <span className="font-semibold text-base md:text-lg text-center">LinkedIn</span>
+      <span className="text-xs md:text-sm text-white/80 mt-1 text-center">/unessafoundation</span>
+    </a>
+  </div>
+</section>
 
     </div>
   );
