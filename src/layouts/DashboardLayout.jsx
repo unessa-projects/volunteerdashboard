@@ -46,6 +46,29 @@ useEffect(() => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+    const steps = useMemo(() => {
+    // Check window width here so it's fresh on each evaluation
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    console.log('Is mobile:', isMobile);
+
+    const tourSteps = (isMobile
+      ? [
+          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
+        ]
+      : [
+          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
+        ]
+    );
+
+    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
+    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
+  }, []);
 
     // This effect is now cleaner as it doesn't need to update separate states
     useEffect(() => {
@@ -104,29 +127,7 @@ useEffect(() => {
   
 
 
-  const steps = useMemo(() => {
-    // Check window width here so it's fresh on each evaluation
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    console.log('Is mobile:', isMobile);
-
-    const tourSteps = (isMobile
-      ? [
-          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-        ]
-      : [
-          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-        ]
-    );
-
-    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
-    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
-  }, []); // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
+ // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
 
 
   const handleLogout = () => {
