@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Steps } from 'intro.js-react';
 import 'intro.js/introjs.css';
-import './introjs-custom.css'; 
+import '../introjs-custom.css'; 
 
 // Create this file for custom styles
 
