@@ -19,7 +19,7 @@ function Donation() {
           return;
         }
 
-        const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
+        const res = await axios.get(https://unessa-backend.onrender.com/api/donations, {
           params: { username }
         });
 
