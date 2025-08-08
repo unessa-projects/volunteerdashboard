@@ -10,29 +10,57 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   // Initialize user state from localStorage (parsed JSON or null)
-  const [user, setUser] = useState(() => {
-    try {
-      const storedUser = localStorage.getItem("googleUser");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch {
-      // If JSON parsing fails, clear corrupted storage and return null
-      localStorage.removeItem("googleUser");
-      return null;
-    }
-  });
+ const [user, setUser] = useState(null);
+
 
   // Loading is true if user data missing, false otherwise
-  const [isLoading, setIsLoading] = useState(() => !user);
+ const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
-      // Redirect to login if no user data
-      navigate("/login", { replace: true });
-    } else {
-      // User exists, stop loading state
-      setIsLoading(false);
+
+ useEffect(() => {
+  const storedUserString = localStorage.getItem("googleUser");
+  let email = null;
+
+  if (storedUserString) {
+    try {
+      const parsedUser = JSON.parse(storedUserString);
+      email = parsedUser.email;
+    } catch {
+      localStorage.removeItem("googleUser");
     }
-  }, [user, navigate]);
+  }
+
+  if (!email) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  // Fetch fresh user data from backend
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // User not found — redirect to login
+          navigate("/login", { replace: true });
+          return;
+        }
+        throw new Error("Failed to fetch user data");
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      localStorage.setItem("googleUser", JSON.stringify(userData));
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      navigate("/login", { replace: true });
+    }
+  };
+
+  fetchUserData();
+}, [navigate]);
 
   // Extract first name from full name safely, fallback "User"
   const username = user?.name ? user.name.split(" ")[0] : "User";
