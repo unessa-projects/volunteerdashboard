@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo,  useCallback  } from "react";
+import React, { useEffect, useState, useMemo,   } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,8 +46,6 @@ const DashboardLayout = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
-  const [isTourReady, setIsTourReady] = useState(false);
-
 
   // Detect mobile screen
   useEffect(() => {
@@ -59,47 +57,40 @@ const DashboardLayout = () => {
 
   // Centralized navigation links
   const navLinks = [
-    { path: "/dashboard", icon: Home, label: "Home", tourId: isMobile ? "tour-home-mobile" : "tour-home-desktop"  },
-    { path: "/insights", icon: BarChart2, label: "Insights", tourId: isMobile ? "tour-insights-mobile" : "tour-insights-desktop"  },
-    { path: "/donations", icon: DollarSign, label: "Donations", tourId:  isMobile ? "tour-donations-mobile" : "tour-donations-desktop"  },
+    { path: "/dashboard", icon: Home, label: "Home", tourId: { mobile: "tour-home-mobile", desktop: "tour-home-desktop" } },
+    { path: "/insights", icon: BarChart2, label: "Insights", tourId: { mobile: "tour-insights-mobile", desktop: "tour-insights-desktop" } },
+    { path: "/donations", icon: DollarSign, label: "Donations", tourId: { mobile: "tour-donations-mobile", desktop: "tour-donations-desktop" } },
     { path: "/community", icon: Users, label: "Learning" },
     { path: "/certificates", icon: Download, label: "Certificates" }
   ];
 
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
 
-
-  
   // Define tour steps based on device
   const steps = useMemo(() => {
-    const baseSteps = [
-      { 
-        selector: '[data-tour-id="tour-avatar"]', 
-        content: "This is your profile avatar. Click here to manage your account and logout." 
-      },
-      { 
-        selector: `[data-tour-id="${navLinks[0].tourId}"]`, 
-        content: "Go back to your dashboard anytime by clicking Home." 
-      },
-      { 
-        selector: `[data-tour-id="${navLinks[1].tourId}"]`, 
-        content: "Check analytics and insights about your impact here." 
-      },
-      { 
-        selector: `[data-tour-id="${navLinks[2].tourId}"]`, 
-        content: "Track and manage donations here." 
-      },
-    ];
+    const tourSteps = isMobile // Use the 'isMobile' state variable from the component's scope
+      ? [
+          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
+        ]
+      : [
+          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
+          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
+          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
+          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
+        ];
 
-    return baseSteps.map(step => ({
+    return tourSteps.map(step => ({
       ...step,
       disableBeacon: true,
       styles: {
         backgroundColor: "#043238",
-        color: "white",
+        color: "white"
       }
     }));
-  }, [isMobile, navLinks]); // Recreate when isMobile changes
+  }, [isMobile]);
 
   // Sync user state on localStorage change (e.g., from another tab)
   useEffect(() => {
@@ -117,37 +108,27 @@ const DashboardLayout = () => {
     if (user && !user.hasSeenTour) {
       const timer = setTimeout(() => {
         setShowTour(true);
-      }, 1000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [user, steps]);
 
-  useEffect(() => {
-    if (isTourReady && user && !user.hasSeenTour) {
-      setShowTour(true);
-    }
-  }, [isTourReady, user]);
-
-  useEffect(() => {
-    console.log('Tour ready:', isTourReady, 'Show tour:', showTour, 'User:', user);
-  }, [isTourReady, showTour, user]);
-
-  const handleTourClose = useCallback(() => {
+  const handleTourClose = () => {
     setShowTour(false);
     if (user?.email) {
-      // Update both state and localStorage
+      // Optimistically update the user state to prevent re-showing the tour on refresh
       const updatedUser = { ...user, hasSeenTour: true };
       setUser(updatedUser);
       localStorage.setItem('googleUser', JSON.stringify(updatedUser));
 
-      // API call to mark tour as seen
+      // Then, notify the backend that the tour has been seen
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email }),
-      }).catch(error => console.error("Error marking tour as seen:", error));
+      });
     }
-  }, [user]);
+  };
 
   // Example logout handler
   const handleLogout = () => {
@@ -220,12 +201,10 @@ const DashboardLayout = () => {
   };
 
 
-  
-
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
      
-     <Tour
+ <Tour
         steps={steps}
         isOpen={showTour}
         onRequestClose={handleTourClose}
@@ -234,6 +213,11 @@ const DashboardLayout = () => {
             ...base,
             backgroundColor: '#043238',
             color: 'white',
+            zIndex: 9999,
+          }),
+          mask: (base) => ({
+            ...base,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
           }),
           maskArea: (base) => ({
             ...base,
@@ -243,19 +227,16 @@ const DashboardLayout = () => {
             ...base,
             backgroundColor: '#FFB823',
           }),
+          controls: (base) => ({
+            ...base,
+            marginTop: 20,
+          }),
+          close: (base) => ({
+            ...base,
+            color: '#FFB823',
+          }),
         }}
-        position="bottom" // Helps with positioning
-        disableInteraction={false} // Allow interaction with highlighted elements
-        disableDotsNavigation={true} // Simpler navigation
-        disableKeyboardNavigation={false} // Allow keyboard navigation
       />
-
-<button 
-  onClick={() => setShowTour(true)}
-  className="fixed bottom-4 right-4 bg-[#FFB823] text-white p-3 rounded-full shadow-lg z-50"
->
-  <HelpCircle size={24} />
-</button>
 
       {/* Mobile Header */}
       <motion.header 
@@ -288,27 +269,14 @@ const DashboardLayout = () => {
 
           <div className="group relative">
             <motion.div
-              data-tour-id="tour-avatar"
               className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
               onClick={() => setShowLogout((prev) => !prev)}
               whilehover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              
+              data-tour-id="tour-avatar-mobile"
             >
               {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
             </motion.div>
-
-            {navLinks.map(link => (
-        <Link
-          key={link.path}
-          data-tour-id={link.tourId}
-          to={link.path}
-          className={linkClass(link.path)}
-        >
-          <link.icon size={20} />
-          {link.label}
-        </Link>
-      ))}
 
             <AnimatePresence>
               {showLogout && (
