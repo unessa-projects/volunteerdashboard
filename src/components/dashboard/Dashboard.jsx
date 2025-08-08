@@ -106,7 +106,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#001F3F] to-[#003366] p-4 md:p-8">
       {/* Progress Tracker */}
-      <div className="mb-8 bg-[#ffffff10] backdrop-blur-sm rounded-xl p-4 border border-[#ffffff10]">
+      <div data-tour-id="tour-progress" className="mb-8 bg-[#ffffff10] backdrop-blur-sm rounded-xl p-4 border border-[#ffffff10]">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-white font-medium">Internship Progress</h3>
           <span className="text-[#ECA90E] font-bold">{daysLeft} days remaining</span>
@@ -118,8 +118,9 @@ const Dashboard = () => {
           ></div>
         </div>
       </div>
-
+<div data-tour-id="tour-impact">
       <ImpactCalculator />
+      </div>
 
       {/* Internship Journey Section */}
       <section className="my-10">

@@ -37,7 +37,11 @@ useEffect(() => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [, setShowStartButton] = useState(true);
-
+// This forces tour to show immediately, overriding your logic
+useEffect(() => {
+  console.log('Forcing tour for testing');
+  setShowTour(true);
+}, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,18 +63,25 @@ useEffect(() => {
           { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
           { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
           { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
+          { selector: '[data-tour-id="tour-progress"]', content: "Track your internship progress" },
+          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" }
         ]
       : [
           { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
           { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
           { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
           { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
+          { selector: '[data-tour-id="tour-progress"]', content: "Track your internship progress" },
+          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" },
         ]
     );
 
     // Use 'selector' instead of 'target' as per latest @reactour/tour docs
-    return tourSteps.map(step => ({ ...step, disableBeacon: true }));
-  }, []);
+    return tourSteps.map(step => ({ ...step, disableBeacon: true, styles: {
+      backgroundColor: '#043238',
+      color: 'white'
+    } }));
+  }, [isMobile]);
 
     // This effect is now cleaner as it doesn't need to update separate states
     useEffect(() => {
@@ -101,6 +112,7 @@ useEffect(() => {
   if (isNewUser && user?.name) {
     console.log('Starting tour...', steps);
     const timer = setTimeout(() => {
+      console.log('Starting tour with steps:', steps);
       setShowTour(true);
     }, 3000);
     return () => clearTimeout(timer);
