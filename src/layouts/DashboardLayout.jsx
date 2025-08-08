@@ -3,7 +3,10 @@ import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
 import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
+import { useProductTour } from "../hooks/useProductTour";
+import { useQuiz } from "../hooks/useQuiz";
 import { Tour } from '@reactour/tour';
+import { sidebarVariants, fadeIn, popIn } from "../utils/animations";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -44,10 +47,12 @@ const DashboardLayout = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [showTour, setShowTour] = useState(false);
-  const [showQuiz, setShowQuiz] = useState(false);
 
-  // Detect mobile screen
+  // Centralize product tour logic in a custom hook
+  const { isTourOpen, tourSteps, handleTourClose } = useProductTour(user, setUser, isMobile);
+  // Centralize quiz logic in a custom hook
+  const { showQuiz, handleQuizComplete, clearQuizStatusOnLogout } = useQuiz(setUser);
+  // Detect mobile screen size
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize(); // initial check
@@ -64,34 +69,6 @@ const DashboardLayout = () => {
     { path: "/certificates", icon: Download, label: "Certificates" }
   ];
 
-  const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
-
-  // Define tour steps based on device
-  const steps = useMemo(() => {
-    const tourSteps = isMobile // Use the 'isMobile' state variable from the component's scope
-      ? [
-          { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-        ]
-      : [
-          { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
-          { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
-          { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
-          { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-        ];
-
-    return tourSteps.map(step => ({
-      ...step,
-      disableBeacon: true,
-      styles: {
-        backgroundColor: "#043238",
-        color: "white"
-      }
-    }));
-  }, [isMobile]);
-
   // Sync user state on localStorage change (e.g., from another tab)
   useEffect(() => {
     const handleStorageChange = () => {
@@ -102,56 +79,16 @@ const DashboardLayout = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Trigger tour for new user when user data and steps are ready
-  useEffect(() => {
-    // A new user is one who has not seen the tour yet.
-    if (user && user.hasSeenTour === false) {
-      const timer = setTimeout(() => {
-        setShowTour(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [user, steps]);
-
-  const handleTourClose = () => {
-    setShowTour(false);
-    if (user?.email) {
-      // Optimistically update the user state to prevent re-showing the tour on refresh
-      const updatedUser = { ...user, hasSeenTour: true };
-      setUser(updatedUser);
-      localStorage.setItem('googleUser', JSON.stringify(updatedUser));
-
-      // Then, notify the backend that the tour has been seen
-      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email }),
-      });
-    }
-  };
-
   // Example logout handler
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
-    localStorage.removeItem("quizStatus");
+    clearQuizStatusOnLogout(); // Clear quiz status via the hook
     navigate("/login");
   };
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  
-  
-  const handleQuizComplete = (result) => {
-    setQuizStatus(result);
-    localStorage.setItem("quizStatus", result);
-    if (result === "passed") {
-      // Just re-read from storage to update the single 'user' state
-      const storedUser = localStorage.getItem("googleUser");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    }
-    setShowQuiz(false);
-  };
 
 
 
@@ -165,48 +102,13 @@ const DashboardLayout = () => {
         : "text-white hover:text-[#FFB823] hover:bg-[#043238]/40"
     }`;
 
-  // Animation variants
-  const sidebarVariants = {
-    hidden: { x: -300, opacity: 0 },
-    visible: { 
-      x: 0, 
-      opacity: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 100,
-        damping: 15
-      }
-    }
-  };
-
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { duration: 0.3 }
-    }
-  };
-
-  const popIn = {
-    hidden: { scale: 0.8, opacity: 0 },
-    visible: { 
-      scale: 1, 
-      opacity: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 200,
-        damping: 15
-      }
-    }
-  };
-
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
      
- <Tour
-        steps={steps}
-        isOpen={showTour}
+      <Tour
+        steps={tourSteps}
+        isOpen={isTourOpen}
         onRequestClose={handleTourClose}
         styles={{
           popover: (base) => ({
