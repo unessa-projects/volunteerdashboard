@@ -114,7 +114,7 @@ useEffect(() => {
     const timer = setTimeout(() => {
       console.log('Starting tour with steps:', steps);
       setShowTour(true);
-    }, 3000);
+    }, 5000);
     return () => clearTimeout(timer);
   }
 }, [user, steps]);
