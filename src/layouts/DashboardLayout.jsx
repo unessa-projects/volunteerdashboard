@@ -16,10 +16,6 @@ const DashboardLayout = () => {
   const [isLoading, setIsLoading] = useState(() => !localStorage.getItem("googleUser"));
 
   useEffect(() => {
-    console.log("Dashboard loaded user:", localStorage.getItem("googleUser"));
-  }, []);
-
-  useEffect(() => {
     if (!user) {
       navigate("/login"); // redirect if no user data found on initial load
     } else {
