@@ -32,7 +32,7 @@ const Avatar = () => {
     avatar: selected,
     username,
   };
-    console.log("Incoming registration data:", req.body);
+  
 
   try {
     const response = await fetch("https://unessa-backend.onrender.com/api/users/register", {
