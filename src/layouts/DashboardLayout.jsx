@@ -21,14 +21,23 @@ const DashboardLayout = () => {
 
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [, setShowStartButton] = useState(true);
 
+
   useEffect(() => {
-    console.log('Current user:', user);
-  }, [user]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
     // This effect is now cleaner as it doesn't need to update separate states
     useEffect(() => {
       if (quizStatus === "failed") {
@@ -56,13 +65,13 @@ const DashboardLayout = () => {
   
   // Check if it's a new user AND the user object with a name exists.
   if (isNewUser && user?.name) {
-    console.log('Starting tour...');
+    console.log('Starting tour...', steps);
     const timer = setTimeout(() => {
       setShowTour(true);
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }
-}, [user]);
+}, [user, steps]);
   // useEffect(() => {
   //   const user = JSON.parse(localStorage.getItem("googleUser"));
   //   if (user?.avatar) setAvatar(user.avatar);
@@ -74,7 +83,10 @@ const DashboardLayout = () => {
   //   navigate("/login");
   // };
 
- 
+  useEffect(() => {
+    console.log('Forcing tour for testing');
+    setShowTour(true);
+  }, []);
 
 
 
@@ -199,7 +211,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
-      <button onClick={() => setShowTour(true)}>Test Tour</button>
+     
  <Tour
         steps={steps}
         isOpen={showTour}
@@ -214,7 +226,33 @@ const DashboardLayout = () => {
             });
           }
         }}
-        // ... other tour props
+        styles={{
+          popover: (base) => ({
+            ...base,
+            backgroundColor: '#043238',
+            color: 'white',
+          }),
+          maskArea: (base) => ({
+            ...base,
+            rx: 10,
+          }),
+          maskWrapper: (base) => ({
+            ...base,
+            color: 'rgba(0, 0, 0, 0.7)',
+          }),
+          badge: (base) => ({
+            ...base,
+            backgroundColor: '#FFB823',
+          }),
+          controls: (base) => ({
+            ...base,
+            marginTop: 20,
+          }),
+          close: (base) => ({
+            ...base,
+            color: '#FFB823',
+          }),
+        }}
       />
       {/* Mobile Header */}
       <motion.header 
