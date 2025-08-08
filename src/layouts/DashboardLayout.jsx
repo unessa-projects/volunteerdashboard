@@ -15,7 +15,8 @@ const DashboardLayout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [stepsEnabled, setStepsEnabled] = useState(false);
@@ -81,11 +82,11 @@ const DashboardLayout = () => {
     { path: "/certificates", icon: Download, label: "Certificates" }
   ];
 
-  const steps = [
+  const steps = useMemo(() => [
     {
       element: '[data-intro-id="avatar-step"]',
       intro: "This is your profile avatar. Click here to manage your account and logout.",
-      position: 'bottom'
+      position: isMobile ? 'bottom' : 'right'
     },
     {
       element: '[data-intro-id="home-step"]',
@@ -102,16 +103,28 @@ const DashboardLayout = () => {
       intro: "Track and manage donations here.",
       position: isMobile ? 'bottom' : 'right'
     }
-  ];
+  ], [isMobile]);
 
   useEffect(() => {
     if (user && !user.hasSeenTour) {
+      // Wait for all elements to be rendered
       const timer = setTimeout(() => {
-        setStepsEnabled(true);
-      }, 1000);
+        // Verify elements exist before starting tour
+        const allElementsExist = steps.every(step => {
+          return document.querySelector(step.element);
+        });
+        
+        if (allElementsExist) {
+          setStepsEnabled(true);
+        } else {
+          console.warn('Some tour elements not found');
+        }
+      }, 1500); // Increased delay to 1.5 seconds
+      
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, [user, steps]);
+
 
   const handleTourComplete = () => {
     setStepsEnabled(false);
@@ -197,22 +210,23 @@ const DashboardLayout = () => {
         steps={steps}
         initialStep={0}
         onExit={handleTourComplete}
+        onComplete={handleTourComplete}
         options={{
           nextLabel: 'Next →',
           prevLabel: '← Back',
           doneLabel: 'Got it!',
           skipLabel: 'Skip',
-          hideNext: false,
-          tooltipClass: 'bg-[#043238] text-white',
-          highlightClass: 'tour-highlight',
-          showStepNumbers: false,
+          tooltipClass: 'introjs-tooltip-custom',
+          highlightClass: 'introjs-highlight-custom',
           showBullets: true,
           showProgress: true,
+          showStepNumbers: false,
           disableInteraction: false,
-          exitOnOverlayClick: false
+          exitOnEsc: true,
+          exitOnOverlayClick: false,
+          keyboardNavigation: true
         }}
       />
-
       {/* Mobile Header */}
       <motion.header 
         className="lg:hidden flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"

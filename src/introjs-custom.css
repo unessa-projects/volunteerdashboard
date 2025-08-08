@@ -1,0 +1,26 @@
+/* introjs-custom.css */
+.introjs-tooltip-custom {
+    background-color: #043238;
+    color: white;
+    border-radius: 8px;
+  }
+  
+  .introjs-highlight-custom {
+    background: rgba(255, 184, 35, 0.2);
+    border-radius: 12px;
+  }
+  
+  .introjs-button {
+    background-color: #FFB823;
+    color: #043238;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .introjs-button:hover {
+    background-color: #ECA90E;
+  }
+  
+  .introjs-progress {
+    background-color: #FFB823;
+  }
