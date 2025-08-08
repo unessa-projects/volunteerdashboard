@@ -55,8 +55,6 @@ const ImpactCalculator = () => {
   const [progress, setProgress] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [apiUsername, setApiUsername] = useState("");
-
   const target = 36000;
 
   const animationIntervalId = useRef(null);
@@ -79,48 +77,41 @@ const ImpactCalculator = () => {
     }, 15);
   };
 
- const fetchAndAnimate = async () => {
-  try {
-    const storedUser = localStorage.getItem("googleUser");
-    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+  const fetchAndAnimate = async () => {
+    try {
+      const storedUser = localStorage.getItem("googleUser");
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
 
-    // Current fallback to localStorage
-    let username = parsedUser?.username || localStorage.getItem("username");
+      // Use username here, NOT name!
+      const username = parsedUser?.username || localStorage.getItem("username");
 
-    if (!username) {
-      console.log("No username found in localStorage");
-      setTotalAmount(0);
-      setProgress(0);
-      return;
+      if (!username) {
+        console.log("No username found in localStorage");
+        setTotalAmount(0);
+        setProgress(0);
+        return;
+      }
+
+      const res = await axios.get(
+        "https://unessa-backend.onrender.com/api/donations",
+        { params: { username } }
+      );
+
+      const total = Array.isArray(res.data)
+        ? res.data.reduce((sum, payment) => sum + payment.amount, 0)
+        : 0;
+
+      setTotalAmount(total);
+      localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
+
+      if (!target) return;
+
+      const calculated = Math.min(Math.round((total / target) * 100), 100);
+      animateProgress(calculated);
+    } catch (err) {
+      console.error("Error fetching donations:", err);
     }
-
-    const res = await axios.get(
-      "https://unessa-backend.onrender.com/api/donations",
-      { params: { username } }
-    );
-
-    // Example: If the API returns the username in response (adjust as per your actual response)
-    if (res.data.username) {
-      username = res.data.username;
-    }
-
-    setApiUsername(username);  // Store API username
-
-    const total = Array.isArray(res.data)
-      ? res.data.reduce((sum, payment) => sum + payment.amount, 0)
-      : 0;
-
-    setTotalAmount(total);
-    localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
-
-    if (!target) return;
-
-    const calculated = Math.min(Math.round((total / target) * 100), 100);
-    animateProgress(calculated);
-  } catch (err) {
-    console.error("Error fetching donations:", err);
-  }
-};
+  };
 
   useEffect(() => {
     fetchAndAnimate();
@@ -135,24 +126,23 @@ const ImpactCalculator = () => {
     };
   }, []);
 
-const handleCopyLink = () => {
-  const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
-  const refName = apiUsername || "";
-  const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-  navigator.clipboard.writeText(finalURL);
-  setCopied(true);
-  setTimeout(() => setCopied(false), 2000);
-};
+  const handleCopyLink = () => {
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
+    const refName = localStorage.getItem("username") || "";
+    const finalURL = ${baseURL}?ref=${encodeURIComponent(refName)};
+    navigator.clipboard.writeText(finalURL);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-const handleShare = () => {
-  const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
-  const refName = apiUsername || "";
-  const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-  const message = `Hello!\nI’m volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖`;
-  const whatsappURL = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-  window.open(whatsappURL, "_blank");
-};
-
+  const handleShare = () => {
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
+    const refName = localStorage.getItem("username") || "";
+    const finalURL = ${baseURL}?ref=${encodeURIComponent(refName)};
+    const message = Hello!\nI’m volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖;
+    const whatsappURL = https://web.whatsapp.com/send?text=${encodeURIComponent(message)};
+    window.open(whatsappURL, "_blank");
+  };
 
   return (
     <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
@@ -193,7 +183,3 @@ const handleShare = () => {
 };
 
 export default ImpactCalculator;
-
-
-
-
