@@ -19,19 +19,30 @@ const DashboardLayout = () => {
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
 
   // Derived state
+// Initialize state properly
+  const [user, setUser] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem("googleUser");
+      return storedUser ? JSON.parse(storedUser) : null;
+    }
+    return null;
+  });
+  
+  const [isLoading, setIsLoading] = useState(!user);
   const username = user?.name ? user.name.split(" ")[0] : "User";
   const avatar = user?.avatar || null;
 
-  // Initialize user and check screen size
   useEffect(() => {
-    // Load user from localStorage
-    const storedUser = localStorage.getItem("googleUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      navigate("/login");
+    if (!user) {
+      const storedUser = localStorage.getItem("googleUser");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        navigate("/login");
+      }
     }
-
+    setIsLoading(false);
+  }, [user, navigate]);
 
     // Set initial mobile state
     const checkIfMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -77,16 +88,15 @@ const DashboardLayout = () => {
 
   // Tour initialization
   useEffect(() => {
-    const isNewUser = localStorage.getItem("isNewUser") === "true";
-    if (isNewUser && user?.name) {
-      console.log('Conditions met for tour:', { isNewUser, hasUser: !!user?.name });
-      const timer = setTimeout(() => {
-        console.log('Starting tour now');
-        setShowTour(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [user]);
+    const handleStorageChange = (e) => {
+      if (e.key === "googleUser") {
+        setUser(e.newValue ? JSON.parse(e.newValue) : null);
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
 
   // Tour steps configuration
