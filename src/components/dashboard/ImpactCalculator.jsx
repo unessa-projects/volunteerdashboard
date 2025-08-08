@@ -55,25 +55,55 @@ const ImpactCalculator = ({ amountFromServer = 0 }) => {
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
- useEffect(() => {
-  if (!amountFromServer || !target) return; // Skip if data not ready
+useEffect(() => {
+  const fetchAndAnimate = async () => {
+    try {
+      const username = localStorage.getItem("username");
 
-  const calculated = Math.min(
-    Math.round((amountFromServer / target) * 100),
-    100
-  );
+      if (!username) {
+        console.log("No username found in localStorage");
+        setLoading(false);
+        return;
+      }
 
-  let start = 0;
-  setProgress(0); // reset before starting animation
+      // 1️⃣ Fetch payments
+      const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
+        params: { username }
+      });
 
-  const interval = setInterval(() => {
-    start += 1;
-    setProgress(start);
-    if (start >= calculated) clearInterval(interval);
-  }, 15);
+      setPayments(res.data);
 
-  return () => clearInterval(interval);
-}, [amountFromServer, target]);
+      const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+      setTotalAmount(total);
+      localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
+
+      // 2️⃣ Run progress animation
+      if (!target) return; // skip if no target
+      const calculated = Math.min(
+        Math.round((total / target) * 100),
+        100
+      );
+
+      let start = 0;
+      setProgress(0);
+
+      const interval = setInterval(() => {
+        start += 1;
+        setProgress(start);
+        if (start >= calculated) clearInterval(interval);
+      }, 15);
+
+      setLoading(false);
+      return () => clearInterval(interval);
+    } catch (err) {
+      console.error("Error fetching donations:", err);
+      setLoading(false);
+    }
+  };
+
+  fetchAndAnimate();
+}, [target]);
+
 
 
   const handleCopyLink = () => {
