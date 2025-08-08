@@ -104,7 +104,7 @@ const DashboardLayout = () => {
 
   // Trigger tour for new user when user data and steps are ready
   useEffect(() => {
-    // Use hasSeenTour from the user object as the source of truth
+    // A new user is one who has not seen the tour yet.
     if (user && user.hasSeenTour === false) {
       const timer = setTimeout(() => {
         setShowTour(true);
@@ -121,7 +121,7 @@ const DashboardLayout = () => {
       setUser(updatedUser);
       localStorage.setItem('googleUser', JSON.stringify(updatedUser));
 
-      // Then, notify the backend
+      // Then, notify the backend that the tour has been seen
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
