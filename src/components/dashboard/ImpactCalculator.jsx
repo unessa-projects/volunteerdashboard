@@ -57,10 +57,8 @@ const ImpactCalculator = () => {
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
-  // useRef to keep track of the interval ID across renders safely
   const animationIntervalId = useRef(null);
 
-  // Animate the progress bar count up smoothly from 0 to `calculated`
   const animateProgress = (calculated) => {
     if (animationIntervalId.current) {
       clearInterval(animationIntervalId.current);
@@ -86,7 +84,7 @@ const ImpactCalculator = () => {
       const username = parsedUser?.name || localStorage.getItem("username");
 
       if (!username) {
-        console.log("No username found in localStorage");
+        console.warn("No username found in localStorage");
         setTotalAmount(0);
         setProgress(0);
         return;
@@ -97,10 +95,18 @@ const ImpactCalculator = () => {
         { params: { username } }
       );
 
+      console.log("API response data:", res.data); // Debug fetched data
+
+      if (!Array.isArray(res.data) || res.data.length === 0) {
+        console.warn("No donations found for user:", username);
+        setTotalAmount(0);
+        setProgress(0);
+        return;
+      }
+
       const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
       setTotalAmount(total);
 
-      // Store only donationAmount separately
       localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
 
       if (!target) return;
@@ -109,16 +115,16 @@ const ImpactCalculator = () => {
       animateProgress(calculated);
     } catch (err) {
       console.error("Error fetching donations:", err);
+      setTotalAmount(0);
+      setProgress(0);
     }
   };
 
   useEffect(() => {
-    fetchAndAnimate(); // fetch on mount immediately
+    fetchAndAnimate();
 
-    // Refresh every 60 seconds
     const refreshInterval = setInterval(fetchAndAnimate, 60000);
 
-    // Cleanup intervals on unmount
     return () => {
       if (animationIntervalId.current) {
         clearInterval(animationIntervalId.current);
@@ -184,5 +190,6 @@ const ImpactCalculator = () => {
 };
 
 export default ImpactCalculator;
+
 
 
