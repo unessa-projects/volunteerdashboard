@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Steps } from 'intro.js-react';
 import 'intro.js/introjs.css';
+import './introjs-custom.css'; 
+
+// Create this file for custom styles
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -14,62 +17,57 @@ const DashboardLayout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [stepsEnabled, setStepsEnabled] = useState(false);
 
+  // Auth check on route change
   useEffect(() => {
-    const storedUserString = localStorage.getItem("googleUser");
-    let email = null;
-
-    if (storedUserString) {
-      try {
-        const parsedUser = JSON.parse(storedUserString);
-        email = parsedUser.email;
-      } catch {
-        localStorage.removeItem("googleUser");
+    const checkAuth = () => {
+      const storedUser = localStorage.getItem("googleUser");
+      if (!storedUser) {
+        navigate("/login", { replace: true, state: { from: location } });
       }
-    }
+    };
+    checkAuth();
+  }, [location, navigate]);
 
-    if (!email) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
+  // Fetch user data
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
+        const storedUser = localStorage.getItem("googleUser");
+        if (!storedUser) return;
+
+        const parsedUser = JSON.parse(storedUser);
+        const response = await fetch(`https://unessa-backend.onrender.com/api/users/${parsedUser.email}`);
+        
         if (!response.ok) {
-          if (response.status === 404) {
-            navigate("/login", { replace: true });
-            return;
-          }
           throw new Error("Failed to fetch user data");
         }
+
         const userData = await response.json();
-        setUser(userData);
-        localStorage.setItem("googleUser", JSON.stringify(userData));
+        setUser({ ...userData, hasSeenTour: userData.hasSeenTour || false });
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching user:", error);
-        navigate("/login", { replace: true });
+        console.error("Error:", error);
+        localStorage.removeItem("googleUser");
+        navigate("/login");
       }
     };
 
     fetchUserData();
   }, [navigate]);
 
-  const username = user?.name ? user.name.split(" ")[0] : "User";
-  const avatar = user?.avatar || null;
-
+  // Mobile detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Navigation links
   const navLinks = [
     { path: "/dashboard", icon: Home, label: "Home", introId: "home-step" },
     { path: "/insights", icon: BarChart2, label: "Insights", introId: "insights-step" },
@@ -78,42 +76,50 @@ const DashboardLayout = () => {
     { path: "/certificates", icon: Download, label: "Certificates" }
   ];
 
+  // Tour steps
   const steps = [
     {
       element: '[data-intro-id="avatar-step"]',
-      intro: "This is your profile avatar. Click here to manage your account and logout.",
-      position: 'bottom'
+      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Your Profile</h4><p>Manage your account and logout from here</p>",
+      position: isMobile ? 'bottom' : 'right'
     },
     {
       element: '[data-intro-id="home-step"]',
-      intro: "Go back to your dashboard anytime by clicking Home.",
+      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Dashboard Home</h4><p>Access your main dashboard view</p>",
       position: isMobile ? 'bottom' : 'right'
     },
     {
       element: '[data-intro-id="insights-step"]',
-      intro: "Check analytics and insights about your impact here.",
+      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Analytics</h4><p>View detailed insights about your impact</p>",
       position: isMobile ? 'bottom' : 'right'
     },
     {
       element: '[data-intro-id="donations-step"]',
-      intro: "Track and manage donations here.",
+      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Donations</h4><p>Track and manage your contributions</p>",
       position: isMobile ? 'bottom' : 'right'
     }
   ];
 
+  // Start tour for new users
   useEffect(() => {
     if (user && !user.hasSeenTour) {
-      const timer = setTimeout(() => setStepsEnabled(true), 1000);
+      const timer = setTimeout(() => {
+        const allElementsExist = steps.every(step => 
+          document.querySelector(step.element)
+        );
+        if (allElementsExist) setStepsEnabled(true);
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, [user, steps]);
 
   const handleTourComplete = () => {
     setStepsEnabled(false);
-    if (user?.email) {
+    if (user?.email && !user.hasSeenTour) {
       const updatedUser = { ...user, hasSeenTour: true };
       setUser(updatedUser);
       localStorage.setItem('googleUser', JSON.stringify(updatedUser));
+      
       fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -138,7 +144,13 @@ const DashboardLayout = () => {
     setShowQuiz(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#043238]">
+        <div className="text-white text-2xl">Loading...</div>
+      </div>
+    );
+  }
 
   const isActive = (path) => location.pathname === path;
   const linkClass = (path) =>
@@ -148,6 +160,7 @@ const DashboardLayout = () => {
         : "text-white hover:text-[#FFB823] hover:bg-[#043238]/40"
     }`;
 
+  // Animation variants
   const sidebarVariants = {
     hidden: { x: -300, opacity: 0 },
     visible: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 100, damping: 15 } }
@@ -165,23 +178,25 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
+      {/* Product Tour */}
       <Steps
         enabled={stepsEnabled}
         steps={steps}
         initialStep={0}
         onExit={handleTourComplete}
+        onComplete={handleTourComplete}
         options={{
           nextLabel: 'Next →',
           prevLabel: '← Back',
-          doneLabel: 'Got it!',
-          skipLabel: 'Skip',
-          hideNext: false,
-          tooltipClass: 'bg-[#043238] text-white',
-          highlightClass: 'tour-highlight',
-          showStepNumbers: false,
+          doneLabel: 'Finish',
+          skipLabel: 'Skip Tour',
+          tooltipClass: 'introjs-theme-custom',
+          highlightClass: 'introjs-highlight-custom',
           showBullets: true,
           showProgress: true,
+          showStepNumbers: false,
           disableInteraction: false,
+          exitOnEsc: true,
           exitOnOverlayClick: false
         }}
       />
@@ -200,7 +215,7 @@ const DashboardLayout = () => {
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          <h1 className="text-xl font-bold">Welcome, {username} 👋</h1>
+          <h1 className="text-xl font-bold">Welcome, {user?.name?.split(" ")[0] || "User"} 👋</h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -219,7 +234,7 @@ const DashboardLayout = () => {
               whileTap={{ scale: 0.95 }}
               data-intro-id="avatar-step"
             >
-              {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
+              {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
             </motion.div>
 
             <AnimatePresence>
@@ -262,16 +277,8 @@ const DashboardLayout = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <motion.div
-                      className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
-                      onClick={() => setShowLogout((prev) => !prev)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      data-intro-id="avatar-step"
-                    >
-                      {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
-                    </motion.div>
-                    <h2 className="text-white font-bold text-lg">{username}</h2>
+                    <img src="/logo.png" alt="Logo" className="w-10 h-10" />
+                    <h2 className="text-white text-lg font-bold">Unessa</h2>
                   </div>
                   <button
                     className="text-white hover:text-[#f3b838] transition-colors"
@@ -301,8 +308,7 @@ const DashboardLayout = () => {
                 onClick={handleLogout}
                 className="mt-4 w-full flex items-center gap-2 justify-center border border-white rounded-md px-4 py-2 text-white hover:text-[#f3b838] hover:border-[#f3b838] transition-colors"
               >
-                <LogOut />
-                Logout
+                <LogOut size={16} /> Logout
               </button>
             </motion.aside>
           </>
@@ -311,26 +317,26 @@ const DashboardLayout = () => {
 
       {/* Desktop Sidebar */}
       <motion.aside
-        className="hidden lg:flex flex-col bg-[#06444f] border-r border-orange w-64 p-6 justify-between min-h-screen sticky top-0"
+        className="hidden lg:flex flex-col bg-[#06444f] border-r border-orange w-72 p-6 justify-between min-h-screen sticky top-0"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
       >
         <div>
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col items-center mb-8">
             <motion.div
-              className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg cursor-pointer"
+              className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg cursor-pointer mb-4"
               onClick={() => setShowLogout((prev) => !prev)}
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               data-intro-id="avatar-step"
             >
-              {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
+              {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
             </motion.div>
-            <h2 className="text-white font-bold mt-2 text-lg">{username}</h2>
+            <h2 className="text-white font-bold text-xl">{user?.name?.split(" ")[0] || "User"}</h2>
           </div>
 
-          <nav className="flex flex-col gap-4">
+          <nav className="flex flex-col gap-3">
             {navLinks.map(({ path, icon: Icon, label, introId }) => (
               <Link
                 key={path}
@@ -347,21 +353,46 @@ const DashboardLayout = () => {
 
         <button
           onClick={handleLogout}
-          className="mt-4 w-full flex items-center gap-2 justify-center border border-white rounded-md px-4 py-2 text-white hover:text-[#f3b838] hover:border-[#f3b838] transition-colors"
+          className="mt-4 w-full flex items-center justify-center gap-2 bg-[#043238] hover:bg-[#043238]/90 text-white py-3 px-4 rounded-lg transition-colors"
         >
-          <LogOut />
-          Logout
+          <LogOut size={18} />
+          <span>Logout</span>
         </button>
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 relative bg-[#2e8173] min-h-screen overflow-y-auto">
+      <main className="flex-1 lg:ml-72 bg-[#043238] min-h-screen overflow-y-auto">
+        {/* Desktop Header */}
+        {!isMobile && (
+          <motion.header 
+            className="flex justify-between items-center bg-[#06444f] text-white p-4 shadow-md"
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+          >
+            <motion.h1 
+              className="text-2xl font-bold"
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Welcome, {user?.name?.split(" ")[0] || "User"} 👋
+            </motion.h1>
+          </motion.header>
+        )}
+
+        {/* Page Content */}
+        <div className="p-6">
+          <Outlet />
+        </div>
+
+        {/* Quiz Button */}
         {quizStatus === "notAttempted" && !showQuiz && (
           <button
             onClick={() => setShowQuiz(true)}
-            className="fixed bottom-6 right-6 bg-[#FFB823] text-[#043238] font-bold px-4 py-2 rounded-lg shadow-lg hover:scale-105 transition-transform z-50"
+            className="fixed bottom-6 right-6 bg-[#FFB823] text-[#043238] font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform z-50 flex items-center gap-2"
           >
-            Take Quiz
+            <span>Take Quiz</span>
           </button>
         )}
 
@@ -371,8 +402,6 @@ const DashboardLayout = () => {
             onComplete={handleQuizComplete}
           />
         )}
-
-        <Outlet />
       </main>
     </div>
   );
