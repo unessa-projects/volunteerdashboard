@@ -8,11 +8,14 @@ const Login = () => {
   const handleCredentialResponse = async (response) => {
     try {
       const decoded = jwtDecode(response.credential);
-      const { email, name, picture, username } = decoded;
+      const { email, name, picture, sub } = decoded;
 
-      // ✅ Store user info
-      localStorage.setItem("googleUser", JSON.stringify({ email, name, avatar: picture, username }));
-  
+      localStorage.setItem("googleUser", JSON.stringify({ 
+        email, 
+        name, 
+        avatar: picture, 
+        id: sub 
+      }));
   
   
       // Step 1: Check if user exists
@@ -30,30 +33,32 @@ const Login = () => {
         const quizData = await quizRes.json();
         localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
   
-        // Check if tour has been seen before
-      if (data.user.hasSeenTour) { // Assuming your backend provides this flag
-        localStorage.setItem("isNewUser", "false");
+        // TOUR-SPECIFIC CHANGES START HERE
+        const hasSeenTour = data.user?.hasSeenTour || false;
+        localStorage.setItem("isNewUser", hasSeenTour ? "false" : "true");
+        
+        // If user hasn't seen tour, mark it as seen in backend after showing it
+        if (!hasSeenTour) {
+          // This will be handled in the Dashboard after tour completes
+        }
+        // TOUR-SPECIFIC CHANGES END HERE
+      
+        console.log("✅ Existing user, redirecting to dashboard...");
+        navigate("/dashboard");
       } else {
+        // First-time user (new)
+        localStorage.setItem("quizStatus", "notAttempted");
+        
+        // TOUR-SPECIFIC CHANGE: Force tour for new users
         localStorage.setItem("isNewUser", "true");
-        // Mark tour as seen on the client-side for immediate effect
-        // and ideally, update the backend here or in the Dashboard component.
+        
+        console.log("🆕 New user, redirecting to name setup...");
+        navigate("/name");
       }
-      
-      console.log("✅ Existing user, redirecting to dashboard...");
-      navigate("/dashboard");
-    } else {
-      // ✅ First-time user (new)
-      localStorage.setItem("quizStatus", "notAttempted");
-      localStorage.setItem("isNewUser", "true");
-      
-      console.log("🆕 New user, redirecting to name setup...");
-      navigate("/name");
+    } catch (err) {
+      console.error("Google login error:", err);
     }
-
-  } catch (err) {
-    console.error("Google login error:", err);
-  }
-};
+  };
   
 
 
