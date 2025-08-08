@@ -43,8 +43,6 @@ useEffect(() => {
   setShowTour(true);
 }, []);
 
-localStorage.setItem("isNewUser", "true");
-localStorage.removeItem("googleUser");
 
   useEffect(() => {
     const handleResize = () => {
