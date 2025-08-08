@@ -26,7 +26,9 @@ const DashboardLayout = () => {
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [, setShowStartButton] = useState(true);
 
-
+  useEffect(() => {
+    console.log('Current user:', user);
+  }, [user]);
     // This effect is now cleaner as it doesn't need to update separate states
     useEffect(() => {
       if (quizStatus === "failed") {
@@ -54,6 +56,7 @@ const DashboardLayout = () => {
   
   // Check if it's a new user AND the user object with a name exists.
   if (isNewUser && user?.name) {
+    console.log('Starting tour...');
     const timer = setTimeout(() => {
       setShowTour(true);
     }, 2000);
@@ -83,7 +86,8 @@ const DashboardLayout = () => {
   const steps = useMemo(() => {
     // Check window width here so it's fresh on each evaluation
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    
+    console.log('Is mobile:', isMobile);
+
     const tourSteps = (isMobile
       ? [
           { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
