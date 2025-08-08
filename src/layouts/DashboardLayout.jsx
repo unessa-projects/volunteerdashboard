@@ -63,16 +63,12 @@ const DashboardLayout = () => {
           { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
           { selector: '[data-tour-id="tour-insights-mobile"]', content: "Check analytics and insights about your impact here." },
           { selector: '[data-tour-id="tour-donations-mobile"]', content: "Track and manage donations here." },
-          { selector: '[data-tour-id="tour-progress"]', content: "Track your internship progress" },
-          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" }
         ]
       : [
           { selector: '[data-tour-id="tour-avatar-desktop"]', content: "This is your profile avatar. Click here to manage your account and logout." },
           { selector: '[data-tour-id="tour-home-desktop"]', content: "Go back to your dashboard anytime by clicking Home." },
           { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
           { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
-          { selector: '[data-tour-id="tour-progress"]', content: "Track your internship progress" },
-          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" }
         ];
 
     return tourSteps.map(step => ({
@@ -228,12 +224,7 @@ const DashboardLayout = () => {
           }),
         }}
       />
-      <button 
-  onClick={() => setShowTour(true)}
-  className="fixed top-20 right-4 bg-red-500 p-2 z-[10000]"
->
-  Test Tour
-</button>
+
       {/* Mobile Header */}
       <motion.header 
         className="lg:hidden flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
