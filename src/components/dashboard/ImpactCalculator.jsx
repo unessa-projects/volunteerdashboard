@@ -53,57 +53,47 @@ const FullCircleProgressBar = ({ percentage }) => {
 
 const ImpactCalculator = () => {
   const [progress, setProgress] = useState(0);
-  const [copied, setCopied] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [loading, setLoading] = useState(true);
-
+  const [copied, setCopied] = useState(false);
   const target = 36000;
 
   useEffect(() => {
-    let interval; // to store animation interval
-
     const fetchAndAnimate = async () => {
       try {
         const username = localStorage.getItem("username");
-
         if (!username) {
           console.log("No username found in localStorage");
-          setLoading(false);
           return;
         }
 
-        // 1️⃣ Fetch payments
-        const res = await axios.get(
-          `https://unessa-backend.onrender.com/api/donations`,
-          { params: { username } }
-        );
+        // Fetch donations
+        const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
+          params: { username }
+        });
 
         const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
         setTotalAmount(total);
+
+        // Save in localStorage if needed
         localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
 
-        // 2️⃣ Animate progress
+        // Animate progress
         const calculated = Math.min(Math.round((total / target) * 100), 100);
-
         let start = 0;
         setProgress(0);
-
-        interval = setInterval(() => {
+        const interval = setInterval(() => {
           start += 1;
           setProgress(start);
           if (start >= calculated) clearInterval(interval);
         }, 15);
 
-        setLoading(false);
+        return () => clearInterval(interval);
       } catch (err) {
         console.error("Error fetching donations:", err);
-        setLoading(false);
       }
     };
 
     fetchAndAnimate();
-
-    return () => clearInterval(interval); // cleanup
   }, [target]);
 
   const handleCopyLink = () => {
@@ -119,15 +109,14 @@ const ImpactCalculator = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username");
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-
     const message = `Hello!\nI’m volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖`;
-
     const whatsappURL = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
   };
 
   return (
     <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
+      {/* Left Section */}
       <div className="md:w-1/2 w-full flex flex-col justify-center items-start gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Your Impact Calculator</h2>
         <p className="text-lg">
@@ -136,7 +125,6 @@ const ImpactCalculator = () => {
         <p className="text-lg">
           ₹{totalAmount} <span className="opacity-70">raised of</span> ₹{target}
         </p>
-
         <div className="flex flex-wrap gap-4 mt-4">
           <button
             onClick={handleCopyLink}
@@ -151,12 +139,10 @@ const ImpactCalculator = () => {
             Share on WhatsApp
           </button>
         </div>
-
-        {copied && (
-          <span className="text-green-300 text-sm mt-2">✅ Link copied to clipboard!</span>
-        )}
+        {copied && <span className="text-green-300 text-sm mt-2">✅ Link copied to clipboard!</span>}
       </div>
 
+      {/* Right Section */}
       <div className="md:w-1/2 w-full flex text-[#ECA90E] justify-center items-center mt-8 md:mt-0">
         <div className="w-[180px] h-[180px] text-[#ECA90E]">
           <FullCircleProgressBar percentage={progress} />
