@@ -129,7 +129,7 @@ const ImpactCalculator = () => {
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username") || "";
-    const finalURL = ${baseURL}?ref=${encodeURIComponent(refName)};
+    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     navigator.clipboard.writeText(finalURL);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -138,7 +138,7 @@ const ImpactCalculator = () => {
   const handleShare = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username") || "";
-    const finalURL = ${baseURL}?ref=${encodeURIComponent(refName)};
+    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     const message = Hello!\nI’m volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖;
     const whatsappURL = https://web.whatsapp.com/send?text=${encodeURIComponent(message)};
     window.open(whatsappURL, "_blank");
