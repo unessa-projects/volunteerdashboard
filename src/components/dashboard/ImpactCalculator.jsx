@@ -76,39 +76,42 @@ const ImpactCalculator = () => {
       }
     }, 15);
   };
-const fetchAndAnimate = async () => {
-  try {
-    const storedUser = localStorage.getItem("googleUser");
-    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-    
-    // Use username here, NOT name!
-    const username = parsedUser?.username || localStorage.getItem("username");
 
-    if (!username) {
-      console.log("No username found in localStorage");
-      setTotalAmount(0);
-      setProgress(0);
-      return;
+  const fetchAndAnimate = async () => {
+    try {
+      const storedUser = localStorage.getItem("googleUser");
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
+      // Use username here, NOT name!
+      const username = parsedUser?.username || localStorage.getItem("username");
+
+      if (!username) {
+        console.log("No username found in localStorage");
+        setTotalAmount(0);
+        setProgress(0);
+        return;
+      }
+
+      const res = await axios.get(
+        "https://unessa-backend.onrender.com/api/donations",
+        { params: { username } }
+      );
+
+      const total = Array.isArray(res.data)
+        ? res.data.reduce((sum, payment) => sum + payment.amount, 0)
+        : 0;
+
+      setTotalAmount(total);
+      localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
+
+      if (!target) return;
+
+      const calculated = Math.min(Math.round((total / target) * 100), 100);
+      animateProgress(calculated);
+    } catch (err) {
+      console.error("Error fetching donations:", err);
     }
-
-    const res = await axios.get(
-      "https://unessa-backend.onrender.com/api/donations",
-      { params: { username } }
-    );
-
-    const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-    setTotalAmount(total);
-
-    localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
-
-    if (!target) return;
-
-    const calculated = Math.min(Math.round((total / target) * 100), 100);
-    animateProgress(calculated);
-  } catch (err) {
-    console.error("Error fetching donations:", err);
-  }
-};
+  };
 
   useEffect(() => {
     fetchAndAnimate();
@@ -180,6 +183,7 @@ const fetchAndAnimate = async () => {
 };
 
 export default ImpactCalculator;
+
 
 
 
