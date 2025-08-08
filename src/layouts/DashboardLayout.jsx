@@ -4,19 +4,19 @@ import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } f
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Tour } from '@reactour/tour';
-
+const storedUser = localStorage.getItem("googleUser");
+  const initialUser = storedUser ? JSON.parse(storedUser) : null;
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-useEffect(() => {
-  const storedUser = localStorage.getItem("googleUser");
-  console.log("Dashboard loaded user:", storedUser);
-}, []);
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
 
   const [user, setUser] = useState(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
+
+  useEffect(() => {
+    console.log("Dashboard loaded user:", localStorage.getItem("googleUser"));
+  }, []);
 
   useEffect(() => {
     if (!user) {
