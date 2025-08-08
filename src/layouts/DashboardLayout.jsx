@@ -9,7 +9,10 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-const storedUser = localStorage.getItem("googleUser");
+useEffect(() => {
+  const storedUser = localStorage.getItem("googleUser");
+  console.log("Dashboard loaded user:", storedUser);
+}, []);
   const initialUser = storedUser ? JSON.parse(storedUser) : null;
 
   const [user, setUser] = useState(initialUser);
