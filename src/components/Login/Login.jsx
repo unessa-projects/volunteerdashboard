@@ -29,30 +29,18 @@ const Login = () => {
       const data = await res.json();
   
       if (data.exists) {
-        // ✅ Existing user: fetch quiz status
+        // Existing user: Overwrite localStorage with the full user object from the DB
+        localStorage.setItem("googleUser", JSON.stringify(data.user));
+
         const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
         const quizData = await quizRes.json();
         localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
   
-        // TOUR-SPECIFIC CHANGES START HERE
-        const hasSeenTour = data.user?.hasSeenTour || false;
-        localStorage.setItem("isNewUser", hasSeenTour ? "false" : "true");
-        
-        // If user hasn't seen tour, mark it as seen in backend after showing it
-        if (!hasSeenTour) {
-          // This will be handled in the Dashboard after tour completes
-        }
-        // TOUR-SPECIFIC CHANGES END HERE
-      
         console.log("✅ Existing user, redirecting to dashboard...");
         navigate("/dashboard");
       } else {
         // First-time user (new)
         localStorage.setItem("quizStatus", "notAttempted");
-        
-        // TOUR-SPECIFIC CHANGE: Force tour for new users
-        localStorage.setItem("isNewUser", "true");
-        
         console.log("🆕 New user, redirecting to name setup...");
         navigate("/name");
       }
