@@ -9,6 +9,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("googleUser");
     // Initialize with the user object or null if it doesn't exist
@@ -46,7 +47,7 @@ const DashboardLayout = () => {
       window.addEventListener("storage", handleStorageChange);
       return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
-    
+
  // --- ✅ Tour trigger now depends on the 'user' object ---
  useEffect(() => {
   const isNewUser = localStorage.getItem("isNewUser") === "true";
@@ -55,7 +56,7 @@ const DashboardLayout = () => {
   if (isNewUser && user?.name) {
     const timer = setTimeout(() => {
       setShowTour(true);
-    }, 500);
+    }, 2000);
     return () => clearTimeout(timer);
   }
 }, [user]);
