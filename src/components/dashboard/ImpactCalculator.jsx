@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 const FullCircleProgressBar = ({ percentage }) => {
@@ -57,57 +57,81 @@ const ImpactCalculator = () => {
   const [copied, setCopied] = useState(false);
   const target = 36000;
 
-  useEffect(() => {
-    let animationIntervalId;
+  const animationIntervalId = useRef(null);
 
-    const fetchAndAnimate = async () => {
-      try {
-        const storedUser = localStorage.getItem("googleUser");
-        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-        const username = parsedUser?.name || localStorage.getItem("username");
+  const animateProgress = (calculated) => {
+    if (animationIntervalId.current) {
+      clearInterval(animationIntervalId.current);
+    }
 
-        if (!username) {
-          console.log("No username found in localStorage");
-          return;
-        }
+    let start = 0;
+    setProgress(0);
 
-        const res = await axios.get(
-          "https://unessa-backend.onrender.com/api/donations",
-          { params: { username } }
-        );
-
-        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-        setTotalAmount(total);
-
-        // Store only donationAmount separately
-        localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
-
-        // Animate progress count up
-        if (!target) return; // avoid division by zero
-        const calculated = Math.min(Math.round((total / target) * 100), 100);
-
-        let start = 0;
-        setProgress(0);
-
-        clearInterval(animationIntervalId);
-        animationIntervalId = setInterval(() => {
-          start++;
-          setProgress(start);
-          if (start >= calculated) clearInterval(animationIntervalId);
-        }, 15);
-
-      } catch (err) {
-        console.error("Error fetching donations:", err);
+    animationIntervalId.current = setInterval(() => {
+      start++;
+      setProgress(start);
+      if (start >= calculated) {
+        clearInterval(animationIntervalId.current);
+        animationIntervalId.current = null;
       }
-    };
+    }, 15);
+  };
 
+  const fetchAndAnimate = async () => {
+    try {
+      const storedUser = localStorage.getItem("googleUser");
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      const username = parsedUser?.name || localStorage.getItem("username");
+
+      if (!username) {
+        console.warn("No username found in localStorage");
+        setTotalAmount(0);
+        setProgress(0);
+        return;
+      }
+
+      const res = await axios.get(
+        "https://unessa-backend.onrender.com/api/donations",
+        { params: { username } }
+      );
+
+      console.log("API response data:", res.data); // Debug fetched data
+
+      if (!Array.isArray(res.data) || res.data.length === 0) {
+        console.warn("No donations found for user:", username);
+        setTotalAmount(0);
+        setProgress(0);
+        return;
+      }
+
+      const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+      setTotalAmount(total);
+
+      localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
+
+      if (!target) return;
+
+      const calculated = Math.min(Math.round((total / target) * 100), 100);
+      animateProgress(calculated);
+    } catch (err) {
+      console.error("Error fetching donations:", err);
+      setTotalAmount(0);
+      setProgress(0);
+    }
+  };
+
+  useEffect(() => {
     fetchAndAnimate();
-  
+
+    const refreshInterval = setInterval(fetchAndAnimate, 60000);
 
     return () => {
-      clearInterval(animationIntervalId);
+      if (animationIntervalId.current) {
+        clearInterval(animationIntervalId.current);
+      }
+      clearInterval(refreshInterval);
     };
-  }, [target]);
+  }, []);
 
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
@@ -166,4 +190,6 @@ const ImpactCalculator = () => {
 };
 
 export default ImpactCalculator;
+
+
 
