@@ -10,14 +10,23 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("googleUser");
-    // Initialize with the user object or null if it doesn't exist
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  // ✅ Always start with null and load from localStorage on mount
+const [user, setUser] = useState(null);
 
-  const username = user?.name ? user.name.split(" ")[0] : "User";
-  const avatar = user?.avatar || null;
+// Username and avatar (will be updated after load)
+const username = user?.name ? user.name.split(" ")[0] : "User";
+const avatar = user?.avatar || null;
+
+// Rehydrate user from localStorage when the component mounts
+useEffect(() => {
+  const storedUser = localStorage.getItem("googleUser");
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  } else {
+    navigate("/login"); // optional: send back to login if no data
+  }
+}, [navigate]);
+
 
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
