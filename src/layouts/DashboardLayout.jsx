@@ -184,29 +184,6 @@ const storedUser = localStorage.getItem("googleUser");
     }
   };
 
-    // (Optional) Call backend to mark it
-  //   if (user?.email) {
-  //     fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ email: user.email }),
-  //     });
-  //   }
-
-  //   localStorage.setItem("isNewUser", "false"); // ✅ prevents future triggering
-  // };
-
-
-  // const [runTour, setRunTour] = useState(false);
-
- 
-  // const commonSteps = [
-  //   { target: '[data-tour-id="tour-internship-journey"]', content: "Explore your internship journey and steps to success." },
-  //   { target: '[data-tour-id="tour-our-credentials"]', content: "View our credentials to learn more about our authenticity." },
-  //   { target: '[data-tour-id="tour-learn-uneesa"]', content: "Discover Uneesa's key initiatives and projects." },
-  // ];
-
-
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
