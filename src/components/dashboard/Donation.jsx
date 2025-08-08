@@ -28,7 +28,7 @@ function Donation() {
         const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
         setTotalAmount(total); // ✅ Set state here
 
-        // Update user object in localStorage without overwriting other properties
+        // CORRECT: Update user object in localStorage without overwriting other properties
         const storedUser = localStorage.getItem("googleUser");
         const user = storedUser ? JSON.parse(storedUser) : {};
         user.amount = total;

@@ -67,9 +67,9 @@ const QuizOverlay = ({ user, onComplete }) => {
         setTimeout(() => onComplete("passed"), 5000);
       } else {
         // Save failed status
-        await axios.post("https://unessa-backend.onrender.com/api/users/update-quiz-status", {
+        await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
           email: user.email,
-          quizStatus: "failed",
+          status: "failed",
         });
         localStorage.setItem("quizStatus", "failed");
       
