@@ -92,7 +92,7 @@ const ImpactCalculator = () => {
     };
 
     fetchAndAnimate(); // first run
-    intervalId = setInterval(fetchAndAnimate, 5000); // refresh every 5s
+    intervalId = setInterval(fetchAndAnimate, 60000); // refresh every 5s
 
     return () => clearInterval(intervalId);
   }, [target]);
