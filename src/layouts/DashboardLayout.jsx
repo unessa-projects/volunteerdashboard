@@ -195,18 +195,13 @@ const DashboardLayout = () => {
             color: 'white',
             zIndex: 9999,
           }),
-          mask: (base) => ({ // Changed from maskWrapper to mask
+          mask: (base) => ({
             ...base,
-            color: 'rgba(0, 0, 0, 0.7)',
-            zIndex: 9998, // Add this line
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
           }),
           maskArea: (base) => ({
             ...base,
             rx: 10,
-          }),
-          maskWrapper: (base) => ({
-            ...base,
-            color: 'rgba(0, 0, 0, 0.7)',
           }),
           badge: (base) => ({
             ...base,
