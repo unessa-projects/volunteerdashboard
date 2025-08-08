@@ -6,7 +6,6 @@ const Page5 = () => {
   const [showMessage, setShowMessage] = useState(false);
 
   const handleYes = () => {
-    localStorage.setItem("isNewUser", "true");
     navigate("/dashboard");
   };
 
