@@ -9,27 +9,32 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  
-  // ✅ Always start with null and load from localStorage on mount
-const [user, setUser] = useState(null);
+const storedUser = localStorage.getItem("googleUser");
+  const initialUser = storedUser ? JSON.parse(storedUser) : null;
 
-// Username and avatar (will be updated after load)
-const username = user?.name ? user.name.split(" ")[0] : "User";
-const avatar = user?.avatar || null;
-   console.log(username);
+  const [user, setUser] = useState(initialUser);
+  const [isLoading, setIsLoading] = useState(!initialUser); // loading only if no user found yet
 
-// Rehydrate user from localStorage when the component mounts
-useEffect(() => {
-  const storedUser = localStorage.getItem("googleUser");
-  
-  if (storedUser) {
-    setUser(JSON.parse(storedUser));
-  } else {
-    navigate("/login"); // optional: send back to login if no data
-  }
-}, [navigate]);
+  // If user not loaded, try to load it again (for example, in case user data is updated somewhere else)
+  useEffect(() => {
+    if (!user) {
+      const stored = localStorage.getItem("googleUser");
+      if (stored) {
+        setUser(JSON.parse(stored));
+        setIsLoading(false);
+      } else {
+        navigate("/login"); // redirect if no user data
+      }
+    } else {
+      setIsLoading(false);
+    }
+  }, [user, navigate]);
 
+  // Username and avatar safely accessed after user is loaded
+  const username = user?.name ? user.name.split(" ")[0] : "User";
+  const avatar = user?.avatar || null;
 
+  // Other states
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -37,28 +42,19 @@ useEffect(() => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [, setShowStartButton] = useState(true);
-// This forces tour to show immediately, overriding your logic
-useEffect(() => {
-  console.log('Forcing tour for testing');
-  setShowTour(true);
-}, []);
 
-
+  // Detect mobile screen
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    handleResize(); // Initial check
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize(); // initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-    const steps = useMemo(() => {
-    // Check window width here so it's fresh on each evaluation
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    console.log('Is mobile:', isMobile);
-
-    const tourSteps = (isMobile
+  // Define tour steps based on device
+  const steps = useMemo(() => {
+    const isMobile = window.innerWidth < 1024;
+    const tourSteps = isMobile
       ? [
           { selector: '[data-tour-id="tour-avatar-mobile"]', content: "This is your profile avatar. Click here to manage your account and logout." },
           { selector: '[data-tour-id="tour-home-mobile"]', content: "Go back to your dashboard anytime by clicking Home." },
@@ -73,83 +69,61 @@ useEffect(() => {
           { selector: '[data-tour-id="tour-insights-desktop"]', content: "Check analytics and insights about your impact here." },
           { selector: '[data-tour-id="tour-donations-desktop"]', content: "Track and manage donations here." },
           { selector: '[data-tour-id="tour-progress"]', content: "Track your internship progress" },
-          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" },
-        ]
-    );
+          { selector: '[data-tour-id="tour-impact"]', content: "Calculate your social impact" }
+        ];
 
-    // Use 'selector' instead of 'target' as per latest @reactour/tour docs
-    return tourSteps.map(step => ({ ...step, disableBeacon: true, styles: {
-      backgroundColor: '#043238',
-      color: 'white'
-    } }));
+    return tourSteps.map(step => ({
+      ...step,
+      disableBeacon: true,
+      styles: {
+        backgroundColor: "#043238",
+        color: "white"
+      }
+    }));
   }, [isMobile]);
 
-    // This effect is now cleaner as it doesn't need to update separate states
-    useEffect(() => {
-      if (quizStatus === "failed") {
-        setShowStartButton(false);
-        const timer = setTimeout(() => setShowStartButton(true), 60000);
-        return () => clearTimeout(timer);
-      } else if (quizStatus === "passed") {
-        setShowStartButton(false);
-      }
-    }, [quizStatus]);
-
-
-    useEffect(() => {
-      const handleStorageChange = () => {
-        const storedUser = localStorage.getItem("googleUser");
-        setUser(storedUser ? JSON.parse(storedUser) : null);
-      };
-      window.addEventListener("storage", handleStorageChange);
-      return () => window.removeEventListener("storage", handleStorageChange);
-    }, []);
-
- // --- ✅ Tour trigger now depends on the 'user' object ---
- useEffect(() => {
-  const isNewUser = localStorage.getItem("isNewUser") === "true";
-  
-  // Check if it's a new user AND the user object with a name exists.
-  if (isNewUser && user?.name) {
-    console.log('Starting tour...', steps);
-    const timer = setTimeout(() => {
-      console.log('Starting tour with steps:', steps);
-      setShowTour(true);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }
-}, [user, steps]);
-  // useEffect(() => {
-  //   const user = JSON.parse(localStorage.getItem("googleUser"));
-  //   if (user?.avatar) setAvatar(user.avatar);
-  //   if (user?.name) setUsername(user.name.split(" ")[0]);
-  // }, []);
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("googleUser");
-  //   navigate("/login");
-  // };
-
+  // Manage quiz start button visibility
   useEffect(() => {
-    console.log('Forcing tour for testing');
-    setShowTour(true);
+    if (quizStatus === "failed") {
+      setShowStartButton(false);
+      const timer = setTimeout(() => setShowStartButton(true), 60000);
+      return () => clearTimeout(timer);
+    } else if (quizStatus === "passed") {
+      setShowStartButton(false);
+    }
+  }, [quizStatus]);
+
+  // Sync user state on localStorage change (e.g., from another tab)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedUser = localStorage.getItem("googleUser");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Trigger tour for new user when user data and steps are ready
+  useEffect(() => {
+    const isNewUser = localStorage.getItem("isNewUser") === "true";
+    if (isNewUser && user?.name) {
+      const timer = setTimeout(() => {
+        setShowTour(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, steps]);
 
-
-  // const storedUser = JSON.parse(localStorage.getItem("googleUser"));
-// const [user, setUser] = useState(JSON.parse(localStorage.getItem("googleUser") || "{}"));
-  
-
-
- // Re-run if you want to support live resizing, e.g., by adding a state that tracks window width.
-
-
+  // Example logout handler
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
     localStorage.removeItem("quizStatus");
     navigate("/login");
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   
   
   const handleQuizComplete = (result) => {
