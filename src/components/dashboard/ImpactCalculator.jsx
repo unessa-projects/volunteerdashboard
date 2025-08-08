@@ -58,6 +58,8 @@ const ImpactCalculator = () => {
   const target = 36000;
 
   useEffect(() => {
+    let intervalId;
+
     const fetchAndAnimate = async () => {
       try {
         const username = localStorage.getItem("username");
@@ -66,34 +68,33 @@ const ImpactCalculator = () => {
           return;
         }
 
-        // Fetch donations
-        const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
-          params: { username }
-        });
+        const res = await axios.get(
+          `https://unessa-backend.onrender.com/api/donations`,
+          { params: { username } }
+        );
 
         const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
         setTotalAmount(total);
 
-        // Save in localStorage if needed
         localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
 
-        // Animate progress
         const calculated = Math.min(Math.round((total / target) * 100), 100);
         let start = 0;
         setProgress(0);
-        const interval = setInterval(() => {
+        const anim = setInterval(() => {
           start += 1;
           setProgress(start);
-          if (start >= calculated) clearInterval(interval);
+          if (start >= calculated) clearInterval(anim);
         }, 15);
-
-        return () => clearInterval(interval);
       } catch (err) {
         console.error("Error fetching donations:", err);
       }
     };
 
-    fetchAndAnimate();
+    fetchAndAnimate(); // first run
+    intervalId = setInterval(fetchAndAnimate, 60000); // refresh every 5s
+
+    return () => clearInterval(intervalId);
   }, [target]);
 
   const handleCopyLink = () => {
