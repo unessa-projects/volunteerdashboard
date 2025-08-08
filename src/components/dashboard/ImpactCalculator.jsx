@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const FullCircleProgressBar = ({ percentage }) => {
   const radius = 80;
@@ -50,61 +51,60 @@ const FullCircleProgressBar = ({ percentage }) => {
   );
 };
 
-const ImpactCalculator = ({ amountFromServer = 0 }) => {
+const ImpactCalculator = () => {
   const [progress, setProgress] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const target = 36000;
 
-useEffect(() => {
-  const fetchAndAnimate = async () => {
-    try {
-      const username = localStorage.getItem("username");
+  useEffect(() => {
+    let interval; // to store animation interval
 
-      if (!username) {
-        console.log("No username found in localStorage");
+    const fetchAndAnimate = async () => {
+      try {
+        const username = localStorage.getItem("username");
+
+        if (!username) {
+          console.log("No username found in localStorage");
+          setLoading(false);
+          return;
+        }
+
+        // 1️⃣ Fetch payments
+        const res = await axios.get(
+          `https://unessa-backend.onrender.com/api/donations`,
+          { params: { username } }
+        );
+
+        const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
+        setTotalAmount(total);
+        localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
+
+        // 2️⃣ Animate progress
+        const calculated = Math.min(Math.round((total / target) * 100), 100);
+
+        let start = 0;
+        setProgress(0);
+
+        interval = setInterval(() => {
+          start += 1;
+          setProgress(start);
+          if (start >= calculated) clearInterval(interval);
+        }, 15);
+
         setLoading(false);
-        return;
+      } catch (err) {
+        console.error("Error fetching donations:", err);
+        setLoading(false);
       }
+    };
 
-      // 1️⃣ Fetch payments
-      const res = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
-        params: { username }
-      });
+    fetchAndAnimate();
 
-      setPayments(res.data);
-
-      const total = res.data.reduce((sum, payment) => sum + payment.amount, 0);
-      setTotalAmount(total);
-      localStorage.setItem("googleUser", JSON.stringify({ amount: total }));
-
-      // 2️⃣ Run progress animation
-      if (!target) return; // skip if no target
-      const calculated = Math.min(
-        Math.round((total / target) * 100),
-        100
-      );
-
-      let start = 0;
-      setProgress(0);
-
-      const interval = setInterval(() => {
-        start += 1;
-        setProgress(start);
-        if (start >= calculated) clearInterval(interval);
-      }, 15);
-
-      setLoading(false);
-      return () => clearInterval(interval);
-    } catch (err) {
-      console.error("Error fetching donations:", err);
-      setLoading(false);
-    }
-  };
-
-  fetchAndAnimate();
-}, [target]);
-
-
+    return () => clearInterval(interval); // cleanup
+  }, [target]);
 
   const handleCopyLink = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
@@ -128,14 +128,13 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
-      {/* Left: Text & Buttons */}
       <div className="md:w-1/2 w-full flex flex-col justify-center items-start gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Your Impact Calculator</h2>
         <p className="text-lg">
           You're <span className="font-semibold">{progress}%</span> closer to your impact goal.
         </p>
         <p className="text-lg">
-          ₹{amountFromServer} <span className="opacity-70">raised of</span> ₹{target}
+          ₹{totalAmount} <span className="opacity-70">raised of</span> ₹{target}
         </p>
 
         <div className="flex flex-wrap gap-4 mt-4">
@@ -158,7 +157,6 @@ useEffect(() => {
         )}
       </div>
 
-      {/* Right: Full Circle Chart */}
       <div className="md:w-1/2 w-full flex text-[#ECA90E] justify-center items-center mt-8 md:mt-0">
         <div className="w-[180px] h-[180px] text-[#ECA90E]">
           <FullCircleProgressBar percentage={progress} />
