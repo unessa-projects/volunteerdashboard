@@ -16,10 +16,12 @@ const [user, setUser] = useState(null);
 // Username and avatar (will be updated after load)
 const username = user?.name ? user.name.split(" ")[0] : "User";
 const avatar = user?.avatar || null;
+   console.log(user.name);
 
 // Rehydrate user from localStorage when the component mounts
 useEffect(() => {
   const storedUser = localStorage.getItem("googleUser");
+  
   if (storedUser) {
     setUser(JSON.parse(storedUser));
   } else {
