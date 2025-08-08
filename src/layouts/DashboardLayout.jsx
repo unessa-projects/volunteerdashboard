@@ -104,14 +104,31 @@ const DashboardLayout = () => {
 
   // Trigger tour for new user when user data and steps are ready
   useEffect(() => {
-    const isNewUser = localStorage.getItem("isNewUser") === "true";
-    if (isNewUser && user?.name) {
+    // Use hasSeenTour from the user object as the source of truth
+    if (user && user.hasSeenTour === false) {
       const timer = setTimeout(() => {
         setShowTour(true);
       }, 3000);
       return () => clearTimeout(timer);
     }
   }, [user, steps]);
+
+  const handleTourClose = () => {
+    setShowTour(false);
+    if (user?.email) {
+      // Optimistically update the user state to prevent re-showing the tour on refresh
+      const updatedUser = { ...user, hasSeenTour: true };
+      setUser(updatedUser);
+      localStorage.setItem('googleUser', JSON.stringify(updatedUser));
+
+      // Then, notify the backend
+      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email }),
+      });
+    }
+  };
 
   // Example logout handler
   const handleLogout = () => {
@@ -190,17 +207,7 @@ const DashboardLayout = () => {
  <Tour
         steps={steps}
         isOpen={showTour}
-        onRequestClose={() => {
-          setShowTour(false);
-          localStorage.setItem("isNewUser", "false"); // Prevents future triggering
-          if (user?.email) {
-            fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email: user.email }),
-            });
-          }
-        }}
+        onRequestClose={handleTourClose}
         styles={{
           popover: (base) => ({
             ...base,

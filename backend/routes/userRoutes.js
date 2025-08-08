@@ -30,8 +30,8 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({
       message: 'User saved successfully',
-      username: newUser.username,
-      token // 👈 Send token to frontend
+      user: newUser,
+      token
     });
   } catch (err) {
     console.error("Error saving user:", err);

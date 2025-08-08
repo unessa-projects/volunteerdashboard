@@ -45,13 +45,9 @@ const Avatar = () => {
     const result = await response.json();
     if (response.ok) {
       console.log(":white_check_mark: User saved:", result);
-      // Store the username in localStorage
-      localStorage.setItem("username", username);
-      const encodedEmail = encodeURIComponent(email);
-const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/getUser/${encodedEmail}`);
-
-      const fullUser = await userRes.json();
-      localStorage.setItem("googleUser", JSON.stringify(fullUser));
+      // The full user object is now returned from the register endpoint
+      const fullUser = result.user;
+      localStorage.setItem("googleUser", JSON.stringify(fullUser)); // This will include hasSeenTour: false
       navigate("/page1");
     } else {
       console.error(":x: Error from server:", result.error);
