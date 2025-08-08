@@ -4,15 +4,16 @@ import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } f
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import { Tour } from '@reactour/tour';
-const storedUser = localStorage.getItem("googleUser");
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
+
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-
-  const [user, setUser] = useState(initialUser);
-  const [isLoading, setIsLoading] = useState(!initialUser);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("googleUser");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [isLoading, setIsLoading] = useState(() => !localStorage.getItem("googleUser"));
 
   useEffect(() => {
     console.log("Dashboard loaded user:", localStorage.getItem("googleUser"));
@@ -21,8 +22,9 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (!user) {
       navigate("/login"); // redirect if no user data found on initial load
+    } else {
+      setIsLoading(false); // Ensure loading is false once user is confirmed
     }
-    // No need for an else block, isLoading is already false if 'user' exists
   }, [user, navigate]);
 
   // Username and avatar safely accessed after user is loaded
@@ -319,40 +321,20 @@ const DashboardLayout = () => {
                 </div>
 
                 <nav className="flex flex-col gap-2">
-                  <Link data-tour-id="tour-home-mobile"
-                    to="/dashboard" 
-                    className={linkClass("/dashboard")}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Home size={18} /> Home
-                  </Link>
-                  <Link data-tour-id="tour-insights-mobile" 
-                    to="/insights" 
-                    className={linkClass("/insights")}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <BarChart2 size={18} /> Insights
-                  </Link>
-                  <Link data-tour-id="tour-donations-mobile"
-                    to="/donations" 
-                    className={linkClass("/donations")}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <DollarSign size={18} /> Donations
-                  </Link>
-                  
-                  <Link 
-                    to="/community" 
-                    className={linkClass("/community")}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Users size={18} /> Learning
-                  </Link>
-
-                  <Link to="/certificates" className={linkClass("/certificates")}
-                    onClick={() => setIsMobileMenuOpen(false)}>
-  <Download size={20} /> Download Certificates
-</Link>
+                  {navLinks.map(link => {
+                    const IconComponent = link.icon;
+                    return (
+                      <Link
+                        key={link.path}
+                        data-tour-id={link.tourId?.mobile}
+                        to={link.path}
+                        className={linkClass(link.path)}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <IconComponent size={18} /> {link.label === 'Certificates' ? 'Download Certificates' : link.label}
+                      </Link>
+                    );
+                  })}
                 </nav>
               </div>
 
@@ -392,24 +374,19 @@ const DashboardLayout = () => {
           </motion.div>
 
           <nav className="flex flex-col gap-3">
-            {[
-              { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-desktop" },
-              { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-desktop" },
-              { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-desktop" },
-              
-              { path: "/community", icon: <Users size={20} />, label: "Learning",  },
-              { path: "/certificates", icon: <Download size={20} />, label: "Certificates",  }
-            ].map((item, index) => (
+            {navLinks.map((item, index) => (
               <motion.div
                 key={item.path}
                 initial="hidden"
                 animate="visible"
                 variants={fadeIn}
                 transition={{ delay: index * 0.1 }}
-                data-tour-id={item.tourId}
+                data-tour-id={item.tourId?.desktop}
               >
                 <Link to={item.path} className={linkClass(item.path)}>
-                  {item.icon} {item.label}
+                  <item.icon size={20} />
+                  {' '}
+                  {item.label}
                 </Link>
               </motion.div>
             ))}
@@ -515,13 +492,7 @@ const DashboardLayout = () => {
         animate="visible"
         variants={popIn}
       >
-        {[
-          { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-mobile" },
-          { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-mobile"  },
-          { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-mobile" },
-          { path: "/community", icon: <Users size={20} />, label: "Learning" },
-          // { path: "/certificates", icon: <Download size={20} />, label: "Certificates"}
-        ].map((item, index) => (
+        {navLinks.filter(link => link.path !== '/certificates').map((item, index) => (
           <motion.div
             key={item.path}
             initial="hidden"
@@ -529,10 +500,10 @@ const DashboardLayout = () => {
             variants={popIn}
             transition={{ delay: index * 0.1 }}
             className="flex-1"
-            data-tour-id={item.tourId}
+            data-tour-id={item.tourId?.mobile}
           >
             <Link to={item.path} className={linkClass(item.path)}>
-              {item.icon}
+              <item.icon size={20} />
               <span className="text-xs mt-1">{item.label}</span>
             </Link>
           </motion.div>
