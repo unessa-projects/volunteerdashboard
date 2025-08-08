@@ -16,6 +16,7 @@ const Login = () => {
         avatar: picture, 
         id: sub 
       }));
+      console.log("User saved to localStorage:", { email, name, picture, sub });
   
   
       // Step 1: Check if user exists
