@@ -9,22 +9,35 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Initialize user state from localStorage (parsed JSON or null)
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("googleUser");
-    return storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const storedUser = localStorage.getItem("googleUser");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      // If JSON parsing fails, clear corrupted storage and return null
+      localStorage.removeItem("googleUser");
+      return null;
+    }
   });
-  const [isLoading, setIsLoading] = useState(() => !localStorage.getItem("googleUser"));
+
+  // Loading is true if user data missing, false otherwise
+  const [isLoading, setIsLoading] = useState(() => !user);
 
   useEffect(() => {
     if (!user) {
-      navigate("/login"); // redirect if no user data found on initial load
+      // Redirect to login if no user data
+      navigate("/login", { replace: true });
     } else {
-      setIsLoading(false); // Ensure loading is false once user is confirmed
+      // User exists, stop loading state
+      setIsLoading(false);
     }
   }, [user, navigate]);
 
-  // Username and avatar safely accessed after user is loaded
+  // Extract first name from full name safely, fallback "User"
   const username = user?.name ? user.name.split(" ")[0] : "User";
+
+  // User avatar or null fallback
   const avatar = user?.avatar || null;
 
   // Other states
