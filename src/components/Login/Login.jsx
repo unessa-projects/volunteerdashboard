@@ -5,52 +5,70 @@ import { jwtDecode } from "jwt-decode";
 const Login = () => {
   const navigate = useNavigate();
 
- const handleCredentialResponse = async (response) => {
+const handleCredentialResponse = async (response) => {
   try {
     const decoded = jwtDecode(response.credential);
-    const { email, name, picture } = decoded;
+    const email = decoded.email; // ✅ define it here
 
-    // Save basic info
-    localStorage.setItem("email", email);
-    localStorage.setItem("name", name);
+    const googleUser = {
+      name: decoded.name,
+      email,
+      avatar: decoded.picture // ✅ store profile pic
+    };
+
+    localStorage.setItem("googleUser", JSON.stringify(googleUser));
 
     // Step 1: Check if user exists
-    const res = await fetch("https://unessa-backend.onrender.com/api/users/check", {
+    const checkRes = await fetch("http://localhost:5000/api/users/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email }), // ✅ now email exists
     });
 
-    const data = await res.json();
+    const checkData = await checkRes.json();
 
-    if (data.exists) {
-      // Step 2: Fetch full user details
-      const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/getUser/${email}`);
+    if (checkData.exists) {
+      // ✅ Step 2: Get user details from backend
+      const userRes = await fetch(`http://localhost:5000/api/users/${email}`);
       const userData = await userRes.json();
-    
-      // ✅ Fetch quiz status from backend
-      const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
+
+      console.log("📥 Backend user data:", userData);
+
+      // ✅ Store in localStorage (backend overrides Google fields if available)
+      localStorage.setItem("email", email);
+      localStorage.setItem("name", userData.name);
+      localStorage.setItem("username", userData.username);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("avatar", userData.avatar);
+
+      localStorage.setItem(
+        "googleUser",
+        JSON.stringify({
+          ...userData,
+          email
+        })
+      );
+
+      // ✅ Step 3: Get quiz status
+      const quizRes = await fetch(`http://localhost:5000/api/users/quiz-status/${email}`);
       const quizData = await quizRes.json();
       localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
-    
-      // ✅ Store full user data
-      localStorage.setItem("googleUser", JSON.stringify(userData));
-    
-      // ✅ Handle product tour flag
+
+      // ✅ Step 4: Handle product tour flag
       if (!localStorage.getItem("hasSeenTour")) {
         localStorage.setItem("isNewUser", "true");
         localStorage.setItem("hasSeenTour", "true");
       } else {
         localStorage.setItem("isNewUser", "false");
       }
-    
-      console.log("✅ Existing user found:", userData);
+
       console.log("📜 Quiz Status:", quizData.quizStatus);
-    
+
       navigate("/dashboard");
     } else {
-      // First-time user (no quiz status yet)
-      localStorage.setItem("googleUser", JSON.stringify({ email, name, picture }));
+      // First-time user
+      console.log("🆕 No user found, redirecting to /name");
+      localStorage.setItem("googleUser", JSON.stringify({ email }));
       localStorage.setItem("quizStatus", "notAttempted");
       localStorage.setItem("isNewUser", "true");
       localStorage.setItem("hasSeenTour", "true");
@@ -63,11 +81,13 @@ const Login = () => {
 };
 
 
+
+
   useEffect(() => {
     const initializeGoogle = () => {
       if (window?.google?.accounts?.id) {
         window.google.accounts.id.initialize({
-          client_id: "632235295452-q80u7io2eit1gh39vo63euk6dbg6ciij.apps.googleusercontent.com",
+          client_id: "576101733937-te217ttgfveqn2jk9misk91d2po77p64.apps.googleusercontent.com",
           callback: handleCredentialResponse,
         });
 

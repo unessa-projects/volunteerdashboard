@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { io as ioClient } from "socket.io-client";
 
 const FullCircleProgressBar = ({ percentage }) => {
   const radius = 80;
@@ -79,27 +80,44 @@ const ImpactCalculator = () => {
 
   const fetchAndAnimate = async () => {
     try {
+      let username = null;
+
+      // 1️⃣ Try to get from localStorage first
       const storedUser = localStorage.getItem("googleUser");
       const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      username = parsedUser?.username || localStorage.getItem("username");
 
-      // Use username here, NOT name!
-      const username = parsedUser?.username || localStorage.getItem("username");
-
+      // 2️⃣ If no username, fetch from backend using email
       if (!username) {
-        console.log("No username found in localStorage");
+        const email = parsedUser?.email || localStorage.getItem("email");
+        if (email) {
+          const userRes = await axios.get(`http://localhost:5000/api/users/${email}`);
+          username = userRes.data.username;
+          console.log("Fetched username from backend:", username);
+
+          // Optional: save it to localStorage for next time
+          localStorage.setItem("username", username);
+        }
+      }
+
+      // 3️⃣ If still no username, stop
+      if (!username) {
+        console.log("❌ No username found in localStorage or backend");
         setTotalAmount(0);
         setProgress(0);
         return;
       }
 
-      const res = await axios.get(
-        "https://unessa-backend.onrender.com/api/donations",
-        { params: { username } }
-      );
+      // 4️⃣ Fetch donations from backend using username
+      const res = await axios.get("http://localhost:5000/api/donations", {
+        params: { username }
+      });
 
       const total = Array.isArray(res.data)
         ? res.data.reduce((sum, payment) => sum + payment.amount, 0)
         : 0;
+
+      console.log(`💰 Total donations for ${username}: ₹${total}`);
 
       setTotalAmount(total);
       localStorage.setItem("donationAmount", JSON.stringify({ amount: total }));
@@ -114,20 +132,29 @@ const ImpactCalculator = () => {
   };
 
   useEffect(() => {
-    fetchAndAnimate();
+    fetchAndAnimate(); // Initial load
 
-    const refreshInterval = setInterval(fetchAndAnimate, 60000);
+    // 🔌 Connect to backend Socket.IO server
+    const socket = ioClient("http://localhost:5000");
+
+    socket.on("connect", () => console.log("✅ Socket connected:", socket.id));
+
+    socket.on("paymentSuccess", (data) => {
+      console.log("💵 New payment received:", data);
+      // Optional: check if this payment belongs to the logged-in user
+      fetchAndAnimate();
+    });
 
     return () => {
       if (animationIntervalId.current) {
         clearInterval(animationIntervalId.current);
       }
-      clearInterval(refreshInterval);
+      socket.disconnect();
     };
   }, []);
 
   const handleCopyLink = () => {
-    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
+    const baseURL = "http://localhost:5173/form";
     const refName = localStorage.getItem("username") || "";
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     navigator.clipboard.writeText(finalURL);
@@ -136,10 +163,26 @@ const ImpactCalculator = () => {
   };
 
   const handleShare = () => {
-    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
+    const baseURL = "http://localhost:5000/form";
     const refName = localStorage.getItem("username") || "";
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-    const message = `Hello!\nI'm volunteering with Unessa Foundation...\n🔗 Donate now: ${finalURL}\nThank you for believing in this mission. 💖`;
+    const message = `Hello!
+I’m volunteering with Unessa Foundation, an NGO based in Vadodara, dedicated to transforming the lives of underprivileged children through education, mentorship, and life skills.
+🎓 Project Sneh is our flagship initiative that supports children from orphanages, low-income families, and rural villages—giving them not just schooling, but the tools and confidence to thrive in life.
+But here’s the truth:
+In India, children in orphanages may receive food and shelter, but they’re often left behind when it comes to opportunity.
+Many age out of the system at 18 and end up in low-paying jobs—not because they lack potential, but because they lack access.
+We believe survival isn’t enough. Every child deserves a future of dignity, choice, and purpose. That’s why we focus on nurturing their minds, building resilience, and preparing them for real-world success.
+🌍 Our 5-Year Vision by 2030
+Empower 10,000+ children across India
+Ensure zero child exits into poverty mindset from shelter homes
+
+🚸 We’re already working with 100+ children in shelter homes—and your support can help us reach many more.
+🔗 Donate now: <<Unique Link>>
+
+
+Let’s build a future where no child is left behind.
+Donate now: ${finalURL}\nThank you for believing in this mission. 💖`;
     const whatsappURL = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
   };
