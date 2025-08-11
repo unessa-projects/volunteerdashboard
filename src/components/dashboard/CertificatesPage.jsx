@@ -27,6 +27,25 @@ const CertificatesPage = () => {
     setShowQuiz(false);
   };
 
+  const getMailToLink = (email) => {
+    const domain = email.split('@')[1];
+    switch (domain) {
+      case 'gmail.com':
+        return 'https://mail.google.com';
+      case 'yahoo.com':
+        return 'https://mail.yahoo.com';
+      case 'outlook.com':
+      case 'hotmail.com':
+        return 'https://outlook.live.com';
+      case 'aol.com':
+        return 'https://mail.aol.com';
+      default:
+        // For other domains, or as a fallback
+        return `https://mail.${domain}`;
+    }
+  };
+  
+
   const hasPassed = quizStatus === "passed";
   const hasFailed = quizStatus === "failed";
   const notAttempted = quizStatus === "notAttempted";
@@ -37,27 +56,25 @@ const CertificatesPage = () => {
 
       {/* Offer Letter Section */}
       <div className="bg-[#06444f] p-4 rounded-lg shadow-lg mb-4">
-        <h2 className="text-xl font-semibold">Offer Letter</h2>
-
-        {hasPassed ? (
-          // Show Download Button if Passed
-          <a
-            href={`https://unessa-backend.onrender.com/offer/offer-letter/${user._id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="block mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            🎉 Download Offer Letter
-          </a>
+  <h2 className="text-xl font-semibold">Offer Letter</h2>
+  {hasPassed ? (
+          <div className="mt-2 text-gray-300">
+            Your offer letter has been sent to your email address: 
+            <a
+              href={getMailToLink(user.email)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-200 ml-1"
+            >
+              {user.email}
+            </a>.
+          </div>
         ) : (
-          // Show Locked Message if Not Passed
           <div className="mt-2 text-gray-300">
             🔒 Locked — Complete the quiz to unlock.
           </div>
         )}
 
-        {/* Start or Retry Quiz Button */}
         {(notAttempted || hasFailed) && (
           <button
             onClick={() => setShowQuiz(true)}
@@ -67,6 +84,7 @@ const CertificatesPage = () => {
           </button>
         )}
       </div>
+
 
       {/* Other Certificates (Locked by default) */}
       <div className="bg-[#06444f] p-4 rounded-lg shadow-lg mb-4 text-gray-400">

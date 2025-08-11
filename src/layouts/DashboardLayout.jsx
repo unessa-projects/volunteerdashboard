@@ -1,139 +1,168 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
-import { Plus, Home, BarChart2, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
+import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
-import { Steps } from 'intro.js-react';
-import 'intro.js/introjs.css';
-import '../introjs-custom.css'; 
-
-// Create this file for custom styles
+import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("googleUser");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const username = user?.name ? user.name.split(" ")[0] : "User";
+  const avatar = user?.avatar || null;
+  const [isNewUser, setIsNewUser] = useState(() => {
+    return localStorage.getItem("isNewUser") === "true";
+  });
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  // const [runTour, setRunTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
-  const [stepsEnabled, setStepsEnabled] = useState(false);
+  const [, setShowStartButton] = useState(true);
+// Add this to your state
+const [isTourRunning, setIsTourRunning] = useState(false);
 
-  // Auth check on route change
+  // Joyride state
+  const [joyrideState, setJoyrideState] = useState({
+    run: false,
+    steps: [],
+    stepIndex: 0,
+  });
+
   useEffect(() => {
-    const checkAuth = () => {
+    if (quizStatus === "failed") {
+      setShowStartButton(false);
+      const timer = setTimeout(() => setShowStartButton(true), 60000);
+      return () => clearTimeout(timer);
+    } else if (quizStatus === "passed") {
+      setShowStartButton(false);
+    }
+  }, [quizStatus]);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
       const storedUser = localStorage.getItem("googleUser");
-      if (!storedUser) {
-        navigate("/login", { replace: true, state: { from: location } });
-      }
+      setUser(storedUser ? JSON.parse(storedUser) : null);
     };
-    checkAuth();
-  }, [location, navigate]);
-
-  // Fetch user data
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const storedUser = localStorage.getItem("googleUser");
-        if (!storedUser) return;
-
-        const parsedUser = JSON.parse(storedUser);
-        const response = await fetch(`https://unessa-backend.onrender.com/api/users/${parsedUser.email}`);
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-
-        const userData = await response.json();
-        setUser({ ...userData, hasSeenTour: userData.hasSeenTour || false });
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-        localStorage.removeItem("googleUser");
-        navigate("/login");
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
-
-  // Mobile detection
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Navigation links
-  const navLinks = [
-    { path: "/dashboard", icon: Home, label: "Home", introId: "home-step" },
-    { path: "/insights", icon: BarChart2, label: "Insights", introId: "insights-step" },
-    { path: "/donations", icon: DollarSign, label: "Donations", introId: "donations-step" },
-    { path: "/community", icon: Users, label: "Learning" },
-    { path: "/certificates", icon: Download, label: "Certificates" }
-  ];
-
-  // Tour steps
-  const steps = [
-    {
-      element: '[data-intro-id="avatar-step"]',
-      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Your Profile</h4><p>Manage your account and logout from here</p>",
-      position: isMobile ? 'bottom' : 'right'
-    },
-    {
-      element: '[data-intro-id="home-step"]',
-      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Dashboard Home</h4><p>Access your main dashboard view</p>",
-      position: isMobile ? 'bottom' : 'right'
-    },
-    {
-      element: '[data-intro-id="insights-step"]',
-      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Analytics</h4><p>View detailed insights about your impact</p>",
-      position: isMobile ? 'bottom' : 'right'
-    },
-    {
-      element: '[data-intro-id="donations-step"]',
-      intro: "<h4 class='text-[#FFB823] font-bold mb-2'>Donations</h4><p>Track and manage your contributions</p>",
-      position: isMobile ? 'bottom' : 'right'
-    }
-  ];
-
-  // Start tour for new users
+  // Initialize tour steps
   useEffect(() => {
-    if (user && !user.hasSeenTour) {
-      const timer = setTimeout(() => {
-        const allElementsExist = steps.every(step => 
-          document.querySelector(step.element)
-        );
-        if (allElementsExist) setStepsEnabled(true);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [user, steps]);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    
+    const tourSteps = isMobile
+      ? [
+          {
+            target: '[data-tour-id="tour-avatar-mobile"]',
+            content: "This is your profile avatar. Click here to manage your account and logout.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-home-mobile"]',
+            content: "Go back to your dashboard anytime by clicking Home.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-insights-mobile"]',
+            content: "Check analytics and insights about your impact here.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-donations-mobile"]',
+            content: "Track and manage donations here.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+        ]
+      : [
+          {
+            target: '[data-tour-id="tour-avatar-desktop"]',
+            content: "This is your profile avatar. Click here to manage your account and logout.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-home-desktop"]',
+            content: "Go back to your dashboard anytime by clicking Home.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-insights-desktop"]',
+            content: "Check analytics and insights about your impact here.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+          {
+            target: '[data-tour-id="tour-donations-desktop"]',
+            content: "Track and manage donations here.",
+            disableBeacon: true,
+            placement: "bottom",
+          },
+        ];
 
-  const handleTourComplete = () => {
-    setStepsEnabled(false);
-    if (user?.email && !user.hasSeenTour) {
-      const updatedUser = { ...user, hasSeenTour: true };
-      setUser(updatedUser);
-      localStorage.setItem('googleUser', JSON.stringify(updatedUser));
+        setJoyrideState(prev => ({ 
+          ...prev, 
+          steps: tourSteps,
+          // Automatically start tour if it's a new user AND we have user data
+          run: isNewUser && user?.name 
+        }));
+        if (isNewUser && user?.name) {
+          const timer = setTimeout(() => {
+            setJoyrideState(prev => ({ ...prev, steps: tourSteps, run: true }));
+          }, 2000);
+          return () => clearTimeout(timer);
+        }
+      }, [user]);
+
+      {joyrideState.run && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-[1000] pointer-events-auto"></div>
+      )}
       
-      fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email }),
-      });
-    }
-  };
+      const handleJoyrideCallback = useCallback((data) => {
+        const { action, index, status, type } = data;
+    
+        if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+          // Tour completed or skipped
+          setJoyrideState(prev => ({ ...prev, run: false }));
+          setIsTourRunning(false);
+          localStorage.setItem("isNewUser", "false");
+          setShowQuiz(true);
+          
+          if (user?.email) {
+            fetch("http://localhost:5000/api/users/mark-tour-seen", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: user.email }),
+            });
+          }
+        } else if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+          // Update state to advance the tour
+          setJoyrideState(prev => ({
+            ...prev,
+            stepIndex: index + (action === ACTIONS.PREV ? -1 : 1),
+          }));
+        }
+      }, [user]);
 
+  
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
     localStorage.removeItem("quizStatus");
     navigate("/login");
   };
-
+  
   const handleQuizComplete = (result) => {
     setQuizStatus(result);
     localStorage.setItem("quizStatus", result);
@@ -143,14 +172,6 @@ const DashboardLayout = () => {
     }
     setShowQuiz(false);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#043238]">
-        <div className="text-white text-2xl">Loading...</div>
-      </div>
-    );
-  }
 
   const isActive = (path) => location.pathname === path;
   const linkClass = (path) =>
@@ -163,59 +184,90 @@ const DashboardLayout = () => {
   // Animation variants
   const sidebarVariants = {
     hidden: { x: -300, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 100, damping: 15 } }
+    visible: { 
+      x: 0, 
+      opacity: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 100,
+        damping: 15
+      }
+    }
   };
 
   const fadeIn = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } }
+    visible: { 
+      opacity: 1,
+      transition: { duration: 0.3 }
+    }
   };
 
   const popIn = {
     hidden: { scale: 0.8, opacity: 0 },
-    visible: { scale: 1, opacity: 1, transition: { type: "spring", stiffness: 200, damping: 15 } }
+    visible: { 
+      scale: 1, 
+      opacity: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 200,
+        damping: 15
+      }
+    }
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
-      {/* Product Tour */}
-      <Steps
-        enabled={stepsEnabled}
-        steps={steps}
-        initialStep={0}
-        onExit={handleTourComplete}
-        onComplete={handleTourComplete}
-        options={{
-          nextLabel: 'Next →',
-          prevLabel: '← Back',
-          doneLabel: 'Finish',
-          skipLabel: 'Skip Tour',
-          tooltipClass: 'introjs-theme-custom',
-          highlightClass: 'introjs-highlight-custom',
-          showBullets: true,
-          showProgress: true,
-          showStepNumbers: false,
-          disableInteraction: false,
-          exitOnEsc: true,
-          exitOnOverlayClick: false
+      <Joyride
+        steps={joyrideState.steps}
+        run={joyrideState.run}
+        stepIndex={joyrideState.stepIndex}
+        callback={handleJoyrideCallback}
+        continuous={true}
+        scrollToFirstStep={true}
+        showProgress={true}
+        showSkipButton={true}
+        styles={{
+          options: {
+            primaryColor: '#043238',
+            textColor: '#ffffff',
+            backgroundColor: '#06444f',
+            overlayColor: 'rgba(0, 0, 0, 0.8)',
+            arrowColor: '#06444f',
+          },
+          buttonNext: {
+            backgroundColor: '#043238',
+            color: '#ffffff',
+          },
+          buttonBack: {
+            color: '#ffffff',
+          },
+          buttonSkip: {
+            color: '#ffffff',
+          },
         }}
       />
+ 
 
       {/* Mobile Header */}
-      <motion.header
+      <motion.header 
         className="lg:hidden flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
         initial="hidden"
         animate="visible"
         variants={fadeIn}
       >
         <div className="flex items-center gap-2">
-          <button
+          <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-[#06444f] transition-colors"
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? (
+              <X size={24} />
+            ) : (
+              <Menu size={24} />
+            )}
           </button>
-          <h1 className="text-xl font-bold">Welcome, {user?.name?.split(" ")[0] || "User"} 👋</h1>
+          <h1 className="text-xl font-bold">Welcome, {username} 👋</h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -232,9 +284,9 @@ const DashboardLayout = () => {
               onClick={() => setShowLogout((prev) => !prev)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              data-intro-id="avatar-step"
+              data-tour-id="tour-avatar-mobile"
             >
-              {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
+              {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
             </motion.div>
 
             <AnimatePresence>
@@ -255,10 +307,11 @@ const DashboardLayout = () => {
         </div>
       </motion.header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (appears from left) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
+            {/* Overlay */}
             <motion.div
               className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
               initial={{ opacity: 0 }}
@@ -267,7 +320,8 @@ const DashboardLayout = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             />
             
-            <motion.aside
+            {/* Sidebar */}
+            <motion.aside 
               className="lg:hidden fixed top-0 left-0 h-full w-64 bg-[#06444f] border-r border-orange shadow-xl z-50 p-6 flex-col justify-between"
               initial="hidden"
               animate="visible"
@@ -277,132 +331,233 @@ const DashboardLayout = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="Logo" className="w-10 h-10" />
-                    <h2 className="text-white text-lg font-bold">Unessa</h2>
+                    <img src="/logo.png" alt="Unessa Logo" className="w-12 h-12 object-contain" />
+                    <h2 className="text-white text-lg font-bold">Unessa Foundation</h2>
                   </div>
-                  <button
-                    className="text-white hover:text-[#f3b838] transition-colors"
+                  <button 
                     onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-1 text-white hover:text-[#FFB823]"
                   >
-                    <X size={24} />
+                    <X size={20} />
                   </button>
                 </div>
 
                 <nav className="flex flex-col gap-2">
-                  {navLinks.map(({ path, icon: Icon, label, introId }) => (
-                    <Link
-                      key={path}
-                      to={path}
-                      className={linkClass(path)}
-                      data-intro-id={introId}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Icon className="w-6 h-6" />
-                      <span>{label}</span>
-                    </Link>
-                  ))}
+                  <Link data-tour-id="tour-home-mobile"
+                    to="/dashboard" 
+                    className={linkClass("/dashboard")}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Home size={18} /> Home
+                  </Link>
+                  <Link data-tour-id="tour-insights-mobile" 
+                    to="/insights" 
+                    className={linkClass("/insights")}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <BarChart2 size={18} /> Insights
+                  </Link>
+                  <Link data-tour-id="tour-donations-mobile"
+                    to="/donations" 
+                    className={linkClass("/donations")}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <DollarSign size={18} /> Donations
+                  </Link>
+                  
+                  <Link 
+                    to="/community" 
+                    className={linkClass("/community")}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Users size={18} /> Learning
+                  </Link>
+
+                  <Link to="/certificates" className={linkClass("/certificates")}
+                    onClick={() => setIsMobileMenuOpen(false)}>
+                    <Download size={20} /> Download Certificates
+                  </Link>
                 </nav>
               </div>
 
-              <button
-                onClick={handleLogout}
-                className="mt-4 w-full flex items-center gap-2 justify-center border border-white rounded-md px-4 py-2 text-white hover:text-[#f3b838] hover:border-[#f3b838] transition-colors"
-              >
-                <LogOut size={16} /> Logout
-              </button>
+              <div className="text-center mt-6">
+                <motion.button
+                  onClick={handleLogout}
+                  className="w-full bg-[#ECA90E] shadow-[0_0_20px_4px_rgba(236,169,14,0.4)] text-white px-4 py-2 rounded-md text-sm hover:bg-[#d6990d] transition-all flex items-center justify-center gap-2"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <LogOut size={16} /> Logout
+                </motion.button>
+              </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <motion.aside
-        className="hidden lg:flex flex-col bg-[#06444f] border-r border-orange w-72 p-6 justify-between min-h-screen sticky top-0"
+      <motion.aside 
+        className="hidden lg:flex fixed top-0 left-0 h-full w-72 bg-[#06444f] border-r border-orange shadow-xl z-50 p-6 flex-col justify-between"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
       >
         <div>
-          <div className="flex flex-col items-center mb-8">
-            <motion.div
-              className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg cursor-pointer mb-4"
-              onClick={() => setShowLogout((prev) => !prev)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              data-intro-id="avatar-step"
-            >
-              {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
-            </motion.div>
-            <h2 className="text-white font-bold text-xl">{user?.name?.split(" ")[0] || "User"}</h2>
-          </div>
-
-          <nav className="flex flex-col gap-3">
-            {navLinks.map(({ path, icon: Icon, label, introId }) => (
-              <Link
-                key={path}
-                to={path}
-                className={linkClass(path)}
-                data-intro-id={introId}
-              >
-                <Icon className="w-6 h-6" />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="mt-4 w-full flex items-center justify-center gap-2 bg-[#043238] hover:bg-[#043238]/90 text-white py-3 px-4 rounded-lg transition-colors"
-        >
-          <LogOut size={18} />
-          <span>Logout</span>
-        </button>
-      </motion.aside>
-
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-72 bg-[#043238] min-h-screen overflow-y-auto">
-        {/* Desktop Header */}
-        {!isMobile && (
-          <motion.header 
-            className="flex justify-between items-center bg-[#06444f] text-white p-4 shadow-md"
+          <motion.div 
+            className="flex items-center gap-3 mb-6"
             initial="hidden"
             animate="visible"
             variants={fadeIn}
           >
-            <motion.h1 
-              className="text-2xl font-bold"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Welcome, {user?.name?.split(" ")[0] || "User"} 👋
-            </motion.h1>
-          </motion.header>
-        )}
+            <img src="/logo.png" alt="Unessa Logo" className="w-16 h-16 object-contain" />
+            <h2 className="text-white text-xl font-bold">Unessa Foundation</h2>
+          </motion.div>
 
-        {/* Page Content */}
-        <div className="p-6">
-          <Outlet />
+          <nav className="flex flex-col gap-3">
+            {[
+              { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-desktop" },
+              { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-desktop" },
+              { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-desktop" },
+              { path: "/community", icon: <Users size={20} />, label: "Learning" },
+              { path: "/certificates", icon: <Download size={20} />, label: "Certificates" }
+            ].map((item, index) => (
+              <motion.div
+                key={item.path}
+                initial="hidden"
+                animate="visible"
+                variants={fadeIn}
+                transition={{ delay: index * 0.1 }}
+                data-tour-id={item.tourId}
+              >
+                <Link to={item.path} className={linkClass(item.path)}>
+                  {item.icon} {item.label}
+                </Link>
+              </motion.div>
+            ))}
+          </nav>
         </div>
 
-        {/* Quiz Button */}
-        {quizStatus === "notAttempted" && !showQuiz && (
-          <button
-            onClick={() => setShowQuiz(true)}
-            className="fixed bottom-6 right-6 bg-[#FFB823] text-[#043238] font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform z-50 flex items-center gap-2"
+        <motion.div 
+          className="text-center"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.button
+            onClick={handleLogout}
+            className="w-full bg-[#ECA90E] shadow-[0_0_20px_4px_rgba(236,169,14,0.4)] text-white px-4 py-2 rounded-md text-sm hover:bg-[#d6990d] transition-all flex items-center justify-center gap-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span>Take Quiz</span>
-          </button>
-        )}
+            <LogOut size={18} /> Logout
+          </motion.button>
+        </motion.div>
+      </motion.aside>
 
-        {showQuiz && (
-          <QuizOverlay
-            onClose={() => setShowQuiz(false)}
-            onComplete={handleQuizComplete}
-          />
-        )}
-      </main>
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-72 min-h-screen pb-20 lg:pb-0">
+        {/* Desktop Header */}
+        <motion.header 
+          className="hidden lg:flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+        >
+          <motion.h1 
+            className="text-xl lg:text-3xl font-bold"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Welcome, {username} 👋
+          </motion.h1>
+
+          <div className="flex items-center gap-6">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              
+            </motion.div>
+
+            <motion.div 
+              className="group relative"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.div 
+                className="w-10 h-10 lg:w-14 lg:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
+                onClick={() => setShowLogout((prev) => !prev)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                data-tour-id="tour-avatar-desktop"
+              >
+                {avatar && <img src={avatar} alt="avatar" className="w-full h-full object-cover" />}
+              </motion.div>
+
+              <AnimatePresence>
+                {showLogout && (
+                  <motion.button
+                    onClick={handleLogout}
+                    className="absolute top-full mt-2 right-0 bg-[#4A9782] text-white px-3 py-1 rounded-md shadow-md text-sm z-10 flex items-center gap-1"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <LogOut size={14} /> Logout
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </motion.header>
+
+        {/* Main Content Area */}
+        <motion.main 
+          className="p-4 bg-[#043238] min-h-[calc(100vh-80px)]"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+        >
+          <Outlet />
+          {showQuiz && <QuizOverlay user={user} onComplete={handleQuizComplete} />}
+        </motion.main>
+      </div>
+
+      {/* Footer Navigation (mobile only) */}
+      <motion.nav 
+        className="fixed bottom-0 left-0 right-0 lg:hidden bg-[#06444f] border-t border-orange shadow-lg flex justify-around items-center p-2 z-50"
+        initial="hidden"
+        animate="visible"
+        variants={popIn}
+      >
+        {[
+          { path: "/dashboard", icon: <Home size={20} />, label: "Home", tourId: "tour-home-mobile" },
+          { path: "/insights", icon: <BarChart2 size={20} />, label: "Insights", tourId: "tour-insights-mobile" },
+          { path: "/donations", icon: <DollarSign size={20} />, label: "Donations", tourId: "tour-donations-mobile" },
+          { path: "/explore", icon: <Search size={20} />, label: "Explore" },
+          { path: "/community", icon: <Users size={20} />, label: "Learning" },
+        ].map((item, index) => (
+          <motion.div
+            key={item.path}
+            initial="hidden"
+            animate="visible"
+            variants={popIn}
+            transition={{ delay: index * 0.1 }}
+            className="flex-1"
+            data-tour-id={item.tourId}
+          >
+            <Link to={item.path} className={linkClass(item.path)}>
+              {item.icon}
+              <span className="text-xs mt-1">{item.label}</span>
+            </Link>
+          </motion.div>
+        ))}
+      </motion.nav>
     </div>
   );
 };

@@ -5,50 +5,62 @@ import { jwtDecode } from "jwt-decode";
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleCredentialResponse = async (response) => {
-    try {
-      const decoded = jwtDecode(response.credential);
-      const { email, name, picture, sub } = decoded;
+ const handleCredentialResponse = async (response) => {
+  try {
+    const decoded = jwtDecode(response.credential);
+    const { email, name, picture } = decoded;
 
-      localStorage.setItem("googleUser", JSON.stringify({ 
-        email, 
-        name, 
-        avatar: picture, 
-        id: sub 
-      }));
-      console.log("User saved to localStorage:", { email, name, picture, sub });
-  
-  
-      // Step 1: Check if user exists
-      const res = await fetch("https://unessa-backend.onrender.com/api/users/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-  
-      const data = await res.json();
-  
-      if (data.exists) {
-        // Existing user: Overwrite localStorage with the full user object from the DB
-        localStorage.setItem("googleUser", JSON.stringify(data.user));
+    // Save basic info
+    localStorage.setItem("email", email);
+    localStorage.setItem("name", name);
 
-        const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
-        const quizData = await quizRes.json();
-        localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
-  
-        console.log("✅ Existing user, redirecting to dashboard...");
-        navigate("/dashboard");
+    // Step 1: Check if user exists
+    const res = await fetch("https://unessa-backend.onrender.com/api/users/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (data.exists) {
+      // Step 2: Fetch full user details
+      const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/getUser/${email}`);
+      const userData = await userRes.json();
+    
+      // ✅ Fetch quiz status from backend
+      const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
+      const quizData = await quizRes.json();
+      localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
+    
+      // ✅ Store full user data
+      localStorage.setItem("googleUser", JSON.stringify(userData));
+    
+      // ✅ Handle product tour flag
+      if (!localStorage.getItem("hasSeenTour")) {
+        localStorage.setItem("isNewUser", "true");
+        localStorage.setItem("hasSeenTour", "true");
       } else {
-        // First-time user (new)
-        localStorage.setItem("quizStatus", "notAttempted");
-        console.log("🆕 New user, redirecting to name setup...");
-        navigate("/name");
+        localStorage.setItem("isNewUser", "false");
       }
-    } catch (err) {
-      console.error("Google login error:", err);
+    
+      console.log("✅ Existing user found:", userData);
+      console.log("📜 Quiz Status:", quizData.quizStatus);
+    
+      navigate("/dashboard");
+    } else {
+      // First-time user (no quiz status yet)
+      localStorage.setItem("googleUser", JSON.stringify({ email, name, picture }));
+      localStorage.setItem("quizStatus", "notAttempted");
+      localStorage.setItem("isNewUser", "true");
+      localStorage.setItem("hasSeenTour", "true");
+      navigate("/name");
     }
-  };
-  
+
+  } catch (err) {
+    console.error("Google login error:", err);
+  }
+};
 
 
   useEffect(() => {

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const quizData = [
-  { question: "What is React?", options: ["A library", "A database", "A language", "A server"], answer: 0 },
-  { question: "Which hook is used for state in React?", options: ["useFetch", "useState", "useLoop", "useVariable"], answer: 1 },
-  { question: "JSX stands for?", options: ["JavaScript XML", "JSON XML", "Java Syntax", "JavaScript Extra"], answer: 0 },
-  { question: "What is used to pass data to components?", options: ["Props", "State", "Data", "Bindings"], answer: 0 },
-  { question: "React is maintained by?", options: ["Apple", "Google", "Facebook", "Microsoft"], answer: 2 },
+  { question: "What is the duration of the Fundraising Volunteer role?", options: ["15 Days", "30 Days", "45 Days", "60 Days"], answer: 1 },
+  { question: "Where will you be working from?", options: ["Assigned center", "College campus", "Remote – anytime, anywhere", "Specific city assigned by the foundation"], answer: 2 },
+  { question: "What is your main mission as a volunteer?", options: ["Attend daily team meetings", "Design fundraising posters", "Leverage your personal network to raise funds", "Conduct research on child education"], answer: 2 },
+  { question: "What is the name of the highest fundraising tier?", options: ["LEGEND", "HERO", "ICON", "IMPACTOR"], answer: 0 },
+  { question: "How much will you earn as a stipend?", options: ["Flat ₹1,000 regardless of funds", "30% of funds raised", "20% of funds raised", "No stipend"], answer: 3 },
 ];
 
 const QuizOverlay = ({ user, onComplete }) => {
@@ -17,6 +17,7 @@ const QuizOverlay = ({ user, onComplete }) => {
   const [score, setScore] = useState(0);
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -24,47 +25,65 @@ const QuizOverlay = ({ user, onComplete }) => {
   }, []);
 
   const handleOptionClick = (index) => {
+    if (showAnswer) return; 
     setSelectedOption(index);
     setShowAnswer(true);
     if (index === quizData[currentQuestion].answer) {
-      setScore(score + 1);
+      setScore(prev => prev + 1);;
     }
   };
 
   const handleNext = async () => {
-    const correct = selectedOption === quizData[currentQuestion].answer;
-    const finalScore = score + (correct ? 1 : 0);
-
+    // The previous logic for calculating the final score and handling the last question was slightly off.
+    // It's better to update the score inside the handleOptionClick and just use the final score here.
+    const finalScore = score; // The score is already updated.
+    
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion((q) => q + 1);
       setSelectedOption(null);
       setShowAnswer(false);
     } else {
-      if (finalScore >= 4) {
+      // Logic for when the quiz is finished
+      if (finalScore >= 4) { // Assuming the pass criteria is still 4 out of 5
         if (loading) return;
         setLoading(true);
         setQuizResult("⏳ Please wait, your offer letter is being generated...");
-      
-        // Generate offer letter
-        await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
-          userId: user._id,
-          email: user.email,
-          name: user.name,
-        });
-      
-        // ✅ Save quiz status to backend
-        await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
-          email: user.email,
-          status: "passed",
-        });
-      
-        // Update local storage
-        const updatedUser = { ...user, quizPassed: true };
-        localStorage.setItem("googleUser", JSON.stringify(updatedUser));
-        localStorage.setItem("quizStatus", "passed");
-      
-        setQuizResult("🎉 Congratulations! Offer letter sent to your email and also you can download it from dashboard.");
-        setTimeout(() => onComplete("passed"), 5000);
+        
+        try {
+          // Generate offer letter
+          await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
+            userId: user.id,
+            email: user.email,
+            name: user.name,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${user.token}`
+            },
+            withCredentials: true
+          });
+          
+          // If the offer generation is successful, then call the next API
+          await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
+            email: user.email,
+            status: "passed",
+          });
+          
+          // Update local storage
+          const updatedUser = { ...user, quizPassed: true };
+          localStorage.setItem("googleUser", JSON.stringify(updatedUser));
+          localStorage.setItem("quizStatus", "passed");
+          
+          setQuizResult("🎉 Congratulations! Offer letter sent to your email and also you can download it from dashboard.");
+          setTimeout(() => onComplete("passed"), 5000);
+          
+        } catch (err) {
+          console.error("Error generating offer letter:", err);
+          setError("Failed to generate offer letter. Please try again.");
+          setLoading(false);
+          setQuizResult("❌ Something went wrong. Failed to generate your offer letter.");
+        }
       } else {
         // Save failed status
         await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
@@ -72,7 +91,7 @@ const QuizOverlay = ({ user, onComplete }) => {
           status: "failed",
         });
         localStorage.setItem("quizStatus", "failed");
-      
+        
         setQuizResult("❌ Sorry, you failed. Try again later.");
         onComplete("failed");
       }
@@ -154,5 +173,5 @@ const QuizOverlay = ({ user, onComplete }) => {
     </div>
   );
 };
-
+    
 export default QuizOverlay;
