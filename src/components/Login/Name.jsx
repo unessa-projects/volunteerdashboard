@@ -6,11 +6,13 @@ const Name = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("googleUser"));
-    if (user?.name) {
-      setUsername(user.name); // pre-fill name from email login
+    const email = localStorage.getItem("email");
+    if (!email) {
+      console.warn("No email found in localStorage, redirecting to login.");
+      navigate("/login");
+      return;
     }
-  }, []);
+  });
 
   const handleSubmit = () => {
     if (username.trim() === "") return;
