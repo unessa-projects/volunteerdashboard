@@ -19,7 +19,7 @@ const handleCredentialResponse = async (response) => {
     localStorage.setItem("googleUser", JSON.stringify(googleUser));
 
     // Step 1: Check if user exists
-    const checkRes = await fetch("http://localhost:5000/api/users/check", {
+    const checkRes = await fetch("https://unessa-backend.onrender.com/api/users/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }), // ✅ now email exists
@@ -29,7 +29,7 @@ const handleCredentialResponse = async (response) => {
 
     if (checkData.exists) {
       // ✅ Step 2: Get user details from backend
-      const userRes = await fetch(`http://localhost:5000/api/users/${email}`);
+      const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
       const userData = await userRes.json();
 
       console.log("📥 Backend user data:", userData);
@@ -50,7 +50,7 @@ const handleCredentialResponse = async (response) => {
       );
 
       // ✅ Step 3: Get quiz status
-      const quizRes = await fetch(`http://localhost:5000/api/users/quiz-status/${email}`);
+      const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
       const quizData = await quizRes.json();
       localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
 

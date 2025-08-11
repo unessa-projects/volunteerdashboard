@@ -14,9 +14,8 @@ const DashboardLayout = () => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
- const username = user?.name ? user.name.split(" ")[0] : "User";
-const avatar = user?.avatar || decoded.picture || null;
-
+  const username = user?.name ? user.name.split(" ")[0] : "User";
+  const avatar = user?.avatar || decoded.picture || null;
   const [isNewUser, setIsNewUser] = useState(() => {
     return localStorage.getItem("isNewUser") === "true";
   });
@@ -142,7 +141,7 @@ const [isTourRunning, setIsTourRunning] = useState(false);
           setShowQuiz(true);
           
           if (user?.email) {
-            fetch("http://localhost:5000/api/users/mark-tour-seen", {
+            fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email: user.email }),

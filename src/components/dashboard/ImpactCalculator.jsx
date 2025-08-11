@@ -91,7 +91,7 @@ const ImpactCalculator = () => {
       if (!username) {
         const email = parsedUser?.email || localStorage.getItem("email");
         if (email) {
-          const userRes = await axios.get(`http://localhost:5000/api/users/${email}`);
+          const userRes = await axios.get(`https://unessa-backend.onrender.com/api/users/${email}`);
           username = userRes.data.username;
           console.log("Fetched username from backend:", username);
 
@@ -109,7 +109,7 @@ const ImpactCalculator = () => {
       }
 
       // 4️⃣ Fetch donations from backend using username
-      const res = await axios.get("http://localhost:5000/api/donations", {
+      const res = await axios.get("https://unessa-backend.onrender.com/api/donations", {
         params: { username }
       });
 
@@ -135,7 +135,7 @@ const ImpactCalculator = () => {
     fetchAndAnimate(); // Initial load
 
     // 🔌 Connect to backend Socket.IO server
-    const socket = ioClient("http://localhost:5000");
+    const socket = ioClient("https://unessa-backend.onrender.com");
 
     socket.on("connect", () => console.log("✅ Socket connected:", socket.id));
 
@@ -154,7 +154,7 @@ const ImpactCalculator = () => {
   }, []);
 
   const handleCopyLink = () => {
-    const baseURL = "http://localhost:5173/form";
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username") || "";
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     navigator.clipboard.writeText(finalURL);
@@ -163,7 +163,7 @@ const ImpactCalculator = () => {
   };
 
   const handleShare = () => {
-    const baseURL = "http://localhost:5000/form";
+    const baseURL = "https://unessa-backend.onrender.com/form";
     const refName = localStorage.getItem("username") || "";
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     const message = `Hello!

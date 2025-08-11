@@ -30,13 +30,13 @@ function Donation() {
         }
 
         // 2. Fetch username from backend
-        const userRes = await axios.get(`http://localhost:5000/api/users/${email}`);
+        const userRes = await axios.get(`https://unessa-backend.onrender.com/api/users/${email}`);
         const { username } = userRes.data;
         usernameFromDB = username;
         console.log("Fetched username:", username);
 
         // 3. Fetch donations with username filter
-        const donationRes = await axios.get(`http://localhost:5000/api/donations`, {
+        const donationRes = await axios.get(`https://unessa-backend.onrender.com/api/donations`, {
           params: { username: username }
         });
 
@@ -57,7 +57,7 @@ function Donation() {
     fetchPayments();
 
     // 4. Socket listener for real-time updates
-    const socket = ioClient("http://localhost:5000");
+    const socket = ioClient("https://unessa-backend.onrender.com");
 
     socket.on("connect", () => console.log("Socket connected:", socket.id));
     socket.on("paymentSuccess", (data) => {
