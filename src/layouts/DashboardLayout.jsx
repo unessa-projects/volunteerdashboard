@@ -15,7 +15,7 @@ const DashboardLayout = () => {
   });
 
   const username = user?.name ? user.name.split(" ")[0] : "User";
-  const avatar = user?.avatar || decoded.picture || null;
+  const avatar = user?.avatar  || null;
   const [isNewUser, setIsNewUser] = useState(() => {
     return localStorage.getItem("isNewUser") === "true";
   });
