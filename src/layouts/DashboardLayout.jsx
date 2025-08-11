@@ -271,13 +271,7 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/raise-funds"
-            className="flex items-center gap-1 bg-[#06444f] border-white border text-white font-bold px-3 py-1 rounded-lg shadow hover:bg-[#f3b838] hover:scale-105 transition-transform"
-          >
-            <Plus className="w-4 h-4" />
-          </Link>
-
+       
           <div className="group relative">
             <motion.div
               className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
