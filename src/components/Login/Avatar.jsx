@@ -87,6 +87,8 @@ const Avatar = () => {
 
   // Success case
   localStorage.setItem("googleUser", JSON.stringify(result.user));
+  localStorage.setItem("username", result.user.username);
+  
   navigate("/page1");
 } catch (error) {
   console.error("Network error:", error);
