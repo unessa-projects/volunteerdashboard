@@ -103,181 +103,136 @@ const QuizOverlay = ({ user, onComplete }) => {
   const progress = ((currentQuestion) / quizData.length) * 100;
 
   const getOptionClasses = (index) => {
-    let classes = "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-300 ease-in-out cursor-pointer transform hover:scale-105 mb-3 ";
+    let classes = "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200 mb-2 text-sm ";
     
     if (showAnswer) {
       if (index === question.answer) {
-        classes += "bg-green-100 text-green-800 border-green-300 font-bold shadow-md relative ";
+        classes += "bg-green-100 text-green-800 border-green-300 font-medium ";
       } else if (selectedOption === index) {
-        classes += "bg-red-100 text-red-800 border-red-300 font-bold shadow-md relative ";
+        classes += "bg-red-100 text-red-800 border-red-300 font-medium ";
       } else {
-        classes += "bg-gray-50 border-gray-200 text-gray-500";
+        classes += "bg-gray-50 border-gray-200 text-gray-700";
       }
     } else {
-      classes += "bg-white border-gray-300 text-gray-800 hover:bg-blue-50 hover:border-blue-500";
+      classes += "bg-white border-gray-300 text-gray-800 hover:bg-blue-50";
       if (selectedOption === index) {
-        classes += " border-blue-500 ring-2 md:ring-4 ring-blue-200";
+        classes += " border-blue-500 bg-blue-50";
       }
     }
     return classes;
   };
 
-  const renderOptionIcon = (index) => {
-    if (!showAnswer) return null;
-    
-    if (index === question.answer) {
-      return (
-        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-500 text-xl">
-          ✓
-        </span>
-      );
-    } else if (selectedOption === index) {
-      return (
-        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-red-500 text-xl">
-          ✕
-        </span>
-      );
-    }
-    return null;
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-gray-900 bg-opacity-75 backdrop-blur-sm">
-      <div className="bg-white text-gray-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl sm:shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-2xl mx-2 sm:mx-4 p-4 sm:p-6 lg:p-8 relative transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-gray-900 bg-opacity-75 backdrop-blur-sm">
+      <div className="bg-white text-gray-800 rounded-xl shadow-xl w-full max-w-sm mx-2 p-4 relative overflow-y-auto max-h-[90vh]">
         <button
           onClick={() => onComplete("failed")}
           disabled={loading}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-red-500 text-2xl sm:text-3xl font-light leading-none"
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-2xl font-light"
         >
           &times;
         </button>
 
         {quizResult ? (
-          <div className="text-center py-6 sm:py-10">
-            <div className="mb-4 sm:mb-6">
+          <div className="text-center py-4">
+            <div className="mb-3">
               {quizResult.includes("Congratulations") ? (
-                <div className="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">
+                <div className="text-4xl mb-2">
                   {currentEmoji}
                 </div>
               ) : (
-                <div className="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">
+                <div className="text-4xl mb-2">
                   ❌
                 </div>
               )}
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
+              <h2 className="text-xl font-bold mb-2">
                 {quizResult.includes("Congratulations") ? "Quiz Passed!" : "Quiz Failed!"}
               </h2>
             </div>
-            <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6 px-2 sm:px-4">
+            <p className="text-sm text-gray-600 mb-3 px-2">
               {quizResult}
             </p>
-            {error && <p className="text-red-500 text-sm mt-1 sm:mt-2">{error}</p>}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             {quizResult.includes("Congratulations") && (
-              <div className="mt-4 sm:mt-6 animate-bounce">
-                <div className="text-3xl sm:text-4xl">{getRandomEmoji()}</div>
+              <div className="mt-3 animate-bounce">
+                <div className="text-2xl">{getRandomEmoji()}</div>
               </div>
             )}
           </div>
         ) : showIntro ? (
-          <div className="text-center py-6 sm:py-10">
-            <div className="text-4xl sm:text-5xl lg:text-6xl mb-4 sm:mb-6">📝</div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">You Have a Small Task!</h2>
-            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto px-2">
-              Answer a few questions correctly to receive your official <span className="font-extrabold text-blue-600">Offer Letter</span> and begin your journey.
+          <div className="text-center py-4">
+            <div className="text-4xl mb-3">📝</div>
+            <h2 className="text-xl font-bold mb-2">You Have a Small Task!</h2>
+            <p className="text-sm text-gray-600 mb-4 px-2">
+              Answer a few questions correctly to receive your official <span className="font-bold text-blue-600">Offer Letter</span>.
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="bg-blue-600 text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
+              className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow hover:bg-blue-700"
             >
               Start Quiz
             </button>
           </div>
         ) : (
-          <div className="animate-fade-in">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold">Quiz Time</h2>
-              <span className="text-base sm:text-lg font-medium text-blue-600">
-                {currentQuestion + 1} / {quizData.length}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-bold">Question {currentQuestion + 1}</h2>
+              <span className="text-sm font-medium text-blue-600">
+                {currentQuestion + 1}/{quizData.length}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5 mb-4 sm:mb-6">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3">
               <div 
-                className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-in-out"
+                className="bg-blue-600 h-full rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{question.question}</p>
+            <p className="text-base font-medium mb-3">{question.question}</p>
             
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-2">
               {question.options.map((option, index) => (
-                <div key={index} className="relative">
-                  {renderOptionIcon(index)}
-                  <button
-                    onClick={() => handleOptionClick(index)}
-                    disabled={showAnswer}
-                    className={getOptionClasses(index)}
-                  >
-                    {option}
-                  </button>
-                </div>
+                <button
+                  key={index}
+                  onClick={() => handleOptionClick(index)}
+                  disabled={showAnswer}
+                  className={getOptionClasses(index)}
+                >
+                  {option}
+                </button>
               ))}
             </div>
             
             {showAnswer && (
-              <div className="mt-6 sm:mt-8">
-                <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg text-center ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                  <p className="font-bold text-base sm:text-lg">
+              <div className="mt-4">
+                <div className={`mb-3 p-2 rounded-lg text-center ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                  <p className="font-medium text-sm">
                     {isCorrect ? (
                       <span className="flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl mr-2">{currentEmoji}</span> Correct! Well done!
+                        <span className="text-lg mr-1">{currentEmoji}</span> Correct!
                       </span>
                     ) : (
                       <span className="flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl mr-2">💡</span> Oops! That's not correct
+                        <span className="text-lg mr-1">💡</span> Incorrect
                       </span>
                     )}
                   </p>
                   {!isCorrect && (
-                    <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-                      The correct answer is: <strong>{question.options[question.answer]}</strong>
+                    <p className="mt-1 text-xs">
+                      Correct answer: <strong>{question.options[question.answer]}</strong>
                     </p>
                   )}
                 </div>
                 
-                {/* Desktop Next Button (hidden on mobile) */}
-                <div className="hidden sm:flex justify-end">
-                  <button
-                    onClick={handleNext}
-                    disabled={loading}
-                    className={`px-6 py-2 sm:px-8 sm:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg transition-colors transform hover:scale-105 ${
-                      loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
-                  >
-                    {loading ? "Processing..." : currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
-                  </button>
-                </div>
-                
-                {/* Mobile Floating Action Button (hidden on desktop) */}
-                <div className="sm:hidden fixed bottom-6 right-6">
-                  <button
-                    onClick={handleNext}
-                    disabled={loading}
-                    className={`w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white ${
-                      loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                  >
-                    {loading ? (
-                      <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                {/* Next/Finish button - mobile optimized */}
+                <button
+                  onClick={handleNext}
+                  disabled={loading}
+                  className={`w-full py-2 rounded-full text-sm font-semibold shadow transition-colors ${
+                    loading ? "bg-gray-400" : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
+                >
+                  {loading ? "Processing..." : currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
+                </button>
               </div>
             )}
           </div>
