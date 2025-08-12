@@ -92,22 +92,23 @@ const QuizOverlay = ({ user, onComplete }) => {
   };
 
   const question = quizData[currentQuestion];
+  const progress = ((currentQuestion) / quizData.length) * 100;
 
   const getOptionClasses = (index) => {
-    let classes = "w-full text-left px-5 py-3 rounded-xl border-2 transition-all duration-300 ease-in-out cursor-pointer ";
+    let classes = "w-full text-left px-5 py-3 rounded-lg border-2 transition-all duration-300 ease-in-out cursor-pointer transform hover:scale-105 ";
     
     if (showAnswer) {
       if (index === question.answer) {
-        classes += "bg-green-100 border-green-500 text-green-800 font-bold shadow-md";
+        classes += "bg-green-500 text-white border-green-600 font-bold shadow-lg";
       } else if (selectedOption === index) {
-        classes += "bg-red-100 border-red-500 text-red-800 font-bold shadow-md";
+        classes += "bg-red-500 text-white border-red-600 font-bold shadow-lg";
       } else {
-        classes += "bg-white border-gray-200 text-gray-400";
+        classes += "bg-gray-200 border-gray-300 text-gray-500";
       }
     } else {
-      classes += "bg-white border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-blue-400";
+      classes += "bg-white border-gray-300 text-gray-800 hover:bg-blue-50 hover:border-blue-500";
       if (selectedOption === index) {
-        classes += " border-blue-500 bg-blue-50";
+        classes += " border-blue-500 ring-4 ring-blue-200";
       }
     }
     return classes;
@@ -126,7 +127,7 @@ const QuizOverlay = ({ user, onComplete }) => {
 
         {quizResult ? (
           <div className="text-center py-10">
-            <h2 className="text-3xl font-bold mb-4">{quizResult.includes("Congratulations") ? "Quiz Passed!" : "Quiz Failed!"}</h2>
+            <h2 className="text-3xl font-bold mb-4">{quizResult.includes("Congratulations") ? "Quiz Passed! 🎉" : "Quiz Failed! ❌"}</h2>
             <p className="text-lg text-gray-600 mb-6">{quizResult}</p>
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
@@ -138,20 +139,25 @@ const QuizOverlay = ({ user, onComplete }) => {
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
             >
               Start Quiz
             </button>
           </div>
         ) : (
-          <>
+          <div className="animate-fade-in">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Quiz Time</h2>
               <span className="text-lg font-medium text-blue-600">
-                Question {currentQuestion + 1} of {quizData.length}
+                {currentQuestion + 1} / {quizData.length}
               </span>
             </div>
-
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+              <div 
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
             <p className="text-xl font-semibold mb-6">{question.question}</p>
             
             <div className="space-y-4">
@@ -172,7 +178,7 @@ const QuizOverlay = ({ user, onComplete }) => {
                 <button
                   onClick={handleNext}
                   disabled={loading}
-                  className={`px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-colors ${
+                  className={`px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-colors transform hover:scale-105 ${
                     loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
                 >
@@ -180,7 +186,7 @@ const QuizOverlay = ({ user, onComplete }) => {
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
