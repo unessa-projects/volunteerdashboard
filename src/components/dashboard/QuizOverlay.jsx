@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Confetti from "react-confetti"; // Import Confetti
 
 const quizData = [
   { question: "What is the duration of the Fundraising Volunteer role?", options: ["15 Days", "30 Days", "45 Days", "60 Days"], answer: 1 },
@@ -18,6 +19,8 @@ const QuizOverlay = ({ user, onComplete }) => {
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false); // State for confetti
+  const [correctAnswerEmoji, setCorrectAnswerEmoji] = useState(null); // State for the animated emoji
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -25,30 +28,33 @@ const QuizOverlay = ({ user, onComplete }) => {
   }, []);
 
   const handleOptionClick = (index) => {
-    if (showAnswer) return; 
+    if (showAnswer) return;
     setSelectedOption(index);
     setShowAnswer(true);
+
     if (index === quizData[currentQuestion].answer) {
-      setScore(prev => prev + 1);;
+      setScore(prev => prev + 1);
+      setCorrectAnswerEmoji("✅"); // Show a checkmark emoji for a correct answer
+      setTimeout(() => setCorrectAnswerEmoji(null), 1000); // Hide the emoji after 1 second
+    } else {
+      setCorrectAnswerEmoji("❌"); // Show an 'x' emoji for an incorrect answer
+      setTimeout(() => setCorrectAnswerEmoji(null), 1000); // Hide the emoji after 1 second
     }
   };
 
   const handleNext = async () => {
-    // The previous logic for calculating the final score and handling the last question was slightly off.
-    // It's better to update the score inside the handleOptionClick and just use the final score here.
-    const finalScore = score; // The score is already updated.
-    
+    const finalScore = score;
+
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion((q) => q + 1);
       setSelectedOption(null);
       setShowAnswer(false);
     } else {
-      // Logic for when the quiz is finished
-      if (finalScore >= 4) { // Assuming the pass criteria is still 4 out of 5
+      if (finalScore >= 4) {
         if (loading) return;
         setLoading(true);
         setQuizResult("⏳ Please wait, your offer letter is being generated...");
-        
+
         try {
           // Generate offer letter
           await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
@@ -63,26 +69,30 @@ const QuizOverlay = ({ user, onComplete }) => {
             },
             withCredentials: true
           });
-          
+
           // If the offer generation is successful, then call the next API
           await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
             email: user.email,
             status: "passed",
           });
-          
+
           // Update local storage
           const updatedUser = { ...user, quizPassed: true };
           localStorage.setItem("googleUser", JSON.stringify(updatedUser));
           localStorage.setItem("quizStatus", "passed");
-          
-          setQuizResult("🎉 Congratulations! Offer letter sent to your email and also you can download it from dashboard.");
-          setTimeout(() => onComplete("passed"), 5000);
-          
+
+          setQuizResult("🎉 Congratulations! Offer letter sent to your email and you can also download it from the dashboard. 🎉");
+          setShowConfetti(true); // Start the confetti animation
+          setTimeout(() => {
+            setShowConfetti(false);
+            onComplete("passed");
+          }, 5000);
+
         } catch (err) {
           console.error("Error generating offer letter:", err);
           setError("Failed to generate offer letter. Please try again.");
           setLoading(false);
-          setQuizResult("❌ Something went wrong. Failed to generate your offer letter.");
+          setQuizResult("❌ Something went wrong. Failed to generate your offer letter. ❌");
         }
       } else {
         // Save failed status
@@ -91,9 +101,9 @@ const QuizOverlay = ({ user, onComplete }) => {
           status: "failed",
         });
         localStorage.setItem("quizStatus", "failed");
-        
-        setQuizResult("❌ Sorry, you failed. Try again later.");
-        onComplete("failed");
+
+        setQuizResult("😥 Sorry, you failed. Please try again later. 😥");
+        setTimeout(() => onComplete("failed"), 3000); // Give a moment for the user to read the message
       }
     }
   };
@@ -102,6 +112,7 @@ const QuizOverlay = ({ user, onComplete }) => {
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center">
+      {showConfetti && <Confetti />}
       <div className="bg-white text-black rounded-2xl shadow-lg w-full max-w-2xl p-8 relative">
         <button
           onClick={() => onComplete("failed")}
@@ -132,6 +143,11 @@ const QuizOverlay = ({ user, onComplete }) => {
           </div>
         ) : (
           <>
+            {correctAnswerEmoji && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+                <div className="text-8xl animate-pop">{correctAnswerEmoji}</div>
+              </div>
+            )}
             <h2 className="text-2xl font-semibold mb-6 text-black">Quiz Time</h2>
             <p className="text-lg font-medium mb-4 text-black">
               Question {currentQuestion + 1}: {question.question}
@@ -173,5 +189,5 @@ const QuizOverlay = ({ user, onComplete }) => {
     </div>
   );
 };
-    
+
 export default QuizOverlay;
