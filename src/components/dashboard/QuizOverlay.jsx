@@ -10,6 +10,9 @@ const quizData = [
   { question: "📈 How much will you earn as a stipend?", options: ["Flat ₹1,000 regardless of funds", "30% of funds raised", "20% of funds raised", "No stipend"], answer: 3 },
 ];
 
+// Array of different emojis for each correct answer
+const correctEmojis = ["🎉", "🥳", "🌟", "✨", "💯"]; 
+
 const QuizOverlay = ({ user, onComplete }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -19,8 +22,8 @@ const QuizOverlay = ({ user, onComplete }) => {
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false); // State for confetti
-  const [correctAnswerEmoji, setCorrectAnswerEmoji] = useState(null); // State for the animated emoji
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [correctAnswerEmoji, setCorrectAnswerEmoji] = useState(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -34,11 +37,12 @@ const QuizOverlay = ({ user, onComplete }) => {
 
     if (index === quizData[currentQuestion].answer) {
       setScore(prev => prev + 1);
-      setCorrectAnswerEmoji("✅"); // Show a checkmark emoji for a correct answer
-      setTimeout(() => setCorrectAnswerEmoji(null), 1000); // Hide the emoji after 1 second
+      // Use the current question index to get a unique emoji
+      setCorrectAnswerEmoji(correctEmojis[currentQuestion]); 
+      setTimeout(() => setCorrectAnswerEmoji(null), 1000); 
     } else {
-      setCorrectAnswerEmoji("❌"); // Show an 'x' emoji for an incorrect answer
-      setTimeout(() => setCorrectAnswerEmoji(null), 1000); // Hide the emoji after 1 second
+      setCorrectAnswerEmoji("❌");
+      setTimeout(() => setCorrectAnswerEmoji(null), 1000);
     }
   };
 
@@ -56,7 +60,6 @@ const QuizOverlay = ({ user, onComplete }) => {
         setQuizResult("⏳ Please wait, your offer letter is being generated...");
 
         try {
-          // Generate offer letter
           await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
             userId: user.id,
             email: user.email,
@@ -70,19 +73,17 @@ const QuizOverlay = ({ user, onComplete }) => {
             withCredentials: true
           });
 
-          // If the offer generation is successful, then call the next API
           await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
             email: user.email,
             status: "passed",
           });
 
-          // Update local storage
           const updatedUser = { ...user, quizPassed: true };
           localStorage.setItem("googleUser", JSON.stringify(updatedUser));
           localStorage.setItem("quizStatus", "passed");
 
           setQuizResult("🎉 Congratulations! Offer letter sent to your email and you can also download it from the dashboard. 🎉");
-          setShowConfetti(true); // Start the confetti animation
+          setShowConfetti(true);
           setTimeout(() => {
             setShowConfetti(false);
             onComplete("passed");
@@ -95,7 +96,6 @@ const QuizOverlay = ({ user, onComplete }) => {
           setQuizResult("❌ Something went wrong. Failed to generate your offer letter. ❌");
         }
       } else {
-        // Save failed status
         await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
           email: user.email,
           status: "failed",
@@ -103,7 +103,7 @@ const QuizOverlay = ({ user, onComplete }) => {
         localStorage.setItem("quizStatus", "failed");
 
         setQuizResult("😥 Sorry, you failed. Please try again later. 😥");
-        setTimeout(() => onComplete("failed"), 3000); // Give a moment for the user to read the message
+        setTimeout(() => onComplete("failed"), 3000);
       }
     }
   };
