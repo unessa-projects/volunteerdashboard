@@ -165,29 +165,7 @@ const ImpactCalculator = () => {
   const handleShare = () => {
     const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username") || "";
-    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
-    Hello! :wave:
-
-    I'm volunteering with Unessa Foundation, an NGO in Vadodara dedicated to helping underprivileged children. We believe every child deserves a future of dignity and purpose.
-    
-    :mortar_board: **Project Sneh** is our flagship initiative. We provide education, mentorship, and life skills to children from orphanages and low-income families.
-    
-    :raising_hand: The reality: Many children in orphanages lack opportunities and age out into low-paying jobs. We're changing that by building resilience and preparing them for real-world success.
-    
-    :earth_africa: **Our Goal by 2030:**
-    - Empower 10,000+ children across India.
-    - Ensure no child leaves a shelter home unprepared.
-    
-    :children_crossing: We're already working with 100+ children. Your support helps us reach more!
-    
-    :link: **Donate now:** ${finalURL}
-    
-    Let's build a future where no child is left behind. Thank you for your support! :sparkling_heart:
-    How to use these in your code:
-    You can simply copy and paste the formatted message you prefer into your message variable. For example, if you choose the first option, your code would look like this:
-    
-    JavaScript
-    
+    const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;    
     const message = `Hello!
     
     I’m volunteering with Unessa Foundation, an NGO based in Vadodara, dedicated to transforming the lives of underprivileged children through **education, mentorship, and life skills**.
@@ -213,7 +191,7 @@ const ImpactCalculator = () => {
     
     const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
-  
+  };
 
   return (
     <div className="flex flex-col md:flex-row bg-[#096d7d33] shadow-lg overflow-hidden text-white p-9 md:p-10">
