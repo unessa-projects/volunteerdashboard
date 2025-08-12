@@ -9,9 +9,6 @@ const quizData = [
   { question: "📈 How much will you earn as a stipend?", options: ["Flat ₹1,000 regardless of funds", "30% of funds raised", "20% of funds raised", "No stipend"], answer: 3 },
 ];
 
-const successEmojis = ["🎉", "🌟", "✨", "🏆", "👏", "👍", "💯"];
-const getRandomEmoji = () => successEmojis[Math.floor(Math.random() * successEmojis.length)];
-
 const QuizOverlay = ({ user, onComplete }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -21,9 +18,6 @@ const QuizOverlay = ({ user, onComplete }) => {
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [currentEmoji, setCurrentEmoji] = useState("🎉");
-  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -31,208 +25,153 @@ const QuizOverlay = ({ user, onComplete }) => {
   }, []);
 
   const handleOptionClick = (index) => {
-    if (showAnswer) return;
+    if (showAnswer) return; 
     setSelectedOption(index);
-    const correct = index === quizData[currentQuestion].answer;
-    setIsCorrect(correct);
     setShowAnswer(true);
-    if (correct) {
-      setScore(prev => prev + 1);
-      setCurrentEmoji(getRandomEmoji());
+    if (index === quizData[currentQuestion].answer) {
+      setScore(prev => prev + 1);;
     }
   };
 
   const handleNext = async () => {
+    // The previous logic for calculating the final score and handling the last question was slightly off.
+    // It's better to update the score inside the handleOptionClick and just use the final score here.
+    const finalScore = score; // The score is already updated.
+    
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion((q) => q + 1);
       setSelectedOption(null);
       setShowAnswer(false);
-      return;
-    }
-
-    // Quiz completed
-    setLoading(true);
-    const finalScore = score;
-    const passed = finalScore >= 4;
-    
-    try {
-      if (passed) {
-        setQuizResult("⏳ Generating your offer letter...");
-        setShowResult(true);
+    } else {
+      // Logic for when the quiz is finished
+      if (finalScore >= 4) { // Assuming the pass criteria is still 4 out of 5
+        if (loading) return;
+        setLoading(true);
+        setQuizResult("⏳ Please wait, your offer letter is being generated...");
         
-        await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
-          userId: user.id,
-          email: user.email,
-          name: user.name,
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${user.token}`
+        try {
+          // Generate offer letter
+          await axios.post("https://unessa-backend.onrender.com/offer/generate-offer", {
+            userId: user.id,
+            email: user.email,
+            name: user.name,
           },
-          withCredentials: true
-        });
-      }
-
-      await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
-        email: user.email,
-        status: passed ? "passed" : "failed",
-      });
-
-      if (passed) {
-        const updatedUser = { ...user, quizPassed: true };
-        localStorage.setItem("googleUser", JSON.stringify(updatedUser));
-        localStorage.setItem("quizStatus", "passed");
-        setQuizResult("🎉 Congratulations! Offer letter sent to your email and dashboard.");
-        setTimeout(() => onComplete("passed"), 3000);
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${user.token}`
+            },
+            withCredentials: true
+          });
+          
+          // If the offer generation is successful, then call the next API
+          await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
+            email: user.email,
+            status: "passed",
+          });
+          
+          // Update local storage
+          const updatedUser = { ...user, quizPassed: true };
+          localStorage.setItem("googleUser", JSON.stringify(updatedUser));
+          localStorage.setItem("quizStatus", "passed");
+          
+          setQuizResult("🎉 Congratulations! Offer letter sent to your email and also you can download it from dashboard.");
+          setTimeout(() => onComplete("passed"), 5000);
+          
+        } catch (err) {
+          console.error("Error generating offer letter:", err);
+          setError("Failed to generate offer letter. Please try again.");
+          setLoading(false);
+          setQuizResult("❌ Something went wrong. Failed to generate your offer letter.");
+        }
       } else {
+        // Save failed status
+        await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
+          email: user.email,
+          status: "failed",
+        });
         localStorage.setItem("quizStatus", "failed");
+        
         setQuizResult("❌ Sorry, you failed. Try again later.");
-        setShowResult(true);
-        setTimeout(() => onComplete("failed"), 3000);
+        onComplete("failed");
       }
-    } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to process your result. Please try again.");
-      setQuizResult("❌ Something went wrong. Please try again later.");
-      setShowResult(true);
-      setLoading(false);
     }
   };
 
   const question = quizData[currentQuestion];
-  const progress = ((currentQuestion) / quizData.length) * 100;
-
-  const getOptionClasses = (index) => {
-    let classes = "w-full text-left px-3 py-2 rounded-lg border text-sm mb-1 ";
-    
-    if (showAnswer) {
-      if (index === question.answer) {
-        classes += "bg-green-50 text-green-800 border-green-200 ";
-      } else if (selectedOption === index) {
-        classes += "bg-red-50 text-red-800 border-red-200 ";
-      } else {
-        classes += "bg-gray-50 border-gray-200 text-gray-700";
-      }
-    } else {
-      classes += "bg-white border-gray-300 text-gray-800";
-      if (selectedOption === index) {
-        classes += " border-blue-500 bg-blue-50";
-      }
-    }
-    return classes;
-  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-gray-900 bg-opacity-75 backdrop-blur-sm">
-      <div className="bg-white text-gray-800 rounded-lg shadow-lg w-full max-w-xs mx-2 p-3 relative overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center">
+      <div className="bg-white text-black rounded-2xl shadow-lg w-full max-w-2xl p-8 relative">
         <button
           onClick={() => onComplete("failed")}
           disabled={loading}
-          className="absolute top-1 right-1 text-gray-400 hover:text-red-500 text-xl font-light"
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl font-bold"
         >
-          &times;
+          ×
         </button>
 
-        {quizResult && showResult ? (
-          <div className="text-center py-3">
-            <div className="mb-2">
-              {quizResult.includes("Congratulations") ? (
-                <div className="text-3xl mb-1">{currentEmoji}</div>
-              ) : (
-                <div className="text-3xl mb-1">❌</div>
-              )}
-              <h2 className="text-lg font-bold mb-1">
-                {quizResult.includes("Congratulations") ? "Quiz Passed!" : "Quiz Failed!"}
-              </h2>
-            </div>
-            <p className="text-xs text-gray-600 mb-2">
-              {quizResult}
-            </p>
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-            {quizResult.includes("Congratulations") && (
-              <div className="mt-2 animate-bounce">
-                <div className="text-xl">{getRandomEmoji()}</div>
-              </div>
-            )}
+        {quizResult ? (
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-4 text-black">Quiz Completed</h2>
+            <p className="text-lg mb-6 text-gray-700">{quizResult}</p>
           </div>
         ) : showIntro ? (
-          <div className="text-center py-3">
-            <div className="text-3xl mb-2">📝</div>
-            <h2 className="text-lg font-bold mb-1">Quick Quiz!</h2>
-            <p className="text-xs text-gray-600 mb-3">
-              Answer correctly to get your <span className="font-bold text-blue-600">Offer Letter</span>.
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-4 text-black">You Have a Small Task!</h2>
+            <p className="text-lg mb-6 text-gray-700">
+              Answer a few questions correctly to receive your{" "}
+              <span className="font-bold text-blue-600">Offer Letter</span>.
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-blue-700"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               Start Quiz
             </button>
           </div>
         ) : (
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-sm font-bold">Q{currentQuestion + 1}</h2>
-              <span className="text-xs text-blue-600">
-                {currentQuestion + 1}/{quizData.length}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
-              <div 
-                className="bg-blue-600 h-full rounded-full"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <p className="text-sm font-medium mb-2">{question.question}</p>
-            
-            <div className="space-y-1">
+          <>
+            <h2 className="text-2xl font-semibold mb-6 text-black">Quiz Time</h2>
+            <p className="text-lg font-medium mb-4 text-black">
+              Question {currentQuestion + 1}: {question.question}
+            </p>
+            <div className="space-y-3">
               {question.options.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => handleOptionClick(index)}
                   disabled={showAnswer}
-                  className={getOptionClasses(index)}
+                  className={`w-full text-left px-4 py-2 rounded-lg border transition ${
+                    selectedOption === index
+                      ? index === question.answer
+                        ? "bg-green-100 border-green-500 text-green-800"
+                        : "bg-red-100 border-red-500 text-red-800"
+                      : "hover:bg-gray-100 border-gray-300 text-black"
+                  }`}
                 >
                   {option}
                 </button>
               ))}
             </div>
-            
             {showAnswer && (
-              <div className="mt-3">
-                <div className={`mb-2 p-1.5 rounded text-center text-xs ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                  {isCorrect ? (
-                    <span className="flex items-center justify-center">
-                      <span className="text-sm mr-1">{currentEmoji}</span> Correct!
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center">
-                      <span className="text-sm mr-1">💡</span> Incorrect
-                    </span>
-                  )}
-                  {!isCorrect && (
-                    <p className="mt-0.5 text-2xs">
-                      Answer: <strong>{question.options[question.answer]}</strong>
-                    </p>
-                  )}
-                </div>
-                
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={handleNext}
                   disabled={loading}
-                  className={`w-full py-1.5 rounded-full text-xs font-semibold ${
-                    loading ? "bg-gray-400" : "bg-blue-600 text-white hover:bg-blue-700"
+                  className={`px-6 py-2 rounded-lg text-white ${
+                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
                   }`}
                 >
-                  {loading ? "..." : currentQuestion < quizData.length - 1 ? "Next" : "Finish"}
+                  {loading ? "Generating..." : currentQuestion < quizData.length - 1 ? "Next" : "Finish"}
                 </button>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
     </div>
   );
 };
-
+    
 export default QuizOverlay;
