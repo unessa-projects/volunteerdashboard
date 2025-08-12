@@ -163,7 +163,7 @@ const ImpactCalculator = () => {
   };
 
   const handleShare = () => {
-    const baseURL = "http://localhost:5000/form";
+    const baseURL = "https://volunteerdashboard-production.up.railway.app/form";
     const refName = localStorage.getItem("username") || "";
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     const message = `Hello!
