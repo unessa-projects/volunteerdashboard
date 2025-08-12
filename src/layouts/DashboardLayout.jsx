@@ -138,6 +138,7 @@ const [isTourRunning, setIsTourRunning] = useState(false);
           setJoyrideState(prev => ({ ...prev, run: false }));
           setIsTourRunning(false);
           localStorage.setItem("isNewUser", "false");
+          setIsNewUser(false);
           setShowQuiz(true);
           
           if (user?.email) {
