@@ -9,6 +9,9 @@ const quizData = [
   { question: "📈 How much will you earn as a stipend?", options: ["Flat ₹1,000 regardless of funds", "30% of funds raised", "20% of funds raised", "No stipend"], answer: 3 },
 ];
 
+const successEmojis = ["🎉", "🌟", "✨", "🏆", "👏", "👍", "💯"];
+const getRandomEmoji = () => successEmojis[Math.floor(Math.random() * successEmojis.length)];
+
 const QuizOverlay = ({ user, onComplete }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -19,6 +22,7 @@ const QuizOverlay = ({ user, onComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [currentEmoji, setCurrentEmoji] = useState("🎉");
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -33,6 +37,7 @@ const QuizOverlay = ({ user, onComplete }) => {
     setShowAnswer(true);
     if (correct) {
       setScore(prev => prev + 1);
+      setCurrentEmoji(getRandomEmoji());
     }
   };
 
@@ -98,7 +103,7 @@ const QuizOverlay = ({ user, onComplete }) => {
   const progress = ((currentQuestion) / quizData.length) * 100;
 
   const getOptionClasses = (index) => {
-    let classes = "w-full text-left px-5 py-3 rounded-lg border-2 transition-all duration-300 ease-in-out cursor-pointer transform hover:scale-105 mb-3 ";
+    let classes = "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-300 ease-in-out cursor-pointer transform hover:scale-105 mb-3 ";
     
     if (showAnswer) {
       if (index === question.answer) {
@@ -111,7 +116,7 @@ const QuizOverlay = ({ user, onComplete }) => {
     } else {
       classes += "bg-white border-gray-300 text-gray-800 hover:bg-blue-50 hover:border-blue-500";
       if (selectedOption === index) {
-        classes += " border-blue-500 ring-4 ring-blue-200";
+        classes += " border-blue-500 ring-2 md:ring-4 ring-blue-200";
       }
     }
     return classes;
@@ -122,13 +127,13 @@ const QuizOverlay = ({ user, onComplete }) => {
     
     if (index === question.answer) {
       return (
-        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-500">
+        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-500 text-xl">
           ✓
         </span>
       );
     } else if (selectedOption === index) {
       return (
-        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-red-500">
+        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-red-500 text-xl">
           ✕
         </span>
       );
@@ -137,67 +142,73 @@ const QuizOverlay = ({ user, onComplete }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-75 backdrop-blur-sm">
-      <div className="bg-white text-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl p-8 relative transform transition-transform duration-300 scale-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-gray-900 bg-opacity-75 backdrop-blur-sm">
+      <div className="bg-white text-gray-800 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl sm:shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-2xl mx-2 sm:mx-4 p-4 sm:p-6 lg:p-8 relative transform transition-transform duration-300 scale-100 overflow-y-auto max-h-[90vh]">
         <button
           onClick={() => onComplete("failed")}
           disabled={loading}
-          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-light leading-none"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-red-500 text-2xl sm:text-3xl font-light leading-none"
         >
           &times;
         </button>
 
         {quizResult ? (
-          <div className="text-center py-10">
-            <div className="mb-6">
+          <div className="text-center py-6 sm:py-10">
+            <div className="mb-4 sm:mb-6">
               {quizResult.includes("Congratulations") ? (
-                <div className="text-6xl mb-4">🎉</div>
+                <div className="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">
+                  {currentEmoji}
+                </div>
               ) : (
-                <div className="text-6xl mb-4">❌</div>
+                <div className="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">
+                  ❌
+                </div>
               )}
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
                 {quizResult.includes("Congratulations") ? "Quiz Passed!" : "Quiz Failed!"}
               </h2>
             </div>
-            <p className="text-lg text-gray-600 mb-6 px-4">{quizResult}</p>
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6 px-2 sm:px-4">
+              {quizResult}
+            </p>
+            {error && <p className="text-red-500 text-sm mt-1 sm:mt-2">{error}</p>}
             {quizResult.includes("Congratulations") && (
-              <div className="mt-6 animate-bounce">
-                <div className="text-4xl">✨</div>
+              <div className="mt-4 sm:mt-6 animate-bounce">
+                <div className="text-3xl sm:text-4xl">{getRandomEmoji()}</div>
               </div>
             )}
           </div>
         ) : showIntro ? (
-          <div className="text-center py-10">
-            <div className="text-6xl mb-6">📝</div>
-            <h2 className="text-3xl font-bold mb-4">You Have a Small Task!</h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+          <div className="text-center py-6 sm:py-10">
+            <div className="text-4xl sm:text-5xl lg:text-6xl mb-4 sm:mb-6">📝</div>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">You Have a Small Task!</h2>
+            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto px-2">
               Answer a few questions correctly to receive your official <span className="font-extrabold text-blue-600">Offer Letter</span> and begin your journey.
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
+              className="bg-blue-600 text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
             >
               Start Quiz
             </button>
           </div>
         ) : (
           <div className="animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Quiz Time</h2>
-              <span className="text-lg font-medium text-blue-600">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold">Quiz Time</h2>
+              <span className="text-base sm:text-lg font-medium text-blue-600">
                 {currentQuestion + 1} / {quizData.length}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+            <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5 mb-4 sm:mb-6">
               <div 
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+                className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-in-out"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-xl font-semibold mb-6">{question.question}</p>
+            <p className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{question.question}</p>
             
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {question.options.map((option, index) => (
                 <div key={index} className="relative">
                   {renderOptionIcon(index)}
@@ -213,28 +224,30 @@ const QuizOverlay = ({ user, onComplete }) => {
             </div>
             
             {showAnswer && (
-              <div className="mt-8">
-                <div className={`mb-6 p-4 rounded-lg text-center ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                  <p className="font-bold text-lg">
+              <div className="mt-6 sm:mt-8">
+                <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg text-center ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                  <p className="font-bold text-base sm:text-lg">
                     {isCorrect ? (
                       <span className="flex items-center justify-center">
-                        <span className="text-2xl mr-2">🎉</span> Correct! Well done!
+                        <span className="text-xl sm:text-2xl mr-2">{currentEmoji}</span> Correct! Well done!
                       </span>
                     ) : (
                       <span className="flex items-center justify-center">
-                        <span className="text-2xl mr-2">💡</span> Oops! That's not correct
+                        <span className="text-xl sm:text-2xl mr-2">💡</span> Oops! That's not correct
                       </span>
                     )}
                   </p>
                   {!isCorrect && (
-                    <p className="mt-2">The correct answer is: <strong>{question.options[question.answer]}</strong></p>
+                    <p className="mt-1 sm:mt-2 text-sm sm:text-base">
+                      The correct answer is: <strong>{question.options[question.answer]}</strong>
+                    </p>
                   )}
                 </div>
                 <div className="flex justify-end">
                   <button
                     onClick={handleNext}
                     disabled={loading}
-                    className={`px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-colors transform hover:scale-105 ${
+                    className={`px-6 py-2 sm:px-8 sm:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg transition-colors transform hover:scale-105 ${
                       loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
