@@ -47,7 +47,7 @@ const rewards = [
       "Certificate for Crowdfunding course",
       "Social Media Shoutout",
       "Internship Opportunity (As per intern's qualifications and vacancy)",
-      "Letter of Recommendation from President of Muskurahat"
+      "Letter of Recommendation from President of Unessa"
     ],
     borderColor: "border-[#ECA90E]"
   },
