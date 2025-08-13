@@ -168,18 +168,18 @@ const ImpactCalculator = () => {
     const finalURL = `${baseURL}?ref=${encodeURIComponent(refName)}`;
     const message = `*Hello!* 👋
 
-I’m volunteering with *Unessa Foundation*, an NGO based in Vadodara 🏙, dedicated to transforming the lives of underprivileged children through education 📚, mentorship 👩‍🏫, and life skills 💡.
+I’m volunteering with *Unessa Foundation*, an NGO based in Vadodara , dedicated to transforming the lives of underprivileged children through education 📚, mentorship , and life skills 💡.
 
-🎓 *Project Sneh* is our flagship initiative that supports children from orphanages 🏠, low-income families 💛, and rural villages 🌾 — giving them not just schooling, but the tools and confidence to thrive in life.
+🎓 *Project Sneh* is our flagship initiative that supports children from orphanages , low-income families 💛, and rural villages — giving them not just schooling, but the tools and confidence to thrive in life.
 
 *But here’s the truth:*
-In India 🇮🇳, children in orphanages may receive food 🍛 and shelter 🛏, but they’re often left behind when it comes to opportunity 🚪.
+In India 🇮🇳, children in orphanages may receive food and shelter, but they’re often left behind when it comes to opportunity 🚪.
 
-Many age out of the system at 18 🎂 and end up in low-paying jobs 💼 — not because they lack potential, but because they lack access.
+Many age out of the system at 18 and end up in low-paying jobs 💼 — not because they lack potential, but because they lack access.
 
 We believe *survival isn’t enough*.  
-Every child deserves a future of dignity ✨, choice 🎯, and purpose 💖.  
-That’s why we focus on nurturing their minds 🧠, building resilience 💪, and preparing them for real-world success 🌟.
+Every child deserves a future of dignity, choice 🎯, and purpose 💖.  
+That’s why we focus on nurturing their minds 🧠, building resilience, and preparing them for real-world success 🌟.
 
 🌍 *Our 5-Year Vision by 2030:*  
 ✅ Empower 10,000+ children across India  
