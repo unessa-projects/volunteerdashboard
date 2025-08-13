@@ -1,9 +1,52 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useLocation, Link, Outlet } from "react-router-dom";
-import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download } from "lucide-react";
+import { Plus, Home, BarChart2, Search, Users, DollarSign, LogOut, X, Menu, Download, CheckCircle, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizOverlay from "../components/dashboard/QuizOverlay";
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
+
+// A new component for the quiz prompt
+const QuizPrompt = ({ onStartQuiz, onDismiss }) => {
+  return (
+    <motion.div
+      initial={{ y: 50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 50, opacity: 0 }}
+      className="fixed bottom-24 lg:bottom-10 right-4 z-[100] bg-[#06444f] text-white p-4 rounded-lg shadow-2xl max-w-sm flex flex-col gap-3"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-bold flex items-center gap-2">
+          <CheckCircle size={24} className="text-[#FFB823]" />
+          Tour Complete!
+        </h3>
+        <button onClick={onDismiss} className="text-gray-400 hover:text-white transition-colors">
+          <X size={20} />
+        </button>
+      </div>
+      <p className="text-sm">
+        Ready to test your knowledge? Take a quick quiz to earn your first certificate! You can always come back to it later.
+      </p>
+      <div className="flex gap-2">
+        <motion.button
+          onClick={onStartQuiz}
+          className="flex-1 bg-[#ECA90E] text-[#043238] font-bold py-2 px-4 rounded-lg transition-all hover:bg-[#d6990d]"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Take Quiz Now
+        </motion.button>
+        <motion.button
+          onClick={onDismiss}
+          className="flex-1 bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-all hover:bg-gray-700"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Maybe Later
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+};
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -15,18 +58,18 @@ const DashboardLayout = () => {
   });
 
   const username = user?.name ? user.name.split(" ")[0] : "User";
-  const avatar = user?.avatar  || null;
+  const avatar = user?.avatar || null;
   const [isNewUser, setIsNewUser] = useState(() => {
     return localStorage.getItem("isNewUser") === "true";
   });
   const [showLogout, setShowLogout] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // const [runTour, setRunTour] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizStatus, setQuizStatus] = useState(() => localStorage.getItem("quizStatus") || "notAttempted");
   const [, setShowStartButton] = useState(true);
-// Add this to your state
-const [isTourRunning, setIsTourRunning] = useState(false);
+  const [isTourRunning, setIsTourRunning] = useState(false);
+  // New state to manage the quiz prompt
+  const [showQuizPrompt, setShowQuizPrompt] = useState(false);
 
   // Joyride state
   const [joyrideState, setJoyrideState] = useState({
@@ -115,7 +158,6 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         setJoyrideState(prev => ({ 
           ...prev, 
           steps: tourSteps,
-          // Automatically start tour if it's a new user AND we have user data
           run: isNewUser && user?.name 
         }));
         if (isNewUser && user?.name) {
@@ -124,40 +166,45 @@ const [isTourRunning, setIsTourRunning] = useState(false);
           }, 2000);
           return () => clearTimeout(timer);
         }
-      }, [user]);
+  }, [user]);
 
-      {joyrideState.run && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-[1000] pointer-events-auto"></div>
-      )}
-      
-      const handleJoyrideCallback = useCallback((data) => {
-        const { action, index, status, type } = data;
-    
-        if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-          // Tour completed or skipped
-          setJoyrideState(prev => ({ ...prev, run: false }));
-          setIsTourRunning(false);
-          localStorage.setItem("isNewUser", "false");
-          setIsNewUser(false);
-          setShowQuiz(true);
-          
-          if (user?.email) {
-            fetch("https://unessa-backend.onrender.com/api/users/mark-tour-seen", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email: user.email }),
-            });
-          }
-        } else if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
-          // Update state to advance the tour
-          setJoyrideState(prev => ({
-            ...prev,
-            stepIndex: index + (action === ACTIONS.PREV ? -1 : 1),
-          }));
-        }
-      }, [user]);
-
+  const handleJoyrideCallback = useCallback((data) => {
+    const { action, index, status, type } = data;
   
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+      setJoyrideState(prev => ({ ...prev, run: false }));
+      setIsTourRunning(false);
+      localStorage.setItem("isNewUser", "false");
+      setIsNewUser(false);
+      
+      // Show the quiz prompt
+      setShowQuizPrompt(true);
+  
+      if (user?.email) {
+        fetch("https://localhost:5000/api/users/mark-tour-seen", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email }),
+        });
+      }
+    } else if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+      setJoyrideState(prev => ({
+        ...prev,
+        stepIndex: index + (action === ACTIONS.PREV ? -1 : 1),
+      }));
+    }
+  }, [user]);
+  
+  
+  const handleStartQuiz = () => {
+    setShowQuizPrompt(false);
+    setShowQuiz(true);
+  };
+  
+  const handleDismissQuizPrompt = () => {
+    setShowQuizPrompt(false);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("googleUser");
     localStorage.removeItem("quizStatus");
@@ -220,37 +267,41 @@ const [isTourRunning, setIsTourRunning] = useState(false);
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#4A9782]">
       <Joyride
-        steps={joyrideState.steps}
-        run={joyrideState.run}
-        stepIndex={joyrideState.stepIndex}
-        callback={handleJoyrideCallback}
-        continuous={true}
-        scrollToFirstStep={true}
-        showProgress={true}
-        showSkipButton={true}
-        styles={{
-          options: {
-            primaryColor: '#043238',
-            textColor: '#ffffff',
-            backgroundColor: '#06444f',
-            overlayColor: 'rgba(0, 0, 0, 0.8)',
-            arrowColor: '#06444f',
-          },
-          buttonNext: {
-            backgroundColor: '#043238',
-            color: '#ffffff',
-          },
-          buttonBack: {
-            color: '#ffffff',
-          },
-          buttonSkip: {
-            color: '#ffffff',
-          },
-        }}
-      />
- 
-
-      {/* Mobile Header */}
+  steps={joyrideState.steps}
+  run={joyrideState.run}
+  stepIndex={joyrideState.stepIndex}
+  callback={handleJoyrideCallback}
+  continuous={true}
+  scrollToFirstStep={true}
+  showProgress={true}
+  showSkipButton={true}
+  styles={{
+    options: {
+      primaryColor: '#043238',
+      textColor: '#ffffff',
+      backgroundColor: '#06444f',
+      overlayColor: 'rgba(0, 0, 0, 0.5)', // Make overlay slightly transparent
+      arrowColor: '#06444f',
+    },
+    buttonNext: {
+      backgroundColor: '#043238',
+      color: '#ffffff',
+    },
+    buttonBack: {
+      color: '#ffffff',
+    },
+    buttonSkip: {
+      color: '#ffffff',
+    },
+  }}
+  disableOverlayClose={false} // Allow closing by clicking overlay
+  hideCloseButton={false} // Show close button
+/>
+      
+      {/* {joyrideState.run && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-[1000] pointer-events-auto"></div>
+      )} */}
+    
       <motion.header 
         className="lg:hidden flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
         initial="hidden"
@@ -272,7 +323,6 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         </div>
 
         <div className="flex items-center gap-2">
-       
           <div className="group relative">
             <motion.div
               className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg cursor-pointer"
@@ -302,11 +352,9 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         </div>
       </motion.header>
 
-      {/* Mobile Menu (appears from left) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
               initial={{ opacity: 0 }}
@@ -315,7 +363,6 @@ const [isTourRunning, setIsTourRunning] = useState(false);
               onClick={() => setIsMobileMenuOpen(false)}
             />
             
-            {/* Sidebar */}
             <motion.aside 
               className="lg:hidden fixed top-0 left-0 h-full w-64 bg-[#06444f] border-r border-orange shadow-xl z-50 p-6 flex-col justify-between"
               initial="hidden"
@@ -390,7 +437,6 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
       <motion.aside 
         className="hidden lg:flex fixed top-0 left-0 h-full w-72 bg-[#06444f] border-r border-orange shadow-xl z-50 p-6 flex-col justify-between"
         initial="hidden"
@@ -450,9 +496,7 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         </motion.div>
       </motion.aside>
 
-      {/* Main Content */}
       <div className="flex-1 lg:ml-72 min-h-screen pb-20 lg:pb-0">
-        {/* Desktop Header */}
         <motion.header 
           className="hidden lg:flex justify-between items-center bg-[#043238] text-white p-4 shadow-md"
           initial="hidden"
@@ -511,7 +555,6 @@ const [isTourRunning, setIsTourRunning] = useState(false);
           </div>
         </motion.header>
 
-        {/* Main Content Area */}
         <motion.main 
           className="p-4 bg-[#043238] min-h-[calc(100vh-80px)]"
           initial="hidden"
@@ -520,10 +563,12 @@ const [isTourRunning, setIsTourRunning] = useState(false);
         >
           <Outlet />
           {showQuiz && <QuizOverlay user={user} onComplete={handleQuizComplete} />}
+          <AnimatePresence>
+            {showQuizPrompt && <QuizPrompt onStartQuiz={handleStartQuiz} onDismiss={handleDismissQuizPrompt} />}
+          </AnimatePresence>
         </motion.main>
       </div>
 
-      {/* Footer Navigation (mobile only) */}
       <motion.nav 
         className="fixed bottom-0 left-0 right-0 lg:hidden bg-[#06444f] border-t border-orange shadow-lg flex justify-around items-center p-2 z-50"
         initial="hidden"
