@@ -1,3 +1,4 @@
+
 // Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -7,25 +8,21 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [daysLeft, setDaysLeft] = useState(30);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [isNewDevice, setIsNewDevice] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     
     const savedStartDate = localStorage.getItem("startDate");
-    if (!savedStartDate) {
-      setIsNewDevice(true);
-       startDate = new Date().toISOString();
-       localStorage.setItem("startDate", startDate);
-       }
+    let startDate = savedStartDate ? new Date(savedStartDate) : new Date();
+    if (!savedStartDate) localStorage.setItem("startDate", startDate.toISOString());
 
     const today = new Date();
-    const diffInDays = Math.floor((today - new Date(startDate)) / (1000 * 60 * 60 * 24));
- setDaysLeft(Math.max(1, 30 - diffInDays));
+    const diffInDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    setDaysLeft(Math.max(1, 30 - diffInDays));
 
-  return () => window.removeEventListener('resize', handleResize);
- }, []);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Card data for better maintainability
   const journeyCards = [
