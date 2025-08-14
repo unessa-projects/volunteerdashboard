@@ -16,16 +16,16 @@ const Dashboard = () => {
     const savedStartDate = localStorage.getItem("startDate");
     if (!savedStartDate) {
       setIsNewDevice(true);
-      const startDate = new Date();
-      localStorage.setItem("startDate", startDate.toISOString());
-  }
+       startDate = new Date().toISOString();
+       localStorage.setItem("startDate", startDate);
+       }
 
     const today = new Date();
-    const diffInDays = Math.floor((today - savedStartDate) / (1000 * 60 * 60 * 24));
-    setDaysLeft(Math.max(1, 30 - diffInDays));
+    const diffInDays = Math.floor((today - new Date(startDate)) / (1000 * 60 * 60 * 24));
+ setDaysLeft(Math.max(1, 30 - diffInDays));
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  return () => window.removeEventListener('resize', handleResize);
+ }, []);
 
   // Card data for better maintainability
   const journeyCards = [
