@@ -7,17 +7,21 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [daysLeft, setDaysLeft] = useState(30);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isNewDevice, setIsNewDevice] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     
     const savedStartDate = localStorage.getItem("startDate");
-    let startDate = savedStartDate ? new Date(savedStartDate) : new Date();
-    if (!savedStartDate) localStorage.setItem("startDate", startDate.toISOString());
+    if (!savedStartDate) {
+      setIsNewDevice(true);
+      const startDate = new Date();
+      localStorage.setItem("startDate", startDate.toISOString());
+  }
 
     const today = new Date();
-    const diffInDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const diffInDays = Math.floor((today - savedStartDate) / (1000 * 60 * 60 * 24));
     setDaysLeft(Math.max(1, 30 - diffInDays));
 
     return () => window.removeEventListener('resize', handleResize);
