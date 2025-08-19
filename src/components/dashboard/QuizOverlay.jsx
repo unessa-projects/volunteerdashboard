@@ -60,7 +60,7 @@ const QuizOverlay = ({ user, onComplete }) => {
         setQuizResult("⏳ Please wait, your offer letter is being generated...");
 
         try {
-          await axios.post("https://intern.unessafoundation.org/offer/generate-offer", {
+          await axios.post("https://internapi.unessafoundation.org/offer/generate-offer", {
             userId: user.id,
             email: user.email,
             name: user.name,
