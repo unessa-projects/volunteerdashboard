@@ -58,7 +58,7 @@ const Avatar = () => {
     };
 
     try {
-      const response = await fetch("https://unessa-backend.onrender.com/api/users/register", {
+      const response = await fetch("https://internapi.unessafoundation.org//api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
