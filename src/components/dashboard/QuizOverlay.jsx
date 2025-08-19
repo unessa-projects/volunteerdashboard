@@ -73,7 +73,7 @@ const QuizOverlay = ({ user, onComplete }) => {
             withCredentials: true
           });
 
-          await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
+          await axios.post("https://internapi.unessafoundation.org/api/users/quiz-status", {
             email: user.email,
             status: "passed",
           });
@@ -96,7 +96,7 @@ const QuizOverlay = ({ user, onComplete }) => {
           setQuizResult("❌ Something went wrong. Failed to generate your offer letter. ❌");
         }
       } else {
-        await axios.post("https://unessa-backend.onrender.com/api/users/quiz-status", {
+        await axios.post("https://internapi.unessafoundation.org/api/users/quiz-status", {
           email: user.email,
           status: "failed",
         });
