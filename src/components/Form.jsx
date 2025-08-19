@@ -128,9 +128,21 @@ const Form = () => {
     }
   };
 
-  return (
-    <div className="bg-[#F8FAFA] min-h-screen flex justify-center items-center px-4 py-10">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 relative animate-fade-in-up">
+ return (
+  <div className="relative min-h-screen w-full">
+    {/* Background iframe */}
+    <iframe
+      src="https://unessafoundation.org/donate/"
+      className="absolute top-0 left-0 w-full h-full border-none"
+      title="Donation Background"
+    ></iframe>
+
+    {/* Overlay with semi-transparent backdrop */}
+    <div className="absolute inset-0 bg-black/30 z-10"></div>
+
+    {/* Your form on top */}
+    <div className="relative z-20 flex justify-center items-center min-h-screen px-4 py-10">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 animate-fade-in-up">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4 border-b pb-3">
@@ -190,7 +202,9 @@ const Form = () => {
         </p>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Form;
