@@ -54,7 +54,7 @@ const Form = () => {
     if (isInvalid) return;
 
     try {
-      const res = await axios.post('https://unessa-backend.onrender.com/create-order', {
+      const res = await axios.post('https://internapi.unessafoundation.org/create-order', {
         ...formData,
         amount: baseAmount,
       });
@@ -69,7 +69,7 @@ const Form = () => {
         order_id: orderId,
         handler: async function (response) {
           try {
-            await axios.post('https://unessa-backend.onrender.com/verify-payment', {
+            await axios.post('https://internapi.unessafoundation.org/verify-payment', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -81,7 +81,7 @@ const Form = () => {
               amount: baseAmount,
             });
 
-            await axios.post('https://unessa-backend.onrender.com/save-payment', {
+            await axios.post('https://internapi.unessafoundation.org/save-payment', {
               refName: localStorage.getItem("username"),
               name: formData.name,
               email: formData.email,
