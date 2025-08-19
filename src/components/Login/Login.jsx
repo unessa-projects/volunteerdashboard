@@ -16,7 +16,7 @@ const Login = () => {
       };
       localStorage.setItem("googleUser", JSON.stringify(googleUser));
       // Step 1: Check if user exists
-      const checkRes = await fetch("https://unessa-backend.onrender.com/api/users/check", {
+      const checkRes = await fetch("https://internapi.unessafoundation.org/api/users/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }), // :white_check_mark: now email exists
@@ -24,7 +24,7 @@ const Login = () => {
       const checkData = await checkRes.json();
       if (checkData.exists) {
         // :white_check_mark: Step 2: Get user details from backend
-        const userRes = await fetch(`https://unessa-backend.onrender.com/api/users/${email}`);
+        const userRes = await fetch(`https://internapi.unessafoundation.org/api/users/${email}`);
         const userData = await userRes.json();
         console.log(":inbox_tray: Backend user data:", userData);
         // :white_check_mark: Store in localStorage (backend overrides Google fields if available)
@@ -41,7 +41,7 @@ const Login = () => {
           })
         );
         // :white_check_mark: Step 3: Get quiz status
-        const quizRes = await fetch(`https://unessa-backend.onrender.com/api/users/quiz-status/${email}`);
+        const quizRes = await fetch(`https://internapi.unessafoundation.org/api/users/quiz-status/${email}`);
         const quizData = await quizRes.json();
         localStorage.setItem("quizStatus", quizData.quizStatus || "notAttempted");
         // :white_check_mark: Step 4: Handle product tour flag
