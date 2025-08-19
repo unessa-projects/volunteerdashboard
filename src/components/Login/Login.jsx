@@ -75,7 +75,7 @@ const Login = () => {
     const initializeGoogle = () => {
       if (window?.google?.accounts?.id) {
         window.google.accounts.id.initialize({
-          client_id: "632235295452-q80u7io2eit1gh39vo63euk6dbg6ciij.apps.googleusercontent.com",
+          client_id: "576101733937-te217ttgfveqn2jk9misk91d2po77p64.apps.googleusercontent.com",
           callback: handleCredentialResponse,
            scope: "email profile", // ✅ request email explicitly
         context: "signin"
