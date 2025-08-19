@@ -181,7 +181,7 @@ const DashboardLayout = () => {
       setShowQuizPrompt(true);
   
       if (user?.email) {
-        fetch("https://localhost:5000/api/users/mark-tour-seen", {
+        fetch("https://internapi.unessafoundation.org/api/users/mark-tour-seen", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user.email }),
