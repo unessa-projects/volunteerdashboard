@@ -253,9 +253,9 @@ const FormFields = ({ formData, onChange, submitted }) => {
       <label 
         htmlFor="dob-input" 
         // Positioned absolute and styled as a placeholder
-        className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400 transition-all duration-200 
-                   peer-focus:top-0 peer-focus:text-xs peer-focus:text-gray-400 
-                   peer-valid:top-0 peer-valid:text-xs peer-valid:text-gray-400"
+        className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-500 transition-all duration-200 
+                   peer-focus:top-0 peer-focus:text-xs peer-focus:text-gray-500 
+                   peer-valid:top-0 peer-valid:text-xs peer-valid:text-gray-500"
       >
         Date of Birth
       </label>
