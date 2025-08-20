@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import AmountSelector from '../components/AmountSelector';
 import FormFields from '../components/FormFields';
-import ThankYou from "../components/ThankYou";
 import axios from 'axios';
 import { IoIosArrowBack, IoIosArrowDown } from 'react-icons/io';
 import { FaRupeeSign } from 'react-icons/fa';
@@ -13,7 +12,7 @@ const Form = () => {
   const [customAmount, setCustomAmount] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
-  const [showConfirmExit, setShowConfirmExit] = useState(false); // NEW
+  const [showConfirmation, setShowConfirmation] = useState(false); // NEW
   const [searchParams] = useSearchParams();
   const refName = searchParams.get("ref");
 
@@ -129,20 +128,6 @@ const Form = () => {
     }
   };
 
-  // --- New Handlers for Confirmation ---
-  const handleBackClick = () => {
-    setShowConfirmExit(true);
-  };
-
-  const handleConfirmYes = () => {
-    // Exit logic here
-    window.location.href = "/"; // Example: go back to homepage
-  };
-
-  const handleConfirmNo = () => {
-    setShowConfirmExit(false);
-  };
-
   return (
     <div className="relative min-h-screen w-full">
       {/* Background iframe */}
@@ -155,95 +140,117 @@ const Form = () => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/30 z-10"></div>
 
-      {/* Form / Confirmation */}
+      {/* Form container */}
       <div className="relative z-20 flex justify-center items-center min-h-screen px-4 py-10">
-        {!showConfirmExit ? (
-          <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 animate-fade-in-up">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-4 border-b pb-3">
-              <button
-                className="text-[#00B5AD] text-xl transition-transform duration-300 hover:scale-110"
-                onClick={handleBackClick} // Updated
-              >
-                <IoIosArrowBack />
-              </button>
-              <h2 className="text-[#00B5AD] font-semibold text-base">Choose a contribution amount</h2>
-              <button className="text-[#00B5AD] text-lg flex items-center gap-1 transition-transform duration-300 hover:scale-110">
-                <FaRupeeSign className="text-sm" />
-                <IoIosArrowDown className="text-sm" />
-              </button>
-            </div>
+        <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 animate-fade-in-up">
 
-            {/* Hint */}
-            <p className="text-center text-sm text-gray-500 mb-4 animate-fade-in">
-              Most Contributors give around{' '}
-              <span className="text-[#00B5AD] font-semibold">₹2500</span>
-            </p>
-
-            {/* Amount Selector */}
-            <AmountSelector
-              presetAmounts={[1000, 2500, 4000]}
-              amount={amount}
-              setAmount={setAmount}
-              customAmount={customAmount}
-              setCustomAmount={setCustomAmount}
-            />
-
-            {/* Form Fields */}
-            <FormFields
-              formData={formData}
-              onChange={handleFormChange}
-              submitted={submitted}
-            />
-
-            {/* Success Message */}
-            {showThankYou && (
-              <div className="p-3 mt-4 text-center text-green-700 font-semibold bg-green-100 border border-green-300 rounded-md animate-pulse">
-                ✅ Payment successful. Redirecting...
-              </div>
-            )}
-
-            {/* Submit Button */}
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4 border-b pb-3">
             <button
-              type="button"
-              className="w-full bg-[#00B5AD] text-white font-semibold py-3 mt-4 rounded-full hover:bg-[#009C96] transition duration-300 hover:shadow-lg active:scale-95"
-              onClick={handleSubmit}
+              className="text-[#00B5AD] text-xl transition-transform duration-300 hover:scale-110"
+              onClick={() => setShowConfirmation(true)} // NEW
             >
-              Proceed To Contribute ₹{baseAmount}
+              <IoIosArrowBack />
             </button>
-
-            {/* Footer */}
-            <p className="text-xs text-center text-gray-400 mt-4">
-              By continuing, you agree to our{' '}
-              <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Terms of Service</span> and{' '}
-              <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Privacy Policy</span>
-            </p>
+            <h2 className="text-[#00B5AD] font-semibold text-base">Choose a contribution amount</h2>
+            <button className="text-[#00B5AD] text-lg flex items-center gap-1 transition-transform duration-300 hover:scale-110">
+              <FaRupeeSign className="text-sm" />
+              <IoIosArrowDown className="text-sm" />
+            </button>
           </div>
-        ) : (
-          // --- Confirmation UI ---
-          <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 text-center animate-fade-in-up">
-            <p className="text-lg font-semibold mb-6">
-              Are you sure you want to leave this page?
+
+          {/* Hint */}
+          <p className="text-center text-sm text-gray-500 mb-4 animate-fade-in">
+            Most Contributors give around{' '}
+            <span className="text-[#00B5AD] font-semibold">₹2500</span>
+          </p>
+
+          {/* Amount Selector */}
+          <AmountSelector
+            presetAmounts={[1000, 2500, 4000]}
+            amount={amount}
+            setAmount={setAmount}
+            customAmount={customAmount}
+            setCustomAmount={setCustomAmount}
+          />
+
+          {/* Form Fields */}
+          <FormFields
+            formData={formData}
+            onChange={handleFormChange}
+            submitted={submitted}
+          />
+
+          {/* Success Message */}
+          {showThankYou && (
+            <div className="p-3 mt-4 text-center text-green-700 font-semibold bg-green-100 border border-green-300 rounded-md animate-pulse">
+              ✅ Payment successful. Redirecting...
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="button"
+            className="w-full bg-[#00B5AD] text-white font-semibold py-3 mt-4 rounded-full hover:bg-[#009C96] transition duration-300 hover:shadow-lg active:scale-95"
+            onClick={handleSubmit}
+          >
+            Proceed To Contribute ₹{baseAmount}
+          </button>
+
+          {/* Footer */}
+          <p className="text-xs text-center text-gray-400 mt-4">
+            By continuing, you agree to our{' '}
+            <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Terms of Service</span> and{' '}
+            <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Privacy Policy</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Confirmation Overlay */}
+      {showConfirmation && (
+        <div className="absolute inset-0 z-40 flex justify-center items-center bg-black/50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center animate-fade-in-up">
+            <svg
+              className="mx-auto mb-4 w-16 h-16 text-[#00B5AD]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V7a2 2 0 012-2h5l5 5v9a2 2 0 01-2 2z"
+              />
+            </svg>
+            <p className="text-gray-700 mb-6">
+              <strong>Please don’t go yet!</strong> <br />
+              Just your small donation can help one-year students with study, stationery, or living expenses. <br />
+              Your contribution can make a difference.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col gap-3">
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                onClick={handleConfirmYes}
+                className="w-full bg-[#00B5AD] text-white font-semibold py-2 rounded-lg hover:bg-[#009C96] transition"
+                onClick={() => setShowConfirmation(false)}
               >
-                Yes
+                Yes, I will help
               </button>
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                onClick={handleConfirmNo}
+                className="w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
+                onClick={() => {
+                  window.location.href = "https://unessafoundation.org/donate/";
+                }}
               >
-                No
+                Sorry, not today
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Form;
+
