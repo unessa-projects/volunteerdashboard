@@ -235,7 +235,7 @@ Terms and conditions
                 Yes, I will help
               </button>
               <button
-                className="w-full  text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
+                className="w-full  text-[#696969] font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
                 onClick={() => {
                   window.location.href = "https://unessafoundation.org/donate/";
                 }}
