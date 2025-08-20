@@ -11,20 +11,25 @@ import {
   FaIdCard,
   FaBirthdayCake,
 } from "react-icons/fa";
+
 const countryOptions = [
   { code: "+91", flag: "https://flagcdn.com/w40/in.png" },
   { code: "+1", flag: "https://flagcdn.com/w40/us.png" },
   { code: "+44", flag: "https://flagcdn.com/w40/gb.png" },
   { code: "+971", flag: "https://flagcdn.com/w40/ae.png" },
 ];
+
 const FormFields = ({ formData, onChange, submitted }) => {
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone) => /^[6-9]\d{9}$/.test(phone);
+
   const isNameInvalid = formData.name.trim() === "";
   const isEmailInvalid = !validateEmail(formData.email);
   const isPhoneInvalid = !validatePhone(formData.phone);
+
   const [selectedCountry, setSelectedCountry] = useState(countryOptions[0]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <div className="space-y-4 text-sm">
       {/* Name Field */}
@@ -48,19 +53,8 @@ const FormFields = ({ formData, onChange, submitted }) => {
         {submitted && isNameInvalid && (
           <p className="text-xs text-red-500 mt-1">Field Required</p>
         )}
-        {/* Tax Exemption Checkbox */}
-        <div className="flex items-center gap-2 mt-2">
-          <input
-            type="checkbox"
-            checked={formData.taxExemption}
-            onChange={(e) => onChange("taxExemption", e.target.checked)}
-            className="accent-red-500"
-          />
-          <label className="text-gray-600 text-xs">
-            Do you want to receive tax exemption?
-          </label>
-        </div>
       </div>
+
       {/* Email Field */}
       <div className="relative">
         <input
@@ -83,6 +77,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
           <p className="text-xs text-red-500 mt-1">Invalid Email</p>
         )}
       </div>
+
       {/* Phone Field */}
       <div className="relative">
         <div
@@ -96,7 +91,9 @@ const FormFields = ({ formData, onChange, submitted }) => {
             onClick={() => setDropdownOpen((prev) => !prev)}
           >
             <img src={selectedCountry.flag} alt="flag" className="w-5 h-4" />
-            <span className="text-sm text-gray-700">{selectedCountry.code}</span>
+            <span className="text-sm text-gray-700">
+              {selectedCountry.code}
+            </span>
             <span className="text-[8px]">▼</span>
             {dropdownOpen && (
               <div className="absolute z-10 top-full left-0 w-32 bg-white border shadow rounded mt-1">
@@ -116,6 +113,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
               </div>
             )}
           </div>
+
           {/* Phone Number Input */}
           <input
             type="tel"
@@ -135,9 +133,37 @@ const FormFields = ({ formData, onChange, submitted }) => {
           />
         </div>
         {submitted && isPhoneInvalid && (
-          <p className="text-xs text-red-500 mt-1">Please enter a valid number</p>
+          <p className="text-xs text-red-500 mt-1">
+            Please enter a valid number
+          </p>
         )}
       </div>
+
+      {/* Tax Exemption Checkbox (moved here) */}
+      <div className="flex items-center gap-2 mt-2">
+        <input
+          type="checkbox"
+          checked={formData.taxExemption}
+          onChange={(e) => onChange("taxExemption", e.target.checked)}
+          className="accent-red-500"
+        />
+        <label className="text-gray-600 text-xs">
+          Do you want to receive tax exemption?
+        </label>
+      </div>
+
+      {/* Reference Name Field (always visible) */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Reference Name"
+          value={formData.referenceName || ""}
+          onChange={(e) => onChange("referenceName", e.target.value)}
+          className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+        />
+        <FaUser className="absolute right-2 top-2 text-gray-400" />
+      </div>
+
       {/* Normal Address Field */}
       <div className="relative">
         <input
@@ -149,6 +175,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
         />
         <FaMapMarkerAlt className="absolute right-2 top-2 text-gray-400" />
       </div>
+
       {/* Extra Fields for Tax Exemption */}
       {formData.taxExemption && (
         <div className="space-y-4 mt-4">
@@ -227,4 +254,5 @@ const FormFields = ({ formData, onChange, submitted }) => {
     </div>
   );
 };
+
 export default FormFields;
