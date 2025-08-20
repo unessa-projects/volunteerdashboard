@@ -218,24 +218,14 @@ Terms and conditions
       {showConfirmation && (
         <div className="absolute inset-0 z-40 flex justify-center items-center bg-black/50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center animate-fade-in-up">
-            <svg
-              className="mx-auto mb-4 w-16 h-16 text-[#00B5AD]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V7a2 2 0 012-2h5l5 5v9a2 2 0 01-2 2z"
-              />
-            </svg>
+          <img 
+  src="/heart.png" 
+  alt="Heart Icon" 
+  className="mx-auto mb-4 w-16 h-16" 
+/>
             <p className="text-gray-700 mb-6">
               <strong>Please don’t go yet!</strong> <br />
-              Just your small donation can help one-year students with study, stationery, or living expenses. <br />
-              Your contribution can make a difference.
+              With just ₹300, you can gift Sneha the chance to learn, grow, and dream through education . <br />
             </p>
             <div className="flex flex-col gap-3">
               <button
@@ -245,7 +235,7 @@ Terms and conditions
                 Yes, I will help
               </button>
               <button
-                className="w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
+                className="w-full  text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
                 onClick={() => {
                   window.location.href = "https://unessafoundation.org/donate/";
                 }}
