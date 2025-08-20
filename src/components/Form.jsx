@@ -96,7 +96,8 @@ const Form = () => {
             setShowThankYou(true);
             setTimeout(() => {
               setShowThankYou(false);
-              window.location.href = "https://unessafoundation.org/donor-profile-form/";
+              window.location.href = " https://unessafoundation.org/donor-profile-form/
+";
             }, 2000);
           } catch (err) {
             console.error('❌ Payment Verification Failed:', err);
