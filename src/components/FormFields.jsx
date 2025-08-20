@@ -241,13 +241,13 @@ const FormFields = ({ formData, onChange, submitted }) => {
             />
             <FaIdCard className="absolute right-2 top-2 text-gray-400" />
           </div>
-          <div className="relative">
+          <div className="relative w-full">
   <input
     type="date"
     value={formData.dob || ""}
     onChange={(e) => onChange("dob", e.target.value)}
-    className="peer w-full border-b py-2 pr-8 outline-none border-gray-300 placeholder-transparent"
-    placeholder=""
+    className="peer w-full border-b py-2 pr-8 outline-none border-gray-300
+               [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-0"
   />
   <label
     className="absolute left-0 top-2 text-gray-400 transition-all 
@@ -259,6 +259,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
   </label>
   <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
 </div>
+
         </div>
       )}
     </div>
