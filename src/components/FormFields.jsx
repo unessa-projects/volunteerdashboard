@@ -44,15 +44,15 @@ const FormFields = ({ formData, onChange, submitted }) => {
           <p className="text-xs text-red-500 mt-1">Field Required</p>
         )}
         <div className="flex items-center gap-2 mt-2">
-          {/* <input
+          <input
             type="checkbox"
             checked={formData.anonymous}
             onChange={(e) => onChange('anonymous', e.target.checked)}
             className="accent-red-500"
-          /> */}
-          {/* <label className="text-gray-600 text-xs">
+          />
+          <label className="text-gray-600 text-xs">
             Make my contribution anonymous
-          </label> */}
+          </label>
         </div>
       </div>
 
