@@ -234,14 +234,15 @@ Terms and conditions
               >
                 Yes, I will help
               </button>
-              <button
-                className="w-full  text-[#696969] font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
-                onClick={() => {
-                  window.location.href = "https://unessafoundation.org/donate/";
-                }}
-              >
-                Sorry, not today
-              </button>
+             <button
+  className="w-full text-[#808080] font-semibold py-2 rounded-lg hover:bg-gray-300 transition"
+  onClick={() => {
+    window.location.href = "https://unessafoundation.org/donate/";
+  }}
+>
+  Sorry, not today
+</button>
+
             </div>
           </div>
         </div>
