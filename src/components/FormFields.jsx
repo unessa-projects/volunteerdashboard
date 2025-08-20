@@ -246,7 +246,10 @@ const FormFields = ({ formData, onChange, submitted }) => {
     type="text"
     placeholder="Date of Birth"
     value={formData.dob || ""}
-    onFocus={(e) => (e.target.type = "date")}
+    onFocus={(e) => {
+      e.target.type = "date";
+      e.target.showPicker?.(); // <-- directly opens the date picker (supported in modern browsers)
+    }}
     onBlur={(e) => {
       if (!formData.dob) e.target.type = "text";
     }}
