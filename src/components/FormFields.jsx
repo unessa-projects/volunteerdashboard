@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
+import React, { useState } from "react";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 const countryOptions = [
-  { code: '', flag: 'https://flagcdn.com/w40/in.png' },
-  { code: '', flag: 'https://flagcdn.com/w40/us.png' },
-  { code: '', flag: 'https://flagcdn.com/w40/gb.png' },
-  { code: '', flag: 'https://flagcdn.com/w40/ae.png' },
+  { code: "+91", flag: "https://flagcdn.com/w40/in.png" },
+  { code: "+1", flag: "https://flagcdn.com/w40/us.png" },
+  { code: "+44", flag: "https://flagcdn.com/w40/gb.png" },
+  { code: "+971", flag: "https://flagcdn.com/w40/ae.png" },
 ];
 
 const FormFields = ({ formData, onChange, submitted }) => {
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone) => /^[6-9]\d{9}$/.test(phone);
 
-  const isNameInvalid = formData.name.trim() === '';
+  const isNameInvalid = formData.name.trim() === "";
   const isEmailInvalid = !validateEmail(formData.email);
   const isPhoneInvalid = !validatePhone(formData.phone);
 
@@ -28,30 +32,32 @@ const FormFields = ({ formData, onChange, submitted }) => {
           type="text"
           placeholder="Name *"
           value={formData.name}
-          onChange={(e) => onChange('name', e.target.value)}
+          onChange={(e) => onChange("name", e.target.value)}
           className={`w-full border-b py-2 pr-10 outline-none ${
             submitted && isNameInvalid
-              ? 'border-red-500 placeholder:text-red-500'
-              : 'border-gray-300'
+              ? "border-red-500 placeholder:text-red-500"
+              : "border-gray-300"
           }`}
         />
         <FaUser
           className={`absolute right-2 top-5 transform -translate-y-1/2 ${
-            submitted && isNameInvalid ? 'text-red-500' : 'text-gray-400'
+            submitted && isNameInvalid ? "text-red-500" : "text-gray-400"
           }`}
         />
         {submitted && isNameInvalid && (
           <p className="text-xs text-red-500 mt-1">Field Required</p>
         )}
+
+        {/* Tax Exemption Checkbox */}
         <div className="flex items-center gap-2 mt-2">
           <input
             type="checkbox"
-            checked={formData.anonymous}
-            onChange={(e) => onChange('anonymous', e.target.checked)}
+            checked={formData.taxExemption}
+            onChange={(e) => onChange("taxExemption", e.target.checked)}
             className="accent-red-500"
           />
           <label className="text-gray-600 text-xs">
-            Make my contribution anonymous
+            Do you want to receive tax exemption?
           </label>
         </div>
       </div>
@@ -62,16 +68,16 @@ const FormFields = ({ formData, onChange, submitted }) => {
           type="email"
           placeholder="Email ID *"
           value={formData.email}
-          onChange={(e) => onChange('email', e.target.value)}
+          onChange={(e) => onChange("email", e.target.value)}
           className={`w-full border-b py-2 pr-8 outline-none ${
             submitted && isEmailInvalid
-              ? 'border-red-500 placeholder:text-red-500'
-              : 'border-gray-300'
+              ? "border-red-500 placeholder:text-red-500"
+              : "border-gray-300"
           }`}
         />
         <FaEnvelope
           className={`absolute right-2 top-5 transform -translate-y-1/2 ${
-            submitted && isEmailInvalid ? 'text-red-500' : 'text-gray-400'
+            submitted && isEmailInvalid ? "text-red-500" : "text-gray-400"
           }`}
         />
         {submitted && isEmailInvalid && (
@@ -83,7 +89,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
       <div className="relative">
         <div
           className={`flex items-center border-b ${
-            submitted && isPhoneInvalid ? 'border-red-500' : 'border-gray-300'
+            submitted && isPhoneInvalid ? "border-red-500" : "border-gray-300"
           }`}
         >
           {/* Country Code Selector */}
@@ -92,7 +98,9 @@ const FormFields = ({ formData, onChange, submitted }) => {
             onClick={() => setDropdownOpen((prev) => !prev)}
           >
             <img src={selectedCountry.flag} alt="flag" className="w-5 h-4" />
-            <span className="text-sm text-gray-700">{selectedCountry.code}</span>
+            <span className="text-sm text-gray-700">
+              {selectedCountry.code}
+            </span>
             <span className="text-[8px]">▼</span>
 
             {dropdownOpen && (
@@ -104,6 +112,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
                     onClick={() => {
                       setSelectedCountry(opt);
                       setDropdownOpen(false);
+                      onChange("countryCode", opt.code);
                     }}
                   >
                     <img src={opt.flag} alt={opt.code} className="w-5 h-4" />
@@ -119,39 +128,97 @@ const FormFields = ({ formData, onChange, submitted }) => {
             type="tel"
             placeholder="Your Mobile Number *"
             value={formData.phone}
-            onChange={(e) => onChange('phone', e.target.value)}
+            onChange={(e) => onChange("phone", e.target.value)}
             className={`w-full border-b py-2 pr-8 outline-none ${
               submitted && isPhoneInvalid
-                ? 'border-red-500 placeholder:text-red-500'
-                : 'border-gray-300'
+                ? "border-red-500 placeholder:text-red-500"
+                : "border-gray-300"
             }`}
           />
 
           <FaPhoneAlt
             className={`absolute right-2 top-5 transform -translate-y-1/2 ${
-              submitted && isPhoneInvalid ? 'text-red-500' : 'text-gray-400'
+              submitted && isPhoneInvalid ? "text-red-500" : "text-gray-400"
             }`}
           />
         </div>
 
         {submitted && isPhoneInvalid && (
-          <p className="text-xs text-red-500 mt-1">Please enter a valid number</p>
+          <p className="text-xs text-red-500 mt-1">
+            Please enter a valid number
+          </p>
         )}
       </div>
 
-      {/* Address Field */}
+      {/* Normal Address Field */}
       <div className="relative">
         <input
           type="text"
           placeholder="Address *"
           value={formData.address}
-          onChange={(e) => onChange('address', e.target.value)}
+          onChange={(e) => onChange("address", e.target.value)}
           className="w-full border-b py-2 pr-8 outline-none border-gray-300"
         />
         <FaMapMarkerAlt className="absolute right-2 top-2 text-gray-400" />
       </div>
+
+      {/* Extra Fields (if taxExemption checked) */}
+      {formData.taxExemption && (
+        <div className="space-y-3 mt-4 border p-3 rounded-lg bg-gray-50">
+          <input
+            type="text"
+            placeholder="Address Line 1"
+            value={formData.addressLine1 || ""}
+            onChange={(e) => onChange("addressLine1", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="text"
+            placeholder="Address Line 2"
+            value={formData.addressLine2 || ""}
+            onChange={(e) => onChange("addressLine2", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="text"
+            placeholder="City"
+            value={formData.city || ""}
+            onChange={(e) => onChange("city", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="text"
+            placeholder="State"
+            value={formData.state || ""}
+            onChange={(e) => onChange("state", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="text"
+            placeholder="Pincode"
+            value={formData.pincode || ""}
+            onChange={(e) => onChange("pincode", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="text"
+            placeholder="PAN Card"
+            value={formData.panCard || ""}
+            onChange={(e) => onChange("panCard", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+          <input
+            type="date"
+            placeholder="Date of Birth"
+            value={formData.dob || ""}
+            onChange={(e) => onChange("dob", e.target.value)}
+            className="w-full border-b py-2 outline-none border-gray-300"
+          />
+        </div>
+      )}
     </div>
   );
 };
 
 export default FormFields;
+
