@@ -242,15 +242,16 @@ const FormFields = ({ formData, onChange, submitted }) => {
             <FaIdCard className="absolute right-2 top-2 text-gray-400" />
           </div>
           <div className="relative">
-            <input
-              type="date"
-              placeholder="Date of Birth"
-              value={formData.dob || ""}
-              onChange={(e) => onChange("dob", e.target.value)}
-              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
-            />
-            <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
-          </div>
+  <label htmlFor="dob-input" className="block text-sm text-gray-500 mb-1">Date of Birth</label>
+  <input
+    id="dob-input"
+    type="date"
+    value={formData.dob || ""}
+    onChange={(e) => onChange("dob", e.target.value)}
+    className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+  />
+  <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
+</div>
         </div>
       )}
     </div>
