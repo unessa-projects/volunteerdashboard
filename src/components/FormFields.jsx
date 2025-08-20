@@ -242,24 +242,15 @@ const FormFields = ({ formData, onChange, submitted }) => {
             <FaIdCard className="absolute right-2 top-2 text-gray-400" />
           </div>
           <div className="relative">
-  <input
-    type="date"
-    id="dob"
-    value={formData.dob || ""}
-    onChange={(e) => onChange("dob", e.target.value)}
-    className="peer w-full border-b py-2 pr-8 outline-none border-gray-300"
-  />
-  <label
-    htmlFor="dob"
-    className="absolute left-0 top-2 text-gray-400 text-sm 
-               peer-focus:-top-3 peer-focus:text-xs peer-focus:text-[#00B5AD] 
-               transition-all"
-  >
-    Date of Birth
-  </label>
-  <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
-</div>
-
+            <input
+              type="date"
+              placeholder="Date of Birth"
+              value={formData.dob || ""}
+              onChange={(e) => onChange("dob", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
+          </div>
         </div>
       )}
     </div>
