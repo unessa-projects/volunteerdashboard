@@ -78,19 +78,16 @@ const FormFields = ({ formData, onChange, submitted }) => {
         )}
       </div>
 
-      {/* Reference Name (when taxExemption checked → show below Email) */}
-      {formData.taxExemption && (
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Reference Name"
-            value={formData.referenceName || ""}
-            onChange={(e) => onChange("referenceName", e.target.value)}
-            className="w-full border-b py-2 pr-8 outline-none border-gray-300"
-          />
-          <FaUser className="absolute right-2 top-2 text-gray-400" />
-        </div>
-      )}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Reference Name"
+          value={formData.referenceName || ""}
+          onChange={(e) => onChange("referenceName", e.target.value)}
+          className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+        />
+        <FaUser className="absolute right-2 top-2 text-gray-400" />
+      </div>
 
       {/* Phone Field */}
       <div className="relative">
@@ -153,7 +150,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
         )}
       </div>
 
-      {/* Tax Exemption Checkbox */}
+      {/* Tax Exemption Checkbox (moved here) */}
       <div className="flex items-center gap-2 mt-2">
         <input
           type="checkbox"
@@ -166,19 +163,8 @@ const FormFields = ({ formData, onChange, submitted }) => {
         </label>
       </div>
 
-      {/* Reference Name (when not ticked → stays before Address) */}
-      {!formData.taxExemption && (
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Reference Name"
-            value={formData.referenceName || ""}
-            onChange={(e) => onChange("referenceName", e.target.value)}
-            className="w-full border-b py-2 pr-8 outline-none border-gray-300"
-          />
-          <FaUser className="absolute right-2 top-2 text-gray-400" />
-        </div>
-      )}
+      {/* Reference Name Field (always visible) */}
+   
 
       {/* Normal Address Field */}
       <div className="relative">
