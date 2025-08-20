@@ -207,7 +207,7 @@ const Form = () => {
   rel="noopener noreferrer"
   className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition"
 >
-  Terms of Service
+Terms and conditions
 </a>
           </p>
         </div>
