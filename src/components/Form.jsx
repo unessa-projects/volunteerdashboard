@@ -131,14 +131,17 @@ const Form = () => {
   return (
     <div className="relative min-h-screen w-full">
       {/* Background iframe */}
-      <iframe
-        src="https://unessafoundation.org/donate/"
-        className="absolute top-0 left-0 w-full h-full border-none"
-        title="Donation Background"
-      ></iframe>
+     <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+  <iframe
+    src="https://unessafoundation.org/donate/"
+    className="w-full h-full border-none filter blur-md"
+    title="Donation Background"
+  ></iframe>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/30 z-10"></div>
+  {/* Dark overlay for contrast */}
+  <div className="absolute inset-0 bg-black/30"></div>
+</div>
+
 
       {/* Form container */}
       <div className="relative z-20 flex justify-center items-center min-h-screen px-4 py-10">
