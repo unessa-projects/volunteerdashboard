@@ -4,6 +4,12 @@ import {
   FaEnvelope,
   FaPhoneAlt,
   FaMapMarkerAlt,
+  FaRegAddressCard,
+  FaCity,
+  FaGlobeAsia,
+  FaHashtag,
+  FaIdCard,
+  FaBirthdayCake,
 } from "react-icons/fa";
 
 const countryOptions = [
@@ -98,9 +104,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
             onClick={() => setDropdownOpen((prev) => !prev)}
           >
             <img src={selectedCountry.flag} alt="flag" className="w-5 h-4" />
-            <span className="text-sm text-gray-700">
-              {selectedCountry.code}
-            </span>
+            <span className="text-sm text-gray-700">{selectedCountry.code}</span>
             <span className="text-[8px]">▼</span>
 
             {dropdownOpen && (
@@ -112,7 +116,6 @@ const FormFields = ({ formData, onChange, submitted }) => {
                     onClick={() => {
                       setSelectedCountry(opt);
                       setDropdownOpen(false);
-                      onChange("countryCode", opt.code);
                     }}
                   >
                     <img src={opt.flag} alt={opt.code} className="w-5 h-4" />
@@ -144,9 +147,7 @@ const FormFields = ({ formData, onChange, submitted }) => {
         </div>
 
         {submitted && isPhoneInvalid && (
-          <p className="text-xs text-red-500 mt-1">
-            Please enter a valid number
-          </p>
+          <p className="text-xs text-red-500 mt-1">Please enter a valid number</p>
         )}
       </div>
 
@@ -162,58 +163,85 @@ const FormFields = ({ formData, onChange, submitted }) => {
         <FaMapMarkerAlt className="absolute right-2 top-2 text-gray-400" />
       </div>
 
-      {/* Extra Fields (if taxExemption checked) */}
+      {/* Extra Fields for Tax Exemption */}
       {formData.taxExemption && (
-        <div className="space-y-3 mt-4 border p-3 rounded-lg bg-gray-50">
-          <input
-            type="text"
-            placeholder="Address Line 1"
-            value={formData.addressLine1 || ""}
-            onChange={(e) => onChange("addressLine1", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="Address Line 2"
-            value={formData.addressLine2 || ""}
-            onChange={(e) => onChange("addressLine2", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="City"
-            value={formData.city || ""}
-            onChange={(e) => onChange("city", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="State"
-            value={formData.state || ""}
-            onChange={(e) => onChange("state", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="Pincode"
-            value={formData.pincode || ""}
-            onChange={(e) => onChange("pincode", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="PAN Card"
-            value={formData.panCard || ""}
-            onChange={(e) => onChange("panCard", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
-          <input
-            type="date"
-            placeholder="Date of Birth"
-            value={formData.dob || ""}
-            onChange={(e) => onChange("dob", e.target.value)}
-            className="w-full border-b py-2 outline-none border-gray-300"
-          />
+        <div className="space-y-4 mt-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Address Line 1"
+              value={formData.addressLine1 || ""}
+              onChange={(e) => onChange("addressLine1", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaRegAddressCard className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Address Line 2"
+              value={formData.addressLine2 || ""}
+              onChange={(e) => onChange("addressLine2", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaRegAddressCard className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="City"
+              value={formData.city || ""}
+              onChange={(e) => onChange("city", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaCity className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="State"
+              value={formData.state || ""}
+              onChange={(e) => onChange("state", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaGlobeAsia className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Pin Code"
+              value={formData.pinCode || ""}
+              onChange={(e) => onChange("pinCode", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaHashtag className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="PAN Card"
+              value={formData.panCard || ""}
+              onChange={(e) => onChange("panCard", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaIdCard className="absolute right-2 top-2 text-gray-400" />
+          </div>
+
+          <div className="relative">
+            <input
+              type="date"
+              placeholder="Date of Birth"
+              value={formData.dob || ""}
+              onChange={(e) => onChange("dob", e.target.value)}
+              className="w-full border-b py-2 pr-8 outline-none border-gray-300"
+            />
+            <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
+          </div>
         </div>
       )}
     </div>
@@ -221,4 +249,5 @@ const FormFields = ({ formData, onChange, submitted }) => {
 };
 
 export default FormFields;
+
 
