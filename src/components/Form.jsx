@@ -131,15 +131,15 @@ const Form = () => {
   return (
     <div className="relative min-h-screen w-full">
       {/* Background iframe */}
-     <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
   <iframe
     src="https://unessafoundation.org/donate/"
     className="w-full h-full border-none filter blur-md"
     title="Donation Background"
   ></iframe>
-
   {/* Dark overlay for contrast */}
   <div className="absolute inset-0 bg-black/30"></div>
+</div>
 </div>
 
 
