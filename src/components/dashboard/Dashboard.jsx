@@ -11,17 +11,27 @@ const Dashboard = () => {
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    
-    const savedStartDate = localStorage.getItem("startDate");
-    let startDate = savedStartDate ? new Date(savedStartDate) : new Date();
-    if (!savedStartDate) localStorage.setItem("startDate", startDate.toISOString());
+    window.addEventListener("resize", handleResize);
 
-    const today = new Date();
-    const diffInDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-    setDaysLeft(Math.max(1, 30 - diffInDays));
+    // ✅ Fixed official start date (e.g., internship started on 20 Aug 2025)
+    const startDate = new Date(Date.UTC(2025, 7, 20)); // months are 0-based → 7 = August
+    const totalDays = 30; // internship duration
 
-    return () => window.removeEventListener('resize', handleResize);
+    // ✅ Today in UTC (ignores device timezone)
+    const now = new Date();
+    const todayUTC = Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate()
+    );
+
+    const diffInDays = Math.floor(
+      (todayUTC - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    setDaysLeft(Math.max(0, totalDays - diffInDays));
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Card data for better maintainability
