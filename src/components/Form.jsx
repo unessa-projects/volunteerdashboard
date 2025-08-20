@@ -143,6 +143,7 @@ const Form = () => {
 </div>
 
 
+
       {/* Form container */}
       <div className="relative z-20 flex justify-center items-center min-h-screen px-4 py-10">
         <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 animate-fade-in-up">
