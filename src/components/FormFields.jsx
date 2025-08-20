@@ -241,17 +241,26 @@ const FormFields = ({ formData, onChange, submitted }) => {
             />
             <FaIdCard className="absolute right-2 top-2 text-gray-400" />
           </div>
-          <div className="relative">
-  <label htmlFor="dob-input" className="block text-sm text-gray-500 mb-1">Date of Birth</label>
-  <input
-    id="dob-input"
-    type="date"
-    value={formData.dob || ""}
-    onChange={(e) => onChange("dob", e.target.value)}
-    className="w-full border-b py-2 pr-8 outline-none border-gray-300"
-  />
-  <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
-</div>
+          <div className="relative mt-6 group"> {/* Add 'group' class for Tailwind */}
+      <input
+        id="dob-input"
+        type="date"
+        value={formData.dob || ""}
+        onChange={(e) => onChange("dob", e.target.value)}
+        // Added peer class
+        className="peer w-full border-b py-2 pr-8 outline-none border-gray-300"
+      />
+      <label 
+        htmlFor="dob-input" 
+        // Positioned absolute and styled as a placeholder
+        className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-500 transition-all duration-200 
+                   peer-focus:top-0 peer-focus:text-xs peer-focus:text-blue-500 
+                   peer-valid:top-0 peer-valid:text-xs peer-valid:text-blue-500"
+      >
+        Date of Birth
+      </label>
+      <FaBirthdayCake className="absolute right-2 top-2 text-gray-400" />
+    </div>
         </div>
       )}
     </div>
