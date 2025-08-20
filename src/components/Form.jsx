@@ -145,16 +145,20 @@ const Form = () => {
         <div className="w-full max-w-md bg-white shadow-xl rounded-lg border border-gray-200 p-6 animate-fade-in-up">
 
           {/* Header */}
-          <div className="flex justify-between items-center mb-4 border-b pb-3">
-            <button
-              className="text-[#00B5AD] text-xl transition-transform duration-300 hover:scale-110"
-              onClick={() => setShowConfirmation(true)} // NEW
-            >
-              <IoIosArrowBack />
-            </button>
-            <h2 className="text-[#00B5AD] font-semibold text-base">Choose a contribution amount</h2>
-          
-          </div>
+          <div className="relative flex items-center mb-4 border-b pb-3">
+  {/* Back button (absolute left) */}
+  <button
+    className="absolute left-0 text-[#00B5AD] text-xl transition-transform duration-300 hover:scale-110"
+    onClick={() => setShowConfirmation(true)}
+  >
+    <IoIosArrowBack />
+  </button>
+
+  {/* Center heading */}
+  <h2 className="mx-auto text-[#00B5AD] font-semibold text-base">
+    Choose a contribution amount
+  </h2>
+</div>
 
           {/* Hint */}
           <p className="text-center text-sm text-gray-500 mb-4 animate-fade-in">
@@ -197,8 +201,14 @@ const Form = () => {
           {/* Footer */}
           <p className="text-xs text-center text-gray-400 mt-4">
             By continuing, you agree to our{' '}
-            <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Terms of Service</span> and{' '}
-            <span className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition">Privacy Policy</span>
+            <a
+  href="https://unessafoundation.org/terms-and-conditions/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-[#00B5AD] underline cursor-pointer hover:text-[#009C96] transition"
+>
+  Terms of Service
+</a>
           </p>
         </div>
       </div>
