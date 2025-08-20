@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AmountSelector from '../components/AmountSelector';
 import FormFields from '../components/FormFields';
 import axios from 'axios';
-import { IoIosArrowBack, IoIosArrowDown } from 'react-icons/io';
-import { FaRupeeSign } from 'react-icons/fa';
+import { IoIosArrowBack, } from 'react-icons/io';
+
 
 const Form = () => {
   const navigate = useNavigate();
@@ -153,10 +153,7 @@ const Form = () => {
               <IoIosArrowBack />
             </button>
             <h2 className="text-[#00B5AD] font-semibold text-base">Choose a contribution amount</h2>
-            <button className="text-[#00B5AD] text-lg flex items-center gap-1 transition-transform duration-300 hover:scale-110">
-              <FaRupeeSign className="text-sm" />
-              <IoIosArrowDown className="text-sm" />
-            </button>
+          
           </div>
 
           {/* Hint */}
