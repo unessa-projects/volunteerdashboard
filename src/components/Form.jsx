@@ -140,9 +140,6 @@ const Form = () => {
   {/* Dark overlay for contrast */}
   <div className="absolute inset-0 bg-black/30"></div>
 </div>
-ch
-
-
 
       {/* Form container */}
       <div className="relative z-20 flex justify-center items-center min-h-screen px-4 py-10">
